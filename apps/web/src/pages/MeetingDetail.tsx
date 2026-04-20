@@ -1,0 +1,691 @@
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getMeeting, updateMeeting, generateMOM, editMOM, approveMOM } from "@/lib/api";
+import { ActionItem, Meeting } from "@/lib/types";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { StatusBadge, TagBadge } from "@/components/StatusBadge";
+import { Progress } from "@/components/ui/progress";
+import {
+  ArrowLeft,
+  Clock,
+  Users,
+  FileText,
+  Play,
+  CheckCircle2,
+  Loader2,
+  Video,
+  Mic,
+  MicOff,
+  MonitorUp,
+  PhoneOff,
+  Download,
+  Eye,
+  ShieldCheck,
+  PencilLine,
+} from "lucide-react";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import { createMomPdfBlob, downloadMomFile } from "@/lib/mom-export";
+import { getCurrentUserDisplayName } from "@/lib/current-user";
+
+const MEETING_DURATION_SECONDS = 20;
+
+function LiveMeetingScreen({ meeting, onMeetingEnd }: { meeting: Meeting; onMeetingEnd: () => void }) {
+  const [elapsed, setElapsed] = useState(0);
+  const [micOn, setMicOn] = useState(true);
+  const timerRef = useRef<ReturnType<typeof setInterval>>();
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setElapsed((prev) => {
+        if (prev + 1 >= MEETING_DURATION_SECONDS) {
+          clearInterval(timerRef.current);
+          setTimeout(onMeetingEnd, 300);
+          return MEETING_DURATION_SECONDS;
+        }
+        return prev + 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [onMeetingEnd]);
+
+  const progress = (elapsed / MEETING_DURATION_SECONDS) * 100;
+  const remaining = MEETING_DURATION_SECONDS - elapsed;
+  const mins = Math.floor(remaining / 60);
+  const secs = remaining % 60;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="fixed inset-0 z-50 bg-primary flex flex-col"
+    >
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-sidebar-border">
+        <div className="flex items-center gap-3">
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
+          </span>
+          <span className="text-primary-foreground font-heading font-semibold text-sm">LIVE</span>
+          <span className="text-primary-foreground/60 text-sm ml-2">{meeting.title}</span>
+        </div>
+        <div className="text-primary-foreground/80 font-mono text-sm">
+          {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")} remaining
+        </div>
+      </div>
+
+      {/* Main area - simulated video grid */}
+      <div className="flex-1 p-6 flex items-center justify-center">
+        <div className="grid grid-cols-2 gap-4 max-w-3xl w-full">
+          {meeting.stakeholders.slice(0, 4).map((s, i) => (
+            <div
+              key={i}
+              className="aspect-video rounded-xl bg-sidebar-accent flex items-center justify-center relative overflow-hidden"
+            >
+              <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center text-2xl font-heading font-bold text-secondary">
+                {s.name.split(" ").map((n) => n[0]).join("")}
+              </div>
+              <span className="absolute bottom-3 left-3 text-xs text-primary-foreground/70 bg-primary/60 px-2 py-0.5 rounded">
+                {s.name}
+              </span>
+            </div>
+          ))}
+          {/* You tile */}
+          <div className="aspect-video rounded-xl bg-sidebar-accent flex items-center justify-center relative overflow-hidden border-2 border-secondary/40">
+            <div className="w-16 h-16 rounded-full bg-secondary/30 flex items-center justify-center text-2xl font-heading font-bold text-secondary">
+              You
+            </div>
+            <span className="absolute bottom-3 left-3 text-xs text-primary-foreground/70 bg-primary/60 px-2 py-0.5 rounded">
+              You (Host)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="px-6">
+        <Progress value={progress} className="h-1.5 bg-sidebar-accent [&>div]:bg-secondary" />
+      </div>
+
+      {/* Bottom controls */}
+      <div className="flex items-center justify-center gap-4 py-5">
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full h-12 w-12 border-sidebar-border text-primary-foreground hover:bg-sidebar-accent"
+          onClick={() => setMicOn(!micOn)}
+        >
+          {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full h-12 w-12 border-sidebar-border text-primary-foreground hover:bg-sidebar-accent"
+        >
+          <Video className="h-5 w-5" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full h-12 w-12 border-sidebar-border text-primary-foreground hover:bg-sidebar-accent"
+        >
+          <MonitorUp className="h-5 w-5" />
+        </Button>
+        <Button
+          size="icon"
+          className="rounded-full h-12 w-12 bg-destructive hover:bg-destructive/90"
+          onClick={onMeetingEnd}
+        >
+          <PhoneOff className="h-5 w-5" />
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
+
+export default function MeetingDetail() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [meeting, setMeeting] = useState<Meeting | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notes, setNotes] = useState("");
+  const [generatingMom, setGeneratingMom] = useState(false);
+  const [inLiveMeeting, setInLiveMeeting] = useState(false);
+  const [postMeetingProcessing, setPostMeetingProcessing] = useState(false);
+  const [downloadingFormat, setDownloadingFormat] = useState<"docx" | "pdf" | "txt" | "json" | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [editingMom, setEditingMom] = useState(false);
+  const [approvingMom, setApprovingMom] = useState(false);
+  const [momKeyPointsDraft, setMomKeyPointsDraft] = useState("");
+  const [momActionItemsDraft, setMomActionItemsDraft] = useState("");
+
+  useEffect(() => {
+    if (!id) return;
+    getMeeting(id).then((m) => {
+      if (m) { setMeeting(m); setNotes(m.notes); }
+      setLoading(false);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  useEffect(() => {
+    if (!meeting?.mom) {
+      setMomKeyPointsDraft("");
+      setMomActionItemsDraft("");
+      return;
+    }
+
+    setMomKeyPointsDraft(meeting.mom.keyPoints.join("\n"));
+    setMomActionItemsDraft(
+      meeting.mom.actionItems.map((item) => `${item.task} | ${item.assignee} | ${item.deadline}`).join("\n"),
+    );
+  }, [meeting?.mom]);
+
+  const saveNotes = async () => {
+    if (!meeting) return;
+    const updated = await updateMeeting(meeting.id, { notes });
+    setMeeting(updated);
+    toast.success("Notes saved");
+  };
+
+  const handleStart = async () => {
+    if (!meeting) return;
+    const updated = await updateMeeting(meeting.id, { status: "ongoing" });
+    setMeeting(updated);
+    toast.success("Meeting started");
+  };
+
+  const handleJoin = async () => {
+    if (!meeting) return;
+    await updateMeeting(meeting.id, { status: "ongoing" });
+    setInLiveMeeting(true);
+    toast.success("You joined the meeting");
+  };
+
+  const handleMeetingEnd = useCallback(async () => {
+    if (!meeting) return;
+    setInLiveMeeting(false);
+    setPostMeetingProcessing(true);
+
+    // Mark completed
+    await updateMeeting(meeting.id, { status: "completed" });
+    toast.success("Meeting ended");
+
+    // Generate MOM
+    await new Promise((r) => setTimeout(r, 800));
+    toast.loading("Generating Minutes of Meeting...", { id: "mom-gen" });
+    await generateMOM(meeting.id);
+    toast.dismiss("mom-gen");
+    toast.success("MOM generated successfully!");
+
+    toast.info("MOM is pending Lyrus Life approval before stakeholder sharing.");
+
+    // Refresh meeting data
+    const updated = await getMeeting(meeting.id);
+    if (updated) { setMeeting(updated); setNotes(updated.notes); }
+    setPostMeetingProcessing(false);
+  }, [meeting]);
+
+  const handleComplete = async () => {
+    if (!meeting) return;
+    const updated = await updateMeeting(meeting.id, { status: "completed" });
+    setMeeting(updated);
+    toast.success("Meeting marked as completed");
+  };
+
+  const handleGenerateMOM = async () => {
+    if (!meeting) return;
+    setGeneratingMom(true);
+    await generateMOM(meeting.id);
+    const updated = await getMeeting(meeting.id);
+    if (updated) setMeeting(updated);
+    setGeneratingMom(false);
+    toast.success("MOM generated successfully!");
+  };
+
+  const parseActionItemsDraft = (): ActionItem[] => {
+    return momActionItemsDraft
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [task = "", assignee = "", deadline = ""] = line.split("|").map((part) => part.trim());
+        return { task, assignee, deadline };
+      })
+      .filter((item) => item.task);
+  };
+
+  const handleSaveMomEdits = async () => {
+    if (!meeting?.mom) return;
+    const keyPoints = momKeyPointsDraft.split("\n").map((p) => p.trim()).filter(Boolean);
+    const actionItems = parseActionItemsDraft();
+
+    if (keyPoints.length === 0) {
+      toast.error("Add at least one key discussion point.");
+      return;
+    }
+
+    if (actionItems.length === 0) {
+      toast.error("Add at least one action item.");
+      return;
+    }
+
+    setEditingMom(true);
+    try {
+      await editMOM(meeting.id, { keyPoints, actionItems });
+      const updated = await getMeeting(meeting.id);
+      if (updated) setMeeting(updated);
+      toast.success("MOM updated. Re-approval is required before sharing.");
+    } catch {
+      toast.error("Failed to save MOM edits");
+    } finally {
+      setEditingMom(false);
+    }
+  };
+
+  const handleApproveMom = async () => {
+    if (!meeting?.mom) return;
+    setApprovingMom(true);
+    try {
+      await approveMOM(meeting.id);
+      const updated = await getMeeting(meeting.id);
+      if (updated) setMeeting(updated);
+      const names = meeting.stakeholders.map((s) => s.name).join(", ");
+      toast.success(
+        names
+          ? `MOM approved and sent to stakeholders: ${names}`
+          : "MOM approved and sent to stakeholders.",
+        { duration: 6000 },
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to approve MOM";
+      toast.error(message);
+    } finally {
+      setApprovingMom(false);
+    }
+  };
+
+  const handleDownloadFormat = async (format: "docx" | "pdf" | "txt" | "json") => {
+    if (!meeting?.mom) return;
+    setDownloadingFormat(format);
+    try {
+      await downloadMomFile(meeting, meeting.mom, format);
+      toast.success(`MOM downloaded as ${format.toUpperCase()}`);
+    } catch {
+      toast.error(`Failed to download ${format.toUpperCase()} file`);
+    } finally {
+      setDownloadingFormat(null);
+    }
+  };
+
+  const handlePreviewPdf = async () => {
+    if (!meeting?.mom) return;
+    setPreviewLoading(true);
+    try {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      const pdfBlob = await createMomPdfBlob(meeting, meeting.mom);
+      const url = URL.createObjectURL(pdfBlob);
+      setPreviewUrl(url);
+      setPreviewOpen(true);
+    } catch {
+      toast.error("Failed to generate PDF preview");
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="space-y-4">{[1, 2].map((i) => <div key={i} className="h-32 bg-muted rounded-xl animate-pulse" />)}</div>;
+  }
+
+  if (!meeting) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        <p>Meeting not found</p>
+        <Button variant="outline" onClick={() => navigate("/meetings")} className="mt-4">Back to Meetings</Button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <AnimatePresence>
+        {inLiveMeeting && (
+          <LiveMeetingScreen meeting={meeting} onMeetingEnd={handleMeetingEnd} />
+        )}
+      </AnimatePresence>
+
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1 text-muted-foreground -ml-2">
+          <ArrowLeft className="h-4 w-4" /> Back
+        </Button>
+
+        {postMeetingProcessing && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <Card className="p-5 border-secondary/40 bg-accent/50 flex items-center gap-3">
+              <Loader2 className="h-5 w-5 animate-spin text-secondary" />
+              <span className="text-sm font-medium">Processing meeting results - generating MOM for internal review...</span>
+            </Card>
+          </motion.div>
+        )}
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="p-6 space-y-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="text-xl font-heading font-bold">{meeting.title}</h1>
+                <p className="text-muted-foreground text-sm mt-1">{meeting.description}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <TagBadge tag={meeting.tag} />
+                <StatusBadge status={meeting.status} />
+              </div>
+            </div>
+
+            <div className="flex gap-6 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {meeting.date} at {meeting.time}</span>
+              <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {meeting.duration} min</span>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium mb-2 flex items-center gap-1.5"><Users className="h-4 w-4" /> Stakeholders</h3>
+              <div className="flex flex-wrap gap-2">
+                {meeting.stakeholders.map((s, i) => (
+                  <span key={i} className="inline-flex items-center px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm">
+                    {s.name} <span className="text-muted-foreground ml-1 text-xs">({s.email})</span>
+                  </span>
+                ))}
+                {meeting.stakeholders.length === 0 && <span className="text-muted-foreground text-sm">No stakeholders added</span>}
+              </div>
+            </div>
+
+            <div className="flex gap-2 flex-wrap">
+              {meeting.status !== "completed" && (
+                <Button onClick={handleJoin} className="gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/90" size="sm">
+                  <Video className="h-3.5 w-3.5" /> Join Meeting
+                </Button>
+              )}
+              {meeting.status === "upcoming" && (
+                <Button onClick={handleStart} variant="outline" size="sm" className="gap-2">
+                  <Play className="h-3.5 w-3.5" /> Start Meeting
+                </Button>
+              )}
+              {meeting.status !== "completed" && (
+                <Button onClick={handleComplete} variant="outline" size="sm" className="gap-2">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Mark Completed
+                </Button>
+              )}
+              <Button onClick={handleGenerateMOM} variant="outline" size="sm" className="gap-2" disabled={generatingMom}>
+                {generatingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+                Generate MOM
+              </Button>
+            </div>
+          </Card>
+        </motion.div>
+
+        <Card className="p-6 space-y-4">
+          <h2 className="text-lg font-heading font-semibold">Meeting Notes</h2>
+          <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add meeting notes here..." rows={5} />
+          <Button variant="outline" size="sm" onClick={saveNotes}>Save Notes</Button>
+        </Card>
+
+        {meeting.mom && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="overflow-hidden border-ring/30 shadow-sm">
+              <div className="relative border-b bg-gradient-to-br from-secondary/12 via-secondary/5 to-background px-6 py-5">
+                <div className="absolute left-0 top-0 h-full w-1 bg-secondary" aria-hidden />
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="space-y-1.5 pl-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary/15 text-secondary">
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-heading font-semibold tracking-tight">Minutes of Meeting</h2>
+                        <p className="text-muted-foreground text-sm">
+                          Refine the draft, then approve — stakeholders are notified automatically.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                    {meeting.mom.shared ? (
+                      <Badge variant="secondary" className="gap-1 border border-success/20 bg-success/10 text-success">
+                        <CheckCircle2 className="h-3 w-3" /> Sent to stakeholders
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="gap-1 border-warning/30 bg-warning/10 text-warning">
+                        Awaiting Lyrus approval
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4 p-6">
+                <div className="rounded-xl border bg-muted/30 p-4 md:p-5">
+                  <div className="mb-4 flex items-center gap-2 text-sm font-medium">
+                    <PencilLine className="h-4 w-4 text-secondary" />
+                    Prepare draft
+                  </div>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="mom-key-points">Key discussion points</Label>
+                      <p className="text-muted-foreground text-xs">One bullet per line. This text appears in PDF and exports.</p>
+                      <Textarea
+                        id="mom-key-points"
+                        value={momKeyPointsDraft}
+                        onChange={(e) => setMomKeyPointsDraft(e.target.value)}
+                        rows={5}
+                        className="min-h-[120px] resize-y font-mono text-sm"
+                        placeholder="e.g. Agreed on Q2 roadmap&#10;Budget review deferred to next week"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="mom-actions">Action items</Label>
+                      <p className="text-muted-foreground text-xs">One row per item: Task | Owner | Deadline</p>
+                      <Textarea
+                        id="mom-actions"
+                        value={momActionItemsDraft}
+                        onChange={(e) => setMomActionItemsDraft(e.target.value)}
+                        rows={5}
+                        className="min-h-[120px] resize-y font-mono text-sm"
+                        placeholder="e.g. Send revised scope | Alex | Next Friday"
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-muted-foreground text-xs">
+                      Saving updates the live MOM and resets approval if it was already approved.
+                    </p>
+                    <Button variant="secondary" size="sm" onClick={handleSaveMomEdits} disabled={editingMom} className="shrink-0 gap-2">
+                      {editingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                      Save draft
+                    </Button>
+                  </div>
+                </div>
+
+                {!meeting.mom.approved && (
+                  <div className="rounded-xl border border-secondary/25 bg-gradient-to-br from-secondary/8 to-transparent p-4 md:p-5">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-secondary">
+                        <ShieldCheck className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-4">
+                        <div>
+                          <h3 className="font-heading text-sm font-semibold">Lyrus Life approval</h3>
+                          <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+                            Stakeholders only receive this MOM after a Lyrus Life reviewer approves it. Approval sends it
+                            to everyone listed on this meeting immediately.
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <p className="text-muted-foreground text-sm">
+                            Approving as{" "}
+                            <span className="font-medium text-foreground">{getCurrentUserDisplayName()}</span>
+                          </p>
+                          <Button size="sm" onClick={handleApproveMom} disabled={approvingMom} className="gap-2 shrink-0 sm:h-10">
+                            {approvingMom ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                            Approve & send
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {meeting.mom.approved && (
+                  <div className="flex items-start gap-3 rounded-lg border border-success/20 bg-success/5 px-4 py-3 text-sm">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">Approved by {meeting.mom.approvedBy || "Lyrus Life"}</p>
+                      {meeting.mom.approvedAt && (
+                        <p className="text-muted-foreground text-xs">{new Date(meeting.mom.approvedAt).toLocaleString()}</p>
+                      )}
+                      {meeting.mom.shared && (
+                        <p className="text-muted-foreground text-xs">Stakeholders were notified automatically when this was approved.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <Separator />
+
+                <div>
+                  <p className="text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wide">Export</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={handlePreviewPdf}
+                      disabled={previewLoading}
+                    >
+                      {previewLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />}
+                      View PDF
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={() => handleDownloadFormat("docx")}
+                      disabled={downloadingFormat !== null}
+                    >
+                      {downloadingFormat === "docx" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                      DOCX
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={() => handleDownloadFormat("pdf")}
+                      disabled={downloadingFormat !== null}
+                    >
+                      {downloadingFormat === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                      PDF
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={() => handleDownloadFormat("txt")}
+                      disabled={downloadingFormat !== null}
+                    >
+                      {downloadingFormat === "txt" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                      TXT
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={() => handleDownloadFormat("json")}
+                      disabled={downloadingFormat !== null}
+                    >
+                      {downloadingFormat === "json" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                      JSON
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <p className="text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wide">Current version</p>
+                  <div className="space-y-4 rounded-lg border bg-card/50 p-4 text-sm">
+                    <div>
+                      <p className="font-medium text-muted-foreground">Date & Time</p>
+                      <p>{meeting.mom.dateTime}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-muted-foreground">Participants</p>
+                      <p>{meeting.mom.participants.join(", ")}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-muted-foreground">Key Discussion Points</p>
+                      <ul className="mt-1 list-inside list-disc space-y-1">
+                        {meeting.mom.keyPoints.map((p, i) => (
+                          <li key={i}>{p}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-medium text-muted-foreground">Action Items</p>
+                      <div className="mt-2 overflow-hidden rounded-lg border">
+                        <table className="w-full text-sm">
+                          <thead className="bg-muted/50">
+                            <tr>
+                              <th className="p-2 text-left font-medium">Task</th>
+                              <th className="p-2 text-left font-medium">Assignee</th>
+                              <th className="p-2 text-left font-medium">Deadline</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {meeting.mom.actionItems.map((a, i) => (
+                              <tr key={i} className="border-t">
+                                <td className="p-2">{a.task}</td>
+                                <td className="p-2">{a.assignee}</td>
+                                <td className="p-2">{a.deadline}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </div>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-5xl h-[85vh]">
+          <DialogHeader>
+            <DialogTitle>MOM PDF Preview</DialogTitle>
+          </DialogHeader>
+          {previewUrl ? (
+            <iframe title="MOM PDF Preview" src={previewUrl} className="w-full h-full rounded-md border" />
+          ) : (
+            <div className="h-full flex items-center justify-center text-sm text-muted-foreground">No preview available</div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
