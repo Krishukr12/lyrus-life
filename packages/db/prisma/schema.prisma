@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MeetingStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  PROCESSING
+  FAILED
+}
+
+enum MeetingTag {
+  INTERNAL
+  CLIENT
+  VENDOR
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+  CANCELLED
+}
+
+enum TaskPriority {
+  HIGH
+  MEDIUM
+  LOW
+  UNSPECIFIED
+}
+
+enum PipelineStep {
+  AUDIO_UPLOADED
+  TRANSCRIPTION_STARTED
+  TRANSCRIPTION_COMPLETED
+  NLU_STARTED
+  NLU_COMPLETED
+  MOM_GENERATED
+  TASKS_CREATED
+  INVITES_SENT
+  NOTIFICATION_SENT
+  USER_EDIT
+  ERROR
+}
+
+enum InviteStatus {
+  SENT
+  LOGGED
+  FAILED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organizedMeetings Meeting[] @relation("MeetingOrganizer")
+  ownedTasks        ActionItem[] @relation("TaskOwner")
+  auditLogs         AuditLog[]
+}
+
+model Meeting {
+  id              String        @id @default(cuid())
+  title           String
+  description     String        @default("")
+  scheduledAt     DateTime
+  durationMinutes Int           @default(60)
+  status          MeetingStatus @default(UPCOMING)
+  tag             MeetingTag    @default(INTERNAL)
+  notes           String        @default("")
+  calendarEventId String?
+  recordingUrl    String?
+  organizerId     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organizer    User?                 @relation("MeetingOrganizer", fields: [organizerId], references: [id])
+  participants MeetingParticipant[]
+  audioFiles   AudioFile[]
+  transcript   Transcript?
+  mom          Mom?
+  actionItems  ActionItem[]
+  decisions    Decision[]
+  summary      Summary?
+  auditLogs    AuditLog[]
+  invites      MeetingInvite[]
+
+  @@index([scheduledAt])
+  @@index([status])
+}
+
+model MeetingInvite {
+  id        String       @id @default(cuid())
+  meetingId String
+  email     String
+  name      String
+  status    InviteStatus
+  error     String?
+  sentAt    DateTime     @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model MeetingParticipant {
+  id        String  @id @default(cuid())
+  meetingId String
+  name      String
+  email     String
+  role      String?
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model AudioFile {
+  id         String   @id @default(cuid())
+  meetingId  String
+  storageKey String
+  mimeType   String
+  sizeBytes  Int
+  createdAt  DateTime @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model Transcript {
+  id        String   @id @default(cuid())
+  meetingId String   @unique
+  fullText  String   @db.Text
+  language  String   @default("en")
+  source    String   @default("unknown")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  meeting  Meeting             @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  segments TranscriptSegment[]
+}
+
+model TranscriptSegment {
+  id           String  @id @default(cuid())
+  transcriptId String
+  speaker      String
+  startTime    Float
+  endTime      Float
+  text         String  @db.Text
+  confidence   Float?
+
+  transcript Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+
+  @@index([transcriptId])
+}
+
+model Mom {
+  id           String   @id @default(cuid())
+  meetingId    String   @unique
+  title        String
+  dateTime     String
+  participants Json
+  keyPoints    Json
+  actionItems  Json
+  approved     Boolean  @default(false)
+  approvedBy   String?
+  approvedAt   DateTime?
+  shared       Boolean  @default(false)
+  lastEditedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+model ActionItem {
+  id          String       @id @default(cuid())
+  meetingId   String
+  description String
+  ownerName   String?
+  ownerEmail  String?
+  ownerId     String?
+  dueDate     DateTime?
+  priority    TaskPriority @default(UNSPECIFIED)
+  status      TaskStatus   @default(OPEN)
+  confidence  Float?
+  externalId  String?
+  externalUrl String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  owner   User?   @relation("TaskOwner", fields: [ownerId], references: [id])
+
+  @@index([meetingId])
+  @@index([status])
+}
+
+model Decision {
+  id        String   @id @default(cuid())
+  meetingId String
+  text      String   @db.Text
+  timestamp Float?
+  createdAt DateTime @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model Summary {
+  id          String   @id @default(cuid())
+  meetingId   String   @unique
+  shortSummary String  @db.Text
+  nextAgenda  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String       @id @default(cuid())
+  meetingId String?
+  userId    String?
+  action    PipelineStep
+  details   Json?
+  createdAt DateTime     @default(now())
+
+  meeting Meeting? @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([meetingId])
+  @@index([createdAt])
+}

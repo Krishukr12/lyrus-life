@@ -1,229 +1,207 @@
-import { Meeting, MOM, MeetingStatus, UserTask, TaskStatus } from "./types";
-import { SEED_MEETINGS } from "./mock-data";
+import { CreateMeetingResponse, Meeting, MOM, UserTask } from "./types";
 import { getCurrentUserDisplayName } from "./current-user";
 
-const STORAGE_KEY = "lyrus_meetings";
-const TASKS_KEY = "lyrus_tasks";
-function loadMeetings(): Meeting[] {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_MEETINGS));
-    return SEED_MEETINGS;
+const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+
+class ApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
+    super(message);
   }
-  return JSON.parse(raw);
 }
 
-function saveMeetings(meetings: Meeting[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(meetings));
-}
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const hasJsonBody = init?.body != null && init.body !== "";
+  const headers: HeadersInit = {
+    ...(hasJsonBody ? { "Content-Type": "application/json" } : {}),
+    ...(init?.headers ?? {}),
+  };
 
-function autoUpdateStatuses(meetings: Meeting[]): Meeting[] {
-  const now = new Date();
-  return meetings.map((m) => {
-    if (m.status === "completed") return m;
-    const start = new Date(`${m.date}T${m.time}`);
-    const end = new Date(start.getTime() + m.duration * 60000);
-    let status: MeetingStatus = "upcoming";
-    if (now >= start && now <= end) status = "ongoing";
-    else if (now > end) status = "completed";
-    return { ...m, status };
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers,
   });
-}
 
-// Simulated delay
-const delay = (ms = 200) => new Promise((r) => setTimeout(r, ms));
+  if (!response.ok) {
+    let message = response.statusText;
+    try {
+      const body = (await response.json()) as { error?: unknown };
+      if (body.error) {
+        message =
+          typeof body.error === "string"
+            ? body.error
+            : JSON.stringify(body.error);
+      }
+    } catch {
+      // ignore parse errors
+    }
+    throw new ApiError(message, response.status);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as Promise<T>;
+}
 
 export async function getMeetings(): Promise<Meeting[]> {
-  await delay();
-  const meetings = autoUpdateStatuses(loadMeetings());
-  saveMeetings(meetings);
-  return meetings;
+  return request<Meeting[]>("/meetings");
 }
 
 export async function getMeeting(id: string): Promise<Meeting | undefined> {
-  const meetings = await getMeetings();
-  return meetings.find((m) => m.id === id);
+  try {
+    return await request<Meeting>(`/meetings/${id}`);
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) return undefined;
+    throw e;
+  }
 }
 
-export async function createMeeting(data: Omit<Meeting, "id" | "status" | "notes" | "mom">): Promise<Meeting> {
-  await delay();
-  const meetings = loadMeetings();
-  const meeting: Meeting = {
-    ...data,
-    id: `m${Date.now()}`,
-    status: "upcoming",
-    notes: "",
-  };
-  meetings.push(meeting);
-  saveMeetings(meetings);
-  return meeting;
+export async function createMeeting(
+  data: Omit<Meeting, "id" | "status" | "notes" | "mom">,
+): Promise<CreateMeetingResponse> {
+  return request<CreateMeetingResponse>("/meetings", {
+    method: "POST",
+    body: JSON.stringify({
+      title: data.title,
+      description: data.description,
+      date: data.date,
+      time: data.time,
+      duration: data.duration,
+      tag: data.tag,
+      stakeholders: data.stakeholders,
+      notes: "",
+    }),
+  });
+}
+
+export async function resendMeetingInvites(meetingId: string): Promise<CreateMeetingResponse> {
+  return request<CreateMeetingResponse>(`/meetings/${meetingId}/invites/resend`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
 }
 
 export async function updateMeeting(id: string, updates: Partial<Meeting>): Promise<Meeting> {
-  await delay();
-  const meetings = loadMeetings();
-  const idx = meetings.findIndex((m) => m.id === id);
-  if (idx === -1) throw new Error("Meeting not found");
-  meetings[idx] = { ...meetings[idx], ...updates };
-  saveMeetings(meetings);
-  return meetings[idx];
+  return request<Meeting>(`/meetings/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
+}
+
+export async function uploadMeetingAudio(meetingId: string, file: File): Promise<void> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const response = await fetch(`${API_BASE}/meetings/${meetingId}/audio`, {
+    method: "POST",
+    body: form,
+  });
+
+  if (!response.ok) {
+    throw new ApiError("Failed to upload audio", response.status);
+  }
+}
+
+export async function processMeeting(meetingId: string): Promise<void> {
+  await request(`/meetings/${meetingId}/process`, { method: "POST" });
+}
+
+export interface CompleteMeetingResponse {
+  ok: boolean;
+  meeting: Meeting;
+  transcriptSource?: string;
+}
+
+export async function completeMeetingWithRecording(
+  meetingId: string,
+  recording: Blob | null,
+  notes: string,
+): Promise<CompleteMeetingResponse> {
+  const form = new FormData();
+  if (notes.trim()) {
+    form.append("notes", notes);
+  }
+  if (recording && recording.size > 0) {
+    form.append("recording", recording, `meeting-${meetingId}.webm`);
+  }
+
+  const response = await fetch(`${API_BASE}/meetings/${meetingId}/complete`, {
+    method: "POST",
+    body: form,
+  });
+
+  if (!response.ok) {
+    let message = response.statusText;
+    try {
+      const body = (await response.json()) as { error?: string };
+      if (body.error) message = body.error;
+    } catch {
+      // ignore
+    }
+    throw new ApiError(message, response.status);
+  }
+
+  return response.json() as Promise<CompleteMeetingResponse>;
 }
 
 export async function generateMOM(meetingId: string): Promise<MOM> {
-  await delay(600);
-  const meeting = (await getMeeting(meetingId))!;
-  const mom: MOM = {
-    id: `mom_${Date.now()}`,
-    meetingId,
-    title: meeting.title,
-    dateTime: `${meeting.date} ${meeting.time}`,
-    participants: meeting.stakeholders.map((s) => s.name),
-    keyPoints: meeting.notes
-      ? meeting.notes.split("\n").filter(Boolean)
-      : [
-          "Reviewed current progress and milestones",
-          "Discussed blockers and mitigation strategies",
-          "Aligned on next sprint priorities",
-          "Resource allocation confirmed for upcoming phase",
-        ],
-    actionItems: [
-      { task: "Prepare updated project timeline", assignee: meeting.stakeholders[0]?.name || "TBD", deadline: "Next Friday" },
-      { task: "Share revised cost estimates", assignee: meeting.stakeholders[1]?.name || "TBD", deadline: "End of week" },
-      { task: "Schedule follow-up review", assignee: meeting.stakeholders[0]?.name || "TBD", deadline: "Next Monday" },
-    ],
-    createdAt: new Date().toISOString(),
-    shared: false,
-    approved: false,
-  };
-  await updateMeeting(meetingId, { mom });
-  return mom;
+  return request<MOM>(`/meetings/${meetingId}/mom/generate`, { method: "POST" });
 }
 
 export async function shareMOM(meetingId: string): Promise<void> {
-  await delay(800);
-  const meeting = (await getMeeting(meetingId))!;
-  if (meeting.mom) {
-    if (!meeting.mom.approved) {
-      throw new Error("MOM requires Lyrus Life approval before sharing.");
-    }
-    await updateMeeting(meetingId, { mom: { ...meeting.mom, shared: true } });
-    // Auto-create tasks from MOM action items
-    const existingTasks = loadTasks();
-    const alreadyCreated = existingTasks.some((t) => t.meetingId === meetingId);
-    if (!alreadyCreated && meeting.mom.actionItems.length > 0) {
-      const newTasks: UserTask[] = meeting.mom.actionItems.map((item, i) => ({
-        id: `task_${Date.now()}_${i}`,
-        meetingId,
-        meetingTitle: meeting.title,
-        task: item.task,
-        assignee: item.assignee,
-        deadline: resolveDeadline(item.deadline),
-        status: "pending" as TaskStatus,
-        createdAt: new Date().toISOString(),
-      }));
-      saveTasks([...existingTasks, ...newTasks]);
-    }
-  }
+  await approveMOM(meetingId);
 }
 
-export async function editMOM(meetingId: string, updates: Pick<MOM, "keyPoints" | "actionItems">): Promise<MOM> {
-  await delay(300);
-  const meeting = (await getMeeting(meetingId))!;
-  if (!meeting.mom) throw new Error("MOM not found");
-
-  const editedMom: MOM = {
-    ...meeting.mom,
-    keyPoints: updates.keyPoints,
-    actionItems: updates.actionItems,
-    approved: false,
-    approvedBy: undefined,
-    approvedAt: undefined,
-    shared: false,
-    lastEditedAt: new Date().toISOString(),
-  };
-
-  await updateMeeting(meetingId, { mom: editedMom });
-  return editedMom;
+export async function editMOM(
+  meetingId: string,
+  updates: Pick<MOM, "keyPoints" | "actionItems">,
+): Promise<MOM> {
+  return request<MOM>(`/meetings/${meetingId}/mom`, {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
 }
 
 export async function approveMOM(meetingId: string): Promise<MOM> {
-  await delay(400);
-  const meeting = (await getMeeting(meetingId))!;
-  if (!meeting.mom) throw new Error("MOM not found");
-
-  const approvedMom: MOM = {
-    ...meeting.mom,
-    approved: true,
-    approvedBy: getCurrentUserDisplayName(),
-    approvedAt: new Date().toISOString(),
-  };
-
-  await updateMeeting(meetingId, { mom: approvedMom });
-  await shareMOM(meetingId);
-  const final = (await getMeeting(meetingId))!;
-  return final.mom!;
-}
-
-function resolveDeadline(text: string): string {
-  const now = new Date();
-  const lower = text.toLowerCase();
-  if (lower.includes("tomorrow")) {
-    return new Date(now.getTime() + 86400000).toISOString().split("T")[0];
-  }
-  if (lower.includes("next monday")) {
-    const day = now.getDay();
-    const diff = (8 - day) % 7 || 7;
-    return new Date(now.getTime() + diff * 86400000).toISOString().split("T")[0];
-  }
-  if (lower.includes("next friday") || lower.includes("end of week")) {
-    const day = now.getDay();
-    const diff = (12 - day) % 7 || 7;
-    return new Date(now.getTime() + diff * 86400000).toISOString().split("T")[0];
-  }
-  // Default: 3 days from now
-  return new Date(now.getTime() + 3 * 86400000).toISOString().split("T")[0];
-}
-
-function loadTasks(): UserTask[] {
-  const raw = localStorage.getItem(TASKS_KEY);
-  return raw ? JSON.parse(raw) : [];
-}
-
-function saveTasks(tasks: UserTask[]) {
-  localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
-}
-
-function autoUpdateTaskStatuses(tasks: UserTask[]): UserTask[] {
-  const today = new Date().toISOString().split("T")[0];
-  return tasks.map((t) => {
-    if (t.status === "completed") return t;
-    if (t.deadline < today) return { ...t, status: "overdue" as TaskStatus };
-    return t;
+  return request<MOM>(`/meetings/${meetingId}/mom/approve`, {
+    method: "POST",
+    body: JSON.stringify({ approvedBy: getCurrentUserDisplayName() }),
   });
 }
 
 export async function getTasks(): Promise<UserTask[]> {
-  await delay();
-  const tasks = autoUpdateTaskStatuses(loadTasks());
-  saveTasks(tasks);
-  return tasks;
+  return request<UserTask[]>("/tasks");
 }
 
 export async function updateTask(id: string, updates: Partial<UserTask>): Promise<UserTask> {
-  await delay();
-  const tasks = loadTasks();
-  const idx = tasks.findIndex((t) => t.id === id);
-  if (idx === -1) throw new Error("Task not found");
-  tasks[idx] = { ...tasks[idx], ...updates };
-  saveTasks(tasks);
-  return tasks[idx];
+  return request<UserTask>(`/tasks/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
 }
 
 export function getTasksDueReminders(): UserTask[] {
-  const tasks = autoUpdateTaskStatuses(loadTasks());
-  const today = new Date().toISOString().split("T")[0];
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
-  return tasks.filter(
-    (t) => t.status !== "completed" && (t.deadline === today || t.deadline === tomorrow) && t.remindedAt !== today
-  );
+  return [];
+}
+
+export interface PlatformInsights {
+  meetingCount: number;
+  taskCount: number;
+  completedTasks: number;
+  overdueTasks: number;
+  completionRate: number;
+  recentMeetings: Array<{
+    id: string;
+    title: string;
+    hasMom: boolean;
+    openTasks: number;
+  }>;
+}
+
+export async function getPlatformInsights(): Promise<PlatformInsights> {
+  return request<PlatformInsights>("/insights");
 }

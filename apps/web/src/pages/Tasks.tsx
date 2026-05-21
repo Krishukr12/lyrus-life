@@ -4,7 +4,7 @@ import { getTasks, updateTask, getTasksDueReminders } from "@/lib/api";
 import { UserTask } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { format, isToday, isTomorrow, isPast, parseISO } from "date-fns";
+import { format, isToday, isTomorrow, isPast, isValid, parseISO } from "date-fns";
 import { CheckCircle2, Clock, AlertTriangle, Play, ListChecks, Bell, CalendarClock, TrendingUp, Target, FilterX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,15 @@ const statusConfig: Record<string, { label: string; icon: React.ElementType; cla
   overdue: { label: "Overdue", icon: AlertTriangle, className: "bg-destructive/15 text-destructive border-destructive/30" },
 };
 
-function DeadlineLabel({ deadline }: { deadline: string }) {
+function parseDeadline(deadline: string): Date | null {
+  if (!deadline?.trim()) return null;
   const d = parseISO(deadline);
+  return isValid(d) ? d : null;
+}
+
+function DeadlineLabel({ deadline }: { deadline: string }) {
+  const d = parseDeadline(deadline);
+  if (!d) return <span className="text-muted-foreground">No due date</span>;
   if (isToday(d)) return <span className="text-warning font-medium">Due Today</span>;
   if (isTomorrow(d)) return <span className="text-secondary font-medium">Due Tomorrow</span>;
   if (isPast(d)) return <span className="text-destructive font-medium">Overdue — {format(d, "MMM d")}</span>;
@@ -31,7 +38,11 @@ function DeadlineLabel({ deadline }: { deadline: string }) {
 export default function Tasks() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: tasks = [], isLoading } = useQuery({ queryKey: ["tasks"], queryFn: getTasks, refetchInterval: 10000 });
+  const { data: tasks = [], isLoading, isError, error } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: getTasks,
+    refetchInterval: 10000,
+  });
   const [remindersShown, setRemindersShown] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -48,7 +59,8 @@ export default function Tasks() {
       setRemindersShown(true);
       due.forEach((t, i) => {
         setTimeout(() => {
-          const d = parseISO(t.deadline);
+          const d = parseDeadline(t.deadline);
+          if (!d) return;
           const label = isToday(d) ? "today" : "tomorrow";
           toast.warning(`⏰ Reminder: "${t.task}" is due ${label}`, {
             description: `Assigned to ${t.assignee} from "${t.meetingTitle}"`,
@@ -66,7 +78,10 @@ export default function Tasks() {
   const inProgress = tasks.filter((t) => t.status === "in_progress");
   const completed = tasks.filter((t) => t.status === "completed");
   const overdue = tasks.filter((t) => t.status === "overdue");
-  const dueToday = tasks.filter((t) => isToday(parseISO(t.deadline)) && t.status !== "completed");
+  const dueToday = tasks.filter((t) => {
+    const d = parseDeadline(t.deadline);
+    return d != null && isToday(d) && t.status !== "completed";
+  });
   const completionRate = tasks.length ? Math.round((completed.length / tasks.length) * 100) : 0;
   const searchQuery = search.trim().toLowerCase();
   const matchesSearch = (task: UserTask) =>
@@ -87,7 +102,7 @@ export default function Tasks() {
   };
 
   const TaskCard = ({ task }: { task: UserTask }) => {
-    const config = statusConfig[task.status];
+    const config = statusConfig[task.status] ?? statusConfig.pending;
     const Icon = config.icon;
     return (
       <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
@@ -128,6 +143,20 @@ export default function Tasks() {
       </motion.div>
     );
   };
+
+  if (isError) {
+    return (
+      <motion.div className="p-6 max-w-4xl mx-auto">
+        <Card className="p-6 text-center">
+          <AlertTriangle className="h-10 w-10 mx-auto mb-2 text-destructive" />
+          <p className="font-medium">Could not load tasks</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {error instanceof Error ? error.message : "Check that the API is running."}
+          </p>
+        </Card>
+      </motion.div>
+    );
+  }
 
   if (isLoading) {
     return (

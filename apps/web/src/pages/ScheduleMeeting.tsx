@@ -35,16 +35,71 @@ export default function ScheduleMeeting() {
     setStakeholders(stakeholders.filter((_, idx) => idx !== i));
   };
 
+  const buildStakeholderList = (): Stakeholder[] => {
+    const list = [...stakeholders];
+    const name = sName.trim();
+    const email = sEmail.trim();
+    if (name && email) {
+      const exists = list.some(
+        (s) => s.email.toLowerCase() === email.toLowerCase(),
+      );
+      if (!exists) {
+        list.push({ name, email });
+      }
+    }
+    return list;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !date || !time) {
       toast.error("Please fill in required fields");
       return;
     }
+
+    const name = sName.trim();
+    const email = sEmail.trim();
+    if ((name && !email) || (!name && email)) {
+      toast.error("Enter both name and email for a stakeholder, or leave both empty");
+      return;
+    }
+
+    const finalStakeholders = buildStakeholderList();
+    if (finalStakeholders.length === 0) {
+      toast.error("Add at least one stakeholder — calendar invites are emailed on schedule.");
+      return;
+    }
+
     setSubmitting(true);
-    await createMeeting({ title, description, date, time, duration: parseInt(duration), tag, stakeholders });
-    toast.success("Meeting scheduled successfully!");
-    navigate("/");
+    try {
+      const result = await createMeeting({
+        title,
+        description,
+        date,
+        time,
+        duration: parseInt(duration, 10),
+        tag,
+        stakeholders: finalStakeholders,
+      });
+
+      const sent = result.invites.filter((i) => i.status === "sent" || i.status === "logged").length;
+      const failed = result.invites.filter((i) => i.status === "failed").length;
+
+      if (sent > 0) {
+        toast.success(`Meeting scheduled — invites sent to ${sent} stakeholder(s).`, { duration: 5000 });
+      }
+      if (failed > 0) {
+        toast.warning(`${failed} invite(s) could not be delivered. Resend from the meeting page.`);
+      }
+
+      navigate(`/meetings/${result.meeting.id}`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to schedule meeting";
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -107,7 +162,10 @@ export default function ScheduleMeeting() {
           </div>
 
           <div className="space-y-3">
-            <Label>Stakeholders</Label>
+            <Label>Stakeholders *</Label>
+            <p className="text-muted-foreground text-xs">
+              Each stakeholder receives a calendar invite (.ics) and email with a link to join the meeting in Lyrus Life.
+            </p>
             <div className="flex gap-2">
               <Input placeholder="Name" value={sName} onChange={(e) => setSName(e.target.value)} className="flex-1" />
               <Input placeholder="Email" value={sEmail} onChange={(e) => setSEmail(e.target.value)} className="flex-1" />

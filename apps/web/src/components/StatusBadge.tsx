@@ -14,11 +14,11 @@ const tagConfig: Record<MeetingTag, { label: string; className: string }> = {
 };
 
 export function StatusBadge({ status }: { status: MeetingStatus }) {
-  const cfg = statusConfig[status];
+  const cfg = statusConfig[status] ?? statusConfig.upcoming;
   return <Badge variant="outline" className={cfg.className}>{cfg.label}</Badge>;
 }
 
 export function TagBadge({ tag }: { tag: MeetingTag }) {
-  const cfg = tagConfig[tag];
+  const cfg = tagConfig[tag] ?? tagConfig.internal;
   return <Badge variant="outline" className={cfg.className}>{cfg.label}</Badge>;
 }

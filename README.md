@@ -1,159 +1,122 @@
-# Turborepo starter
+# Lyrus Life — Meeting → MOM → Task Platform
 
-This Turborepo starter is maintained by the Turborepo core team.
+AI-driven pipeline: capture meetings, transcribe audio (STT + diarization), extract action items/decisions/summaries (NLU), human-review MOM, and sync tasks.
 
-## Using this example
+## Monorepo layout (Turborepo + pnpm)
 
-Run the following command:
+| Path | Purpose |
+|------|---------|
+| `apps/web` | React + Vite UI (meetings, MOM review, tasks, insights) |
+| `apps/api` | Fastify REST API and processing orchestration |
+| `packages/db` | Prisma schema + PostgreSQL client |
+| `packages/shared` | Zod schemas and shared types |
+| `packages/nlu` | LLM extraction (OpenAI + heuristic fallback) |
+| `packages/transcription` | ASR (OpenAI Whisper + mock fallback) |
 
-```sh
-npx create-turbo@latest
+## Quick start
+
+```bash
+# 1. Install dependencies
+pnpm install
+
+# 2. Start Postgres (Docker Desktop must be running)
+docker compose up -d
+cp .env.example .env
+
+# 3. Database
+pnpm db:generate
+pnpm db:push
+pnpm db:seed
+
+# 4. Run API + web
+pnpm dev
 ```
 
-## What's inside?
+### DATABASE_URL
 
-This Turborepo includes the following packages/apps:
+Put this in the **repo root** `.env` file (same value works for local Docker):
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```env
+DATABASE_URL="postgresql://lyrus:lyrus@localhost:5432/lyrus_life?schema=public"
 ```
 
-Without global `turbo`, use your package manager:
+| Part | Value |
+|------|--------|
+| User | `lyrus` |
+| Password | `lyrus` |
+| Host | `localhost` |
+| Port | `5432` |
+| Database | `lyrus_life` |
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+If you use a hosted Postgres (Neon, Supabase, Railway), replace the whole URL with the connection string they give you, for example:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@ep-xxxx.region.aws.neon.tech/lyrus_life?sslmode=require"
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+**Common error:** `Can't reach database server at localhost:5432` means Postgres is not running. Start Docker Desktop, then run `docker compose up -d` from the project root.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+### Meeting invites (email + calendar)
 
-```sh
-turbo build --filter=docs
+When you **schedule a meeting** with stakeholders, each person receives:
+
+- An **email** with meeting details and a link to open the meeting in Lyrus Life
+- A **calendar invite** (`.ics` attachment) for Outlook / Google Calendar / Apple Calendar
+
+**Without SMTP** (local dev): invites are written to `invites/<meetingId>/` on disk and marked `logged` in the UI. Configure SMTP in `.env` for real delivery:
+
+```env
+WEB_APP_URL=http://localhost:8080
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=465
+EMAIL_SECURE=true
+EMAIL_USER=no-reply@yourdomain.com
+EMAIL_PASS=your-gmail-app-password
+EMAIL_FROM="Your Company <no-reply@yourdomain.com>"
 ```
 
-Without global `turbo`:
+(`SMTP_*` variable names are also supported for backward compatibility.)
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+### End-to-end meeting flow
 
-### Develop
+1. **Schedule** — Add stakeholders (required) → invites sent automatically  
+2. **Join meeting** — Open meeting → **Join** → microphone records the session (browser `MediaRecorder`)  
+3. **End meeting** — Hang up → recording + notes upload → **Whisper/AWS transcribes** → **MOM generated**  
+4. **Review & approve** MOM → tasks created for assignees  
 
-To develop all apps and packages, run the following command:
+Set **`OPENAI_API_KEY`** in `.env` for real speech-to-text. Without it, only very small test files use the demo transcript; real recordings return an error until you configure OpenAI or AWS (`TRANSCRIPTION_PROVIDER`, `AWS_S3_BUCKET`, etc.).
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+- Web: http://localhost:8080  
+- API: http://localhost:3001  
+- Health: http://localhost:3001/health  
 
-```sh
-cd my-turborepo
-turbo dev
-```
+## Environment
 
-Without global `turbo`, use your package manager:
+Copy `.env.example` to `.env` at the repo root. Set `OPENAI_API_KEY` for production-quality STT and NLU; without it, the stack uses deterministic mock transcription and heuristic extraction for local development.
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
+## API overview
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/meetings` | List meetings |
+| POST | `/meetings` | Create meeting |
+| GET | `/meetings/:id` | Meeting detail + transcript + MOM |
+| PATCH | `/meetings/:id` | Update meeting |
+| POST | `/meetings/:id/audio` | Upload audio → STT → NLU pipeline |
+| POST | `/meetings/:id/complete` | End meeting: multipart `recording` + `notes` → pipeline |
+| POST | `/meetings/:id/process` | Run pipeline from audio or notes |
+| POST | `/meetings/:id/mom/generate` | Regenerate MOM from transcript/notes |
+| PATCH | `/meetings/:id/mom` | Edit MOM draft |
+| POST | `/meetings/:id/mom/approve` | Approve MOM and create tasks |
+| GET | `/tasks` | List action items |
+| GET | `/insights` | Dashboard metrics |
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## Roadmap alignment
 
-```sh
-turbo dev --filter=web
-```
+- **MVP (current):** Audio upload, STT/NLU pipeline, MOM review UI, PostgreSQL persistence, task list  
+- **v1:** Google Calendar, Jira, email notifications  
+- **v2:** Real-time streaming, multi-language, advanced analytics  
 
-Without global `turbo`:
+## Manual decisions (product)
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+See the design doc: API keys, consent/legal copy, retention policy, PM tool mappings, and enterprise SSO require product-owner input before production rollout.

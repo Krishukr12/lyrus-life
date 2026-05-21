@@ -1,6 +1,16 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMeeting, updateMeeting, generateMOM, editMOM, approveMOM } from "@/lib/api";
+import {
+  getMeeting,
+  updateMeeting,
+  generateMOM,
+  editMOM,
+  approveMOM,
+  uploadMeetingAudio,
+  completeMeetingWithRecording,
+  resendMeetingInvites,
+} from "@/lib/api";
+import { useMeetingRecorder } from "@/hooks/use-meeting-recorder";
 import { ActionItem, Meeting } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,37 +38,130 @@ import {
   Eye,
   ShieldCheck,
   PencilLine,
+  Mail,
+  Send,
 } from "lucide-react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { createMomPdfBlob, downloadMomFile } from "@/lib/mom-export";
 import { getCurrentUserDisplayName } from "@/lib/current-user";
 
-const MEETING_DURATION_SECONDS = 20;
+function formatDuration(totalSeconds: number) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
 
-function LiveMeetingScreen({ meeting, onMeetingEnd }: { meeting: Meeting; onMeetingEnd: () => void }) {
+function transcriptSourceLabel(source?: string) {
+  switch (source) {
+    case "openai_whisper":
+      return "OpenAI Whisper (real audio)";
+    case "aws_transcribe":
+      return "AWS Transcribe (real audio)";
+    case "notes":
+      return "From live notes";
+    case "mock":
+      return "Demo script (configure OpenAI or AWS for real STT)";
+    default:
+      return source ?? "Unknown";
+  }
+}
+
+/** Avoid white-screen crashes when API returns partial mom/transcript shapes */
+function normalizeMeeting(m: Meeting): Meeting {
+  const stakeholders = Array.isArray(m.stakeholders) ? m.stakeholders : [];
+  let mom = m.mom;
+  if (mom) {
+    mom = {
+      ...mom,
+      keyPoints: Array.isArray(mom.keyPoints) ? mom.keyPoints : [],
+      actionItems: Array.isArray(mom.actionItems) ? mom.actionItems : [],
+      participants: Array.isArray(mom.participants) ? mom.participants : [],
+    };
+  }
+  let transcript = m.transcript;
+  if (transcript) {
+    transcript = {
+      ...transcript,
+      segments: Array.isArray(transcript.segments) ? transcript.segments : [],
+    };
+  }
+  return {
+    ...m,
+    notes: m.notes ?? "",
+    stakeholders,
+    mom,
+    transcript,
+  };
+}
+
+function MeetingProcessingOverlay() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-50 bg-primary flex flex-col items-center justify-center gap-4 px-6"
+    >
+      <Loader2 className="h-12 w-12 animate-spin text-secondary" />
+      <p className="text-primary-foreground text-center font-medium">
+        Uploading recording and generating minutes…
+      </p>
+      <p className="text-primary-foreground/60 text-sm text-center max-w-md">
+        This can take a minute for cloud transcription. Please keep this tab open.
+      </p>
+    </motion.div>
+  );
+}
+
+function LiveMeetingScreen({
+  meeting,
+  liveNotes,
+  onLiveNotesChange,
+  onMeetingEnd,
+}: {
+  meeting: Meeting;
+  liveNotes: string;
+  onLiveNotesChange: (value: string) => void;
+  onMeetingEnd: (recording: Blob | null) => Promise<void>;
+}) {
+  const durationSeconds = Math.max(60, meeting.duration * 60);
   const [elapsed, setElapsed] = useState(0);
   const [micOn, setMicOn] = useState(true);
+  const [ending, setEnding] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const { state: recorderState, startRecording, stopRecording, setMuted } = useMeetingRecorder();
+
+  useEffect(() => {
+    void startRecording().catch(() => {
+      toast.error("Microphone access is required to record this meeting");
+    });
+  }, [startRecording]);
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
-      setElapsed((prev) => {
-        if (prev + 1 >= MEETING_DURATION_SECONDS) {
-          clearInterval(timerRef.current);
-          setTimeout(onMeetingEnd, 300);
-          return MEETING_DURATION_SECONDS;
-        }
-        return prev + 1;
-      });
+      setElapsed((prev) => prev + 1);
     }, 1000);
     return () => clearInterval(timerRef.current);
-  }, [onMeetingEnd]);
+  }, []);
 
-  const progress = (elapsed / MEETING_DURATION_SECONDS) * 100;
-  const remaining = MEETING_DURATION_SECONDS - elapsed;
-  const mins = Math.floor(remaining / 60);
-  const secs = remaining % 60;
+  useEffect(() => {
+    setMuted(!micOn);
+  }, [micOn, setMuted]);
+
+  const handleEndCall = async () => {
+    if (ending) return;
+    setEnding(true);
+    try {
+      const blob = await stopRecording();
+      await onMeetingEnd(blob);
+    } finally {
+      setEnding(false);
+    }
+  };
+
+  const progress = Math.min(100, (elapsed / durationSeconds) * 100);
+  const remaining = Math.max(0, durationSeconds - elapsed);
+  const recordedLabel = formatDuration(recorderState.durationSeconds);
 
   return (
     <motion.div
@@ -75,17 +178,23 @@ function LiveMeetingScreen({ meeting, onMeetingEnd }: { meeting: Meeting; onMeet
             <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
           </span>
           <span className="text-primary-foreground font-heading font-semibold text-sm">LIVE</span>
+          {recorderState.isRecording && (
+            <Badge variant="outline" className="border-destructive/50 text-destructive bg-destructive/10">
+              REC • {recordedLabel}
+            </Badge>
+          )}
           <span className="text-primary-foreground/60 text-sm ml-2">{meeting.title}</span>
         </div>
-        <div className="text-primary-foreground/80 font-mono text-sm">
-          {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")} remaining
-        </div>
+        <motion.div className="text-primary-foreground/80 font-mono text-sm text-right">
+          <div>{formatDuration(remaining)} remaining</div>
+          <div className="text-xs opacity-70">Recording uploads when you end</div>
+        </motion.div>
       </div>
 
       {/* Main area - simulated video grid */}
       <div className="flex-1 p-6 flex items-center justify-center">
         <div className="grid grid-cols-2 gap-4 max-w-3xl w-full">
-          {meeting.stakeholders.slice(0, 4).map((s, i) => (
+          {(meeting.stakeholders ?? []).slice(0, 4).map((s, i) => (
             <div
               key={i}
               className="aspect-video rounded-xl bg-sidebar-accent flex items-center justify-center relative overflow-hidden"
@@ -108,6 +217,18 @@ function LiveMeetingScreen({ meeting, onMeetingEnd }: { meeting: Meeting; onMeet
             </span>
           </div>
         </div>
+      </div>
+
+      <div className="px-6 pb-2">
+        <Label className="text-primary-foreground/80 text-xs">
+          Live notes (backup if transcription fails — use &quot;Name: statement&quot; per line)
+        </Label>
+        <Textarea
+          value={liveNotes}
+          onChange={(e) => onLiveNotesChange(e.target.value)}
+          placeholder={"Alice: will send budget by Friday\nBob: agreed to postpone pilot to Q3"}
+          className="mt-1 min-h-[88px] bg-primary-foreground/10 border-sidebar-border text-primary-foreground placeholder:text-primary-foreground/40"
+        />
       </div>
 
       {/* Progress bar */}
@@ -142,9 +263,10 @@ function LiveMeetingScreen({ meeting, onMeetingEnd }: { meeting: Meeting; onMeet
         <Button
           size="icon"
           className="rounded-full h-12 w-12 bg-destructive hover:bg-destructive/90"
-          onClick={onMeetingEnd}
+          onClick={handleEndCall}
+          disabled={ending}
         >
-          <PhoneOff className="h-5 w-5" />
+          {ending ? <Loader2 className="h-5 w-5 animate-spin" /> : <PhoneOff className="h-5 w-5" />}
         </Button>
       </div>
     </motion.div>
@@ -168,14 +290,33 @@ export default function MeetingDetail() {
   const [approvingMom, setApprovingMom] = useState(false);
   const [momKeyPointsDraft, setMomKeyPointsDraft] = useState("");
   const [momActionItemsDraft, setMomActionItemsDraft] = useState("");
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [liveNotes, setLiveNotes] = useState("");
+  const [resendingInvites, setResendingInvites] = useState(false);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+
+  const refreshMeeting = useCallback(async () => {
+    if (!id) return;
+    const m = await getMeeting(id);
+    if (!m) return undefined;
+    const normalized = normalizeMeeting(m);
+    setMeeting(normalized);
+    setNotes(normalized.notes);
+    return normalized;
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;
-    getMeeting(id).then((m) => {
-      if (m) { setMeeting(m); setNotes(m.notes); }
-      setLoading(false);
-    });
-  }, [id]);
+    refreshMeeting().finally(() => setLoading(false));
+  }, [id, refreshMeeting]);
+
+  useEffect(() => {
+    if (!meeting?.pipelineStatus || meeting.pipelineStatus !== "processing") return;
+    const interval = setInterval(() => {
+      void refreshMeeting();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [meeting?.pipelineStatus, refreshMeeting]);
 
   useEffect(() => {
     return () => {
@@ -190,9 +331,13 @@ export default function MeetingDetail() {
       return;
     }
 
-    setMomKeyPointsDraft(meeting.mom.keyPoints.join("\n"));
+    const keyPoints = Array.isArray(meeting.mom.keyPoints) ? meeting.mom.keyPoints : [];
+    const actionItems = Array.isArray(meeting.mom.actionItems) ? meeting.mom.actionItems : [];
+    setMomKeyPointsDraft(keyPoints.join("\n"));
     setMomActionItemsDraft(
-      meeting.mom.actionItems.map((item) => `${item.task} | ${item.assignee} | ${item.deadline}`).join("\n"),
+      actionItems
+        .map((item) => `${item.task ?? ""} | ${item.assignee ?? ""} | ${item.deadline ?? ""}`)
+        .join("\n"),
     );
   }, [meeting?.mom]);
 
@@ -213,33 +358,85 @@ export default function MeetingDetail() {
   const handleJoin = async () => {
     if (!meeting) return;
     await updateMeeting(meeting.id, { status: "ongoing" });
+    if (!liveNotes.trim() && meeting.description.trim()) {
+      setLiveNotes(`Host: ${meeting.description.trim()}`);
+    }
     setInLiveMeeting(true);
-    toast.success("You joined the meeting");
+    toast.success("You joined the meeting — add live notes for better MOM quality");
   };
 
-  const handleMeetingEnd = useCallback(async () => {
+  const handleMeetingEnd = useCallback(
+    async (recording: Blob | null) => {
+      if (!meeting) return;
+      setPostMeetingProcessing(true);
+
+      const combinedNotes = [notes.trim(), liveNotes.trim()].filter(Boolean).join("\n");
+
+      toast.loading("Uploading recording and generating MOM...", { id: "mom-gen" });
+      try {
+        const result = await completeMeetingWithRecording(
+          meeting.id,
+          recording,
+          combinedNotes,
+        );
+        const updated = normalizeMeeting(result.meeting);
+        setMeeting(updated);
+        setNotes(updated.notes);
+        toast.dismiss("mom-gen");
+
+        const source = result.transcriptSource ?? updated.transcript?.source;
+        if (recording && recording.size > 5000) {
+          toast.success(`Recording processed (${transcriptSourceLabel(source)})`);
+        } else if (updated.mom) {
+          toast.success("MOM generated from notes");
+        }
+
+        if (updated.mom) {
+          toast.info("Review and approve the MOM below before sharing.");
+        } else {
+          toast.warning("No MOM produced. Add notes or check OPENAI_API_KEY in .env");
+        }
+      } catch (error) {
+        toast.dismiss("mom-gen");
+        const message = error instanceof Error ? error.message : "Processing failed";
+        toast.error(message);
+        await refreshMeeting();
+      } finally {
+        setInLiveMeeting(false);
+        setPostMeetingProcessing(false);
+      }
+    },
+    [meeting, notes, liveNotes, refreshMeeting],
+  );
+
+  const handleResendInvites = async () => {
     if (!meeting) return;
-    setInLiveMeeting(false);
-    setPostMeetingProcessing(true);
+    setResendingInvites(true);
+    try {
+      const result = await resendMeetingInvites(meeting.id);
+      setMeeting(result.meeting);
+      const sent = result.invites.filter((i) => i.status === "sent" || i.status === "logged").length;
+      toast.success(`Invites sent to ${sent} stakeholder(s)`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to resend invites");
+    } finally {
+      setResendingInvites(false);
+    }
+  };
 
-    // Mark completed
-    await updateMeeting(meeting.id, { status: "completed" });
-    toast.success("Meeting ended");
-
-    // Generate MOM
-    await new Promise((r) => setTimeout(r, 800));
-    toast.loading("Generating Minutes of Meeting...", { id: "mom-gen" });
-    await generateMOM(meeting.id);
-    toast.dismiss("mom-gen");
-    toast.success("MOM generated successfully!");
-
-    toast.info("MOM is pending Lyrus Life approval before stakeholder sharing.");
-
-    // Refresh meeting data
-    const updated = await getMeeting(meeting.id);
-    if (updated) { setMeeting(updated); setNotes(updated.notes); }
-    setPostMeetingProcessing(false);
-  }, [meeting]);
+  const handleAudioUpload = async (file: File) => {
+    if (!meeting) return;
+    setUploadingAudio(true);
+    try {
+      await uploadMeetingAudio(meeting.id, file);
+      toast.success("Audio uploaded — STT and NLU pipeline started");
+      await refreshMeeting();
+    } catch {
+      toast.error("Failed to upload audio");
+    } finally {
+      setUploadingAudio(false);
+    }
+  };
 
   const handleComplete = async () => {
     if (!meeting) return;
@@ -364,25 +561,20 @@ export default function MeetingDetail() {
 
   return (
     <>
-      <AnimatePresence>
-        {inLiveMeeting && (
-          <LiveMeetingScreen meeting={meeting} onMeetingEnd={handleMeetingEnd} />
-        )}
-      </AnimatePresence>
+      {postMeetingProcessing && <MeetingProcessingOverlay />}
+      {inLiveMeeting && !postMeetingProcessing && (
+        <LiveMeetingScreen
+          meeting={meeting}
+          liveNotes={liveNotes}
+          onLiveNotesChange={setLiveNotes}
+          onMeetingEnd={handleMeetingEnd}
+        />
+      )}
 
       <div className="max-w-3xl mx-auto space-y-6">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1 text-muted-foreground -ml-2">
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>
-
-        {postMeetingProcessing && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Card className="p-5 border-secondary/40 bg-accent/50 flex items-center gap-3">
-              <Loader2 className="h-5 w-5 animate-spin text-secondary" />
-              <span className="text-sm font-medium">Processing meeting results - generating MOM for internal review...</span>
-            </Card>
-          </motion.div>
-        )}
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="p-6 space-y-6">
@@ -405,13 +597,43 @@ export default function MeetingDetail() {
             <div>
               <h3 className="text-sm font-medium mb-2 flex items-center gap-1.5"><Users className="h-4 w-4" /> Stakeholders</h3>
               <div className="flex flex-wrap gap-2">
-                {meeting.stakeholders.map((s, i) => (
+                {(meeting.stakeholders ?? []).map((s, i) => (
                   <span key={i} className="inline-flex items-center px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm">
                     {s.name} <span className="text-muted-foreground ml-1 text-xs">({s.email})</span>
                   </span>
                 ))}
                 {meeting.stakeholders.length === 0 && <span className="text-muted-foreground text-sm">No stakeholders added</span>}
               </div>
+              {meeting.stakeholders.length > 0 && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5"
+                    disabled={resendingInvites}
+                    onClick={handleResendInvites}
+                  >
+                    {resendingInvites ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                    Resend invites
+                  </Button>
+      </div>
+              )}
+              {meeting.invites && meeting.invites.length > 0 && (
+                <div className="mt-3 space-y-1.5">
+                  <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                    <Mail className="h-3.5 w-3.5" /> Invite delivery
+                  </p>
+                  {meeting.invites.map((inv) => (
+                    <div key={inv.email} className="text-xs flex items-center gap-2">
+                      <span>{inv.name}</span>
+                      <Badge variant="outline" className="text-[10px]">
+                        {inv.status === "logged" ? "saved (dev)" : inv.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-2 flex-wrap">
@@ -442,6 +664,60 @@ export default function MeetingDetail() {
           <h2 className="text-lg font-heading font-semibold">Meeting Notes</h2>
           <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add meeting notes here..." rows={5} />
           <Button variant="outline" size="sm" onClick={saveNotes}>Save Notes</Button>
+        </Card>
+
+        <Card className="p-6 space-y-4">
+          <h2 className="text-lg font-heading font-semibold">Recording &amp; Transcript</h2>
+          <p className="text-muted-foreground text-sm">
+            Upload meeting audio for speech-to-text with speaker segments, then AI extracts tasks and decisions.
+          </p>
+          <input
+            ref={audioInputRef}
+            type="file"
+            accept="audio/*,video/webm"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void handleAudioUpload(file);
+              e.target.value = "";
+            }}
+          />
+          <motion.div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              disabled={uploadingAudio}
+              onClick={() => audioInputRef.current?.click()}
+            >
+              {uploadingAudio ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mic className="h-3.5 w-3.5" />}
+              Upload audio
+            </Button>
+            {meeting.pipelineStatus === "processing" && (
+              <Badge variant="outline" className="gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" /> Processing…
+              </Badge>
+            )}
+          </motion.div>
+          {meeting.transcript && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3 rounded-lg border bg-muted/20 p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm font-medium">Transcript</p>
+                {meeting.transcript.source && (
+                  <Badge variant="secondary" className="text-xs font-normal">
+                    {transcriptSourceLabel(meeting.transcript.source)}
+                  </Badge>
+                )}
+              </div>
+              <motion.div className="max-h-64 space-y-2 overflow-y-auto text-sm">
+                {(meeting.transcript.segments ?? []).map((seg, i) => (
+                  <p key={i}>
+                    <span className="font-medium text-secondary">{seg.speaker}:</span> {seg.text}
+                  </p>
+                ))}
+              </motion.div>
+            </motion.div>
+          )}
         </Card>
 
         {meeting.mom && (
@@ -633,12 +909,12 @@ export default function MeetingDetail() {
                     </div>
                     <div>
                       <p className="font-medium text-muted-foreground">Participants</p>
-                      <p>{meeting.mom.participants.join(", ")}</p>
+                      <p>{(meeting.mom.participants ?? []).join(", ")}</p>
                     </div>
                     <div>
                       <p className="font-medium text-muted-foreground">Key Discussion Points</p>
                       <ul className="mt-1 list-inside list-disc space-y-1">
-                        {meeting.mom.keyPoints.map((p, i) => (
+                        {(meeting.mom.keyPoints ?? []).map((p, i) => (
                           <li key={i}>{p}</li>
                         ))}
                       </ul>
@@ -655,7 +931,7 @@ export default function MeetingDetail() {
                             </tr>
                           </thead>
                           <tbody>
-                            {meeting.mom.actionItems.map((a, i) => (
+                            {(meeting.mom.actionItems ?? []).map((a, i) => (
                               <tr key={i} className="border-t">
                                 <td className="p-2">{a.task}</td>
                                 <td className="p-2">{a.assignee}</td>

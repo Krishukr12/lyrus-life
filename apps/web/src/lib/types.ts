@@ -6,6 +6,39 @@ export interface Stakeholder {
   export type MeetingStatus = "upcoming" | "ongoing" | "completed";
   export type MeetingTag = "internal" | "client" | "vendor";
   
+  export interface TranscriptSegment {
+    speaker: string;
+    startTime: number;
+    endTime: number;
+    text: string;
+  }
+
+  export interface MeetingTranscript {
+    id: string;
+    fullText: string;
+    language: string;
+    source?: string;
+    segments: TranscriptSegment[];
+  }
+
+  export interface MeetingInviteRecord {
+    email: string;
+    name: string;
+    status: "sent" | "logged" | "failed";
+    error?: string;
+    sentAt?: string;
+  }
+
+  export interface CreateMeetingResponse {
+    meeting: Meeting;
+    invites: Array<{
+      email: string;
+      name: string;
+      status: "sent" | "logged" | "failed";
+      error?: string;
+    }>;
+  }
+
   export interface Meeting {
     id: string;
     title: string;
@@ -18,6 +51,9 @@ export interface Stakeholder {
     tag: MeetingTag;
     notes: string;
     mom?: MOM;
+    transcript?: MeetingTranscript;
+    pipelineStatus?: "processing" | "failed" | null;
+    invites?: MeetingInviteRecord[];
   }
   
   export interface MOM {
