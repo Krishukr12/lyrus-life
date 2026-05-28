@@ -32,6 +32,9 @@ importers:
       '@lyrus/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@lyrus/mom-pdf':
+        specifier: workspace:*
+        version: link:../../packages/mom-pdf
       '@lyrus/nlu':
         specifier: workspace:*
         version: link:../../packages/nlu
@@ -75,6 +78,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.76.0(react@18.3.1))
+      '@lyrus/mom-pdf':
+        specifier: workspace:*
+        version: link:../../packages/mom-pdf
       '@radix-ui/react-accordion':
         specifier: ^1.2.11
         version: 1.2.12(@types/react-dom@18.3.7(@types/react@18.3.29))(@types/react@18.3.29)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -354,6 +360,19 @@ importers:
         specifier: ^8.50.0
         version: 8.50.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
 
+  packages/mom-pdf:
+    dependencies:
+      jspdf:
+        specifier: ^3.0.1
+        version: 3.0.4
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+
   packages/nlu:
     dependencies:
       '@lyrus/shared':
@@ -372,6 +391,9 @@ importers:
 
   packages/notifications:
     dependencies:
+      '@lyrus/mom-pdf':
+        specifier: workspace:*
+        version: link:../mom-pdf
       nodemailer:
         specifier: ^6.10.1
         version: 6.10.1
@@ -3515,6 +3537,9 @@ packages:
 
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
+
+  jspdf@3.0.4:
+    resolution: {integrity: sha512-dc6oQ8y37rRcHn316s4ngz/nOjayLF/FFxBF4V9zamQKRqXxyiH1zagkCdktdWhtoQId5K20xt1lB90XzkB+hQ==}
 
   jspdf@4.2.1:
     resolution: {integrity: sha512-YyAXyvnmjTbR4bHQRLzex3CuINCDlQnBqoSYyjJwTP2x9jDLuKDzy7aKUl0hgx3uhcl7xzg32agn5vlie6HIlQ==}
@@ -8097,6 +8122,17 @@ snapshots:
   json-schema-traverse@1.0.0: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
+
+  jspdf@3.0.4:
+    dependencies:
+      '@babel/runtime': 7.29.2
+      fast-png: 6.4.0
+      fflate: 0.8.3
+    optionalDependencies:
+      canvg: 3.0.11
+      core-js: 3.49.0
+      dompurify: 3.4.5
+      html2canvas: 1.4.1
 
   jspdf@4.2.1:
     dependencies:

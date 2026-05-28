@@ -806,7 +806,8 @@ export default function MeetingDetail() {
                         <div>
                           <h3 className="font-heading text-sm font-semibold">Lyrus Life approval</h3>
                           <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-                            Stakeholders only receive this MOM after a Lyrus Life reviewer approves it. Approval sends it
+                            Stakeholders only receive this MOM after a Lyrus Life reviewer approves it. Approval emails the
+                            Lyrus Life MOM PDF to every stakeholder.
                             to everyone listed on this meeting immediately.
                           </p>
                         </div>

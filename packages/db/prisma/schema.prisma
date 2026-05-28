@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum MeetingStatus {
@@ -63,7 +63,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  organizedMeetings Meeting[] @relation("MeetingOrganizer")
+  organizedMeetings Meeting[]    @relation("MeetingOrganizer")
   ownedTasks        ActionItem[] @relation("TaskOwner")
   auditLogs         AuditLog[]
 }
@@ -83,7 +83,7 @@ model Meeting {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  organizer    User?                 @relation("MeetingOrganizer", fields: [organizerId], references: [id])
+  organizer    User?                @relation("MeetingOrganizer", fields: [organizerId], references: [id])
   participants MeetingParticipant[]
   audioFiles   AudioFile[]
   transcript   Transcript?
@@ -151,12 +151,12 @@ model Transcript {
 }
 
 model TranscriptSegment {
-  id           String  @id @default(cuid())
+  id           String @id @default(cuid())
   transcriptId String
   speaker      String
   startTime    Float
   endTime      Float
-  text         String  @db.Text
+  text         String @db.Text
   confidence   Float?
 
   transcript Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
@@ -165,20 +165,20 @@ model TranscriptSegment {
 }
 
 model Mom {
-  id           String   @id @default(cuid())
-  meetingId    String   @unique
+  id           String    @id @default(cuid())
+  meetingId    String    @unique
   title        String
   dateTime     String
   participants Json
   keyPoints    Json
   actionItems  Json
-  approved     Boolean  @default(false)
+  approved     Boolean   @default(false)
   approvedBy   String?
   approvedAt   DateTime?
-  shared       Boolean  @default(false)
+  shared       Boolean   @default(false)
   lastEditedAt DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 }
@@ -219,12 +219,12 @@ model Decision {
 }
 
 model Summary {
-  id          String   @id @default(cuid())
-  meetingId   String   @unique
-  shortSummary String  @db.Text
-  nextAgenda  Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  meetingId    String   @unique
+  shortSummary String   @db.Text
+  nextAgenda   Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 }

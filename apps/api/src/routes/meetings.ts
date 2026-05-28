@@ -27,6 +27,7 @@ import {
   saveUploadedAudio,
 } from "../services/pipeline.js";
 import { sendAndRecordMeetingInvites } from "../services/invites.js";
+import { sendMomToStakeholdersOnApproval } from "../services/mom-share.js";
 
 const meetingInclude = {
   participants: true,
@@ -441,8 +442,34 @@ export async function meetingRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: "MOM not found" });
     }
 
+    if (meeting.status !== MeetingStatus.COMPLETED) {
+      return reply.status(400).send({
+        error: "Meeting must be finished before MOM can be approved and shared",
+      });
+    }
+
     const approvedBy =
       (request.body as { approvedBy?: string } | undefined)?.approvedBy ?? "Lyrus Life Admin";
+
+    let shareResults: Awaited<ReturnType<typeof sendMomToStakeholdersOnApproval>> = [];
+    if (!meeting.mom.shared && meeting.participants.length > 0) {
+      try {
+        shareResults = await sendMomToStakeholdersOnApproval(meeting.id, approvedBy);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to send MOM";
+        return reply.status(500).send({ error: message });
+      }
+
+      const delivered = shareResults.filter(
+        (r) => r.status === "sent" || r.status === "logged",
+      );
+      if (delivered.length === 0) {
+        return reply.status(502).send({
+          error: "Could not deliver MOM to any stakeholder",
+          shareResults,
+        });
+      }
+    }
 
     const mom = await prisma.mom.update({
       where: { meetingId: meeting.id },
@@ -470,11 +497,11 @@ export async function meetingRoutes(app: FastifyInstance) {
     });
 
     await logAudit(meeting.id, PipelineStep.TASKS_CREATED, { count: actionItems.length });
-    await logAudit(meeting.id, PipelineStep.NOTIFICATION_SENT, {
-      recipients: meeting.participants.map((p) => p.email),
-    });
 
-    return mapMom(mom);
+    return {
+      ...mapMom(mom),
+      shareResults: shareResults.length > 0 ? shareResults : undefined,
+    };
   });
 
   app.get("/tasks", async () => {
