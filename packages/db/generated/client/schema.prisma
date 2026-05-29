@@ -56,16 +56,43 @@ enum InviteStatus {
   FAILED
 }
 
+enum AudioStorageBackend {
+  LOCAL
+  S3
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String?
+  role         UserRole @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   organizedMeetings Meeting[]    @relation("MeetingOrganizer")
   ownedTasks        ActionItem[] @relation("TaskOwner")
   auditLogs         AuditLog[]
+  otpCodes          AuthOtp[]
+}
+
+model AuthOtp {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Meeting {
@@ -80,6 +107,10 @@ model Meeting {
   calendarEventId String?
   recordingUrl    String?
   organizerId     String?
+  joinSlug        String?       @unique
+  liveStartedAt   DateTime?
+  liveBroadcastAt DateTime?
+  liveEndedAt     DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -125,12 +156,13 @@ model MeetingParticipant {
 }
 
 model AudioFile {
-  id         String   @id @default(cuid())
-  meetingId  String
-  storageKey String
-  mimeType   String
-  sizeBytes  Int
-  createdAt  DateTime @default(now())
+  id             String              @id @default(cuid())
+  meetingId      String
+  storageKey     String
+  storageBackend AudioStorageBackend @default(LOCAL)
+  mimeType       String
+  sizeBytes      Int
+  createdAt      DateTime            @default(now())
 
   meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 

@@ -124,8 +124,19 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   name: 'name',
+  passwordHash: 'passwordHash',
+  role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AuthOtpScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.MeetingScalarFieldEnum = {
@@ -140,6 +151,10 @@ exports.Prisma.MeetingScalarFieldEnum = {
   calendarEventId: 'calendarEventId',
   recordingUrl: 'recordingUrl',
   organizerId: 'organizerId',
+  joinSlug: 'joinSlug',
+  liveStartedAt: 'liveStartedAt',
+  liveBroadcastAt: 'liveBroadcastAt',
+  liveEndedAt: 'liveEndedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -166,6 +181,7 @@ exports.Prisma.AudioFileScalarFieldEnum = {
   id: 'id',
   meetingId: 'meetingId',
   storageKey: 'storageKey',
+  storageBackend: 'storageBackend',
   mimeType: 'mimeType',
   sizeBytes: 'sizeBytes',
   createdAt: 'createdAt'
@@ -280,6 +296,11 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+exports.UserRole = exports.$Enums.UserRole = {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+};
+
 exports.MeetingStatus = exports.$Enums.MeetingStatus = {
   UPCOMING: 'UPCOMING',
   ONGOING: 'ONGOING',
@@ -298,6 +319,11 @@ exports.InviteStatus = exports.$Enums.InviteStatus = {
   SENT: 'SENT',
   LOGGED: 'LOGGED',
   FAILED: 'FAILED'
+};
+
+exports.AudioStorageBackend = exports.$Enums.AudioStorageBackend = {
+  LOCAL: 'LOCAL',
+  S3: 'S3'
 };
 
 exports.TaskPriority = exports.$Enums.TaskPriority = {
@@ -331,6 +357,7 @@ exports.PipelineStep = exports.$Enums.PipelineStep = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  AuthOtp: 'AuthOtp',
   Meeting: 'Meeting',
   MeetingInvite: 'MeetingInvite',
   MeetingParticipant: 'MeetingParticipant',

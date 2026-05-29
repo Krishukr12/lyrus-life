@@ -1,5 +1,3 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { parseISO, isValid } from "date-fns";
 import {
   MeetingStatus,
@@ -16,8 +14,6 @@ import {
 } from "../lib/mappers.js";
 import type { Prisma } from "@lyrus/db";
 import { logAudit } from "./audit.js";
-
-const UPLOAD_DIR = process.env.UPLOAD_DIR ?? path.join(process.cwd(), "uploads");
 
 function parseDueDate(value: string, fallback: Date): Date | null {
   if (!value || value === "TBD") return null;
@@ -126,7 +122,24 @@ async function persistExtraction(meetingId: string, meetingDate: Date) {
   await logAudit(meetingId, PipelineStep.MOM_GENERATED);
 }
 
-export async function runMeetingPipeline(meetingId: string, audioFilePath: string, mimeType: string) {
+export type PipelineAudioSource = {
+  filePath: string;
+  mimeType: string;
+  s3Key?: string;
+  s3Bucket?: string;
+};
+
+export async function runMeetingPipeline(
+  meetingId: string,
+  audio: PipelineAudioSource | string,
+  mimeType?: string,
+) {
+  const source: PipelineAudioSource =
+    typeof audio === "string"
+      ? { filePath: audio, mimeType: mimeType ?? "audio/webm" }
+      : audio;
+  const audioFilePath = source.filePath;
+  const audioMimeType = source.mimeType;
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
     include: { participants: true },
@@ -147,10 +160,12 @@ export async function runMeetingPipeline(meetingId: string, audioFilePath: strin
 
   const transcription = await transcribeAudio({
     filePath: audioFilePath,
-    mimeType,
+    mimeType: audioMimeType,
     participants: participantNames,
     meetingNotes: meeting.notes,
     meetingId,
+    s3Key: source.s3Key,
+    s3Bucket: source.s3Bucket,
   });
 
   await prisma.transcript.upsert({
@@ -309,32 +324,3 @@ export async function createTranscriptFromNotes(meetingId: string) {
   return fullText;
 }
 
-export async function saveUploadedAudio(
-  meetingId: string,
-  buffer: Buffer,
-  filename: string,
-  mimeType: string,
-): Promise<{ storageKey: string; filePath: string }> {
-  await mkdir(UPLOAD_DIR, { recursive: true });
-  const ext = path.extname(filename) || ".webm";
-  const storageKey = `${meetingId}/${Date.now()}${ext}`;
-  const filePath = path.join(UPLOAD_DIR, storageKey);
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, buffer);
-
-  await prisma.audioFile.create({
-    data: {
-      meetingId,
-      storageKey,
-      mimeType,
-      sizeBytes: buffer.length,
-    },
-  });
-
-  await logAudit(meetingId, PipelineStep.AUDIO_UPLOADED, {
-    storageKey,
-    sizeBytes: buffer.length,
-  });
-
-  return { storageKey, filePath };
-}

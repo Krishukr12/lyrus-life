@@ -21,6 +21,7 @@ import {
   Timer,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { PendingMomAlert } from "@/components/PendingMomAlert";
 
 export default function Dashboard() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
@@ -117,6 +118,8 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <PendingMomAlert meetings={meetings} />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {stats.map((s, i) => (

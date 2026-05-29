@@ -1,6 +1,15 @@
-import { LayoutDashboard, CalendarDays, Users, Plus, ListChecks, ChartNoAxesCombined } from "lucide-react";
+import {
+  LayoutDashboard,
+  CalendarDays,
+  Users,
+  Plus,
+  ListChecks,
+  ChartNoAxesCombined,
+  LogOut,
+} from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +21,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+
+const companyName = import.meta.env.VITE_COMPANY_NAME ?? "Lyrus Life";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -25,13 +36,14 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
-      <SidebarContent className="pt-6">
+      <SidebarContent className="pt-6 flex flex-col h-full">
         <div className={`px-4 mb-8 ${collapsed ? "text-center" : ""}`}>
           <h1 className="font-heading text-sidebar-primary font-bold text-xl tracking-tight">
-            {collapsed ? "LL" : "Lyrus Life"}
+            {collapsed ? companyName.slice(0, 2).toUpperCase() : companyName}
           </h1>
           {!collapsed && (
             <p className="text-xs text-sidebar-foreground/60 mt-0.5">Meeting Management</p>
@@ -72,6 +84,23 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <div className={`mt-auto px-4 pb-6 ${collapsed ? "text-center" : ""}`}>
+          {!collapsed && user && (
+            <p className="text-xs text-sidebar-foreground/70 truncate mb-2" title={user.email}>
+              {user.name}
+            </p>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-sidebar-foreground/80 hover:text-sidebar-foreground"
+            onClick={() => void logout()}
+          >
+            <LogOut className="h-4 w-4 mr-2 shrink-0" />
+            {!collapsed && <span>Sign out</span>}
+          </Button>
+        </div>
       </SidebarContent>
     </Sidebar>
   );

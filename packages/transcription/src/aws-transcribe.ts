@@ -30,27 +30,34 @@ export async function transcribeWithAws(
   filePath: string,
   meetingId: string,
   participants: string[],
+  options?: { existingS3Key?: string; existingS3Bucket?: string },
 ): Promise<TranscriptionOutput> {
   if (!isAwsConfigured()) {
     throw new Error("AWS Transcribe is not configured");
   }
 
   const region = process.env.AWS_REGION!;
-  const bucket = process.env.AWS_S3_BUCKET!;
+  const bucket = options?.existingS3Bucket ?? process.env.AWS_S3_BUCKET!;
   const s3 = new S3Client({ region });
   const transcribe = new TranscribeClient({ region });
 
-  const key = `meetings/${meetingId}/${Date.now()}.webm`;
-  const body = await readFile(filePath);
-
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      Body: body,
-      ContentType: "audio/webm",
-    }),
-  );
+  let key = options?.existingS3Key;
+  if (!key) {
+    const prefix = (process.env.AWS_S3_PREFIX ?? "recordings").replace(/^\/+|\/+$/g, "");
+    key = prefix
+      ? `${prefix}/${meetingId}/${Date.now()}.webm`
+      : `meetings/${meetingId}/${Date.now()}.webm`;
+    const body = await readFile(filePath);
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: body,
+        ContentType: "audio/webm",
+        ServerSideEncryption: "AES256",
+      }),
+    );
+  }
 
   const jobName = `lyrus-${meetingId}-${Date.now()}`.replace(/[^a-zA-Z0-9-_]/g, "-");
   const mediaUri = `s3://${bucket}/${key}`;

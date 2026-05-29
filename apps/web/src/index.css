@@ -76,3 +76,320 @@
     @apply bg-card rounded-xl border border-border/60 p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-ring/30;
   }
 }
+
+/* ——— Live meeting room ——— */
+.meeting-room-root,
+.meeting-room {
+  background: #0b0f17;
+  color: #fff;
+}
+
+.meeting-room-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 45% at 15% 0%, hsl(174 55% 42% / 0.14), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 100% 80%, hsl(220 70% 45% / 0.12), transparent 45%),
+    linear-gradient(165deg, #0d121c 0%, #080b12 100%);
+}
+
+.meeting-video-shell {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.meeting-video-shell:has(.meeting-video-stage--presenting) {
+  border-color: hsl(199 89% 48% / 0.55) !important;
+  box-shadow:
+    0 0 0 1px hsl(199 89% 48% / 0.25),
+    0 0 40px hsl(199 89% 48% / 0.15),
+    0 12px 48px rgba(0, 0, 0, 0.5) !important;
+}
+
+.meeting-video-shell .lk-meeting-stage {
+  width: 100%;
+  height: 100%;
+}
+
+.lk-room .lk-meeting-stage-inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.lk-room .lk-grid-layout-wrapper,
+.lk-room .lk-focus-layout-wrapper {
+  flex: 1;
+  min-height: 0;
+  padding: 0.625rem;
+}
+
+/* Hide default LiveKit toasts / duplicate metadata */
+.lk-room .lk-connection-state-toast,
+.lk-room .lk-focus-toggle-button {
+  display: none !important;
+}
+
+/* Participant tiles */
+.meeting-tile-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.lk-room .meeting-participant-tile {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #121820;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.lk-room .meeting-participant-tile .lk-participant-metadata {
+  display: none;
+}
+
+.lk-room .lk-participant-placeholder {
+  background: linear-gradient(160deg, #1a2332 0%, #0f141c 100%);
+}
+
+.lk-room .meeting-participant-tile[data-lk-speaking="true"] {
+  border-color: hsl(174 60% 45% / 0.5);
+  box-shadow: 0 0 0 2px hsl(174 60% 45% / 0.2);
+}
+
+.meeting-host-pill {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.meeting-notes-toggle:focus-visible {
+  outline: 2px solid hsl(174 60% 45% / 0.6);
+  outline-offset: 2px;
+}
+
+.meeting-tile-host-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #fde68a;
+  background: rgba(180, 83, 9, 0.75);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.meeting-tile-presenting-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #e0f2fe;
+  background: rgba(14, 116, 214, 0.85);
+  border: 1px solid rgba(125, 211, 252, 0.35);
+  box-shadow: 0 4px 12px rgba(14, 116, 214, 0.35);
+}
+
+.meeting-tile-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+  pointer-events: none;
+}
+
+.meeting-tile-name-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.meeting-tile-muted-icon {
+  color: #f87171;
+}
+
+.meeting-tile-muted-icon:not([data-lk-muted="true"]) {
+  display: none;
+}
+
+/* Control dock (Zoom / Meet style) */
+.meeting-control-dock {
+  flex-shrink: 0;
+  padding: 0 12px 14px;
+}
+
+.meeting-control-dock-hint {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  padding-bottom: 8px;
+}
+
+.meeting-control-dock-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 10px 16px;
+  border-radius: 9999px;
+  background: rgba(18, 22, 32, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px);
+}
+
+.meeting-control-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.meeting-control-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.meeting-control-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Media control buttons */
+.meeting-media-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.meeting-media-btn:hover:not(:disabled) {
+  transform: scale(1.06);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.meeting-media-btn--active {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.meeting-media-btn--danger {
+  background: #dc2626;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.45);
+}
+
+.meeting-media-btn--danger:hover:not(:disabled) {
+  background: #ef4444;
+}
+
+.meeting-media-btn--present {
+  background: #0284c7;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.5);
+}
+
+.meeting-media-btn--present:hover:not(:disabled) {
+  background: #0ea5e9;
+}
+
+.meeting-media-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 32px;
+  margin-left: -6px;
+  border-radius: 0 9999px 9999px 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+}
+
+.meeting-media-chevron:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+/* Device picker list */
+.meeting-device-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.meeting-device-list li {
+  margin: 0;
+  padding: 0;
+}
+
+.meeting-device-list li button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+}
+
+.meeting-device-list li button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.meeting-device-list li[data-lk-active="true"] button {
+  background: hsl(174 60% 40% / 0.2);
+  color: hsl(174 70% 75%);
+  font-weight: 500;
+}
+
+.meeting-action-btn {
+  @apply rounded-full h-10 px-5 text-xs font-semibold gap-2 border inline-flex items-center;
+}
+
+.meeting-action-btn--leave {
+  @apply border-white/15 bg-white/10 text-white hover:bg-white/15 hover:text-white;
+}
+
+.meeting-action-btn--end {
+  @apply border-transparent bg-red-600 text-white hover:bg-red-500 shadow-lg shadow-red-950/40;
+}

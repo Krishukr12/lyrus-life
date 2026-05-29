@@ -1,3 +1,6 @@
+import nodemailer from "nodemailer";
+import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
+
 export interface SmtpConfig {
   host: string;
   port: number;
@@ -5,6 +8,20 @@ export interface SmtpConfig {
   user: string;
   pass: string;
   from: string;
+}
+
+/** Same transport options used for meeting invites and OTP mail. */
+export function createSmtpTransport(smtp: SmtpConfig) {
+  return nodemailer.createTransport({
+    host: smtp.host,
+    port: smtp.port,
+    secure: smtp.secure,
+    requireTLS: !smtp.secure && smtp.port === 587,
+    auth: {
+      user: smtp.user,
+      pass: smtp.pass,
+    },
+  } satisfies SMTPTransport.Options);
 }
 
 function env(key: string, fallbackKey?: string): string | undefined {

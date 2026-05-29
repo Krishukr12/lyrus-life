@@ -7,10 +7,8 @@ import {
   editMOM,
   approveMOM,
   uploadMeetingAudio,
-  completeMeetingWithRecording,
   resendMeetingInvites,
 } from "@/lib/api";
-import { useMeetingRecorder } from "@/hooks/use-meeting-recorder";
 import { ActionItem, Meeting } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge, TagBadge } from "@/components/StatusBadge";
-import { Progress } from "@/components/ui/progress";
+import { MomStakeholderBadge } from "@/components/MomStakeholderBadge";
 import {
   ArrowLeft,
   Clock,
@@ -31,9 +29,6 @@ import {
   Loader2,
   Video,
   Mic,
-  MicOff,
-  MonitorUp,
-  PhoneOff,
   Download,
   Eye,
   ShieldCheck,
@@ -45,27 +40,6 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { createMomPdfBlob, downloadMomFile } from "@/lib/mom-export";
 import { getCurrentUserDisplayName } from "@/lib/current-user";
-
-function formatDuration(totalSeconds: number) {
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-}
-
-function transcriptSourceLabel(source?: string) {
-  switch (source) {
-    case "openai_whisper":
-      return "OpenAI Whisper (real audio)";
-    case "aws_transcribe":
-      return "AWS Transcribe (real audio)";
-    case "notes":
-      return "From live notes";
-    case "mock":
-      return "Demo script (configure OpenAI or AWS for real STT)";
-    default:
-      return source ?? "Unknown";
-  }
-}
 
 /** Avoid white-screen crashes when API returns partial mom/transcript shapes */
 function normalizeMeeting(m: Meeting): Meeting {
@@ -95,184 +69,6 @@ function normalizeMeeting(m: Meeting): Meeting {
   };
 }
 
-function MeetingProcessingOverlay() {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-50 bg-primary flex flex-col items-center justify-center gap-4 px-6"
-    >
-      <Loader2 className="h-12 w-12 animate-spin text-secondary" />
-      <p className="text-primary-foreground text-center font-medium">
-        Uploading recording and generating minutes…
-      </p>
-      <p className="text-primary-foreground/60 text-sm text-center max-w-md">
-        This can take a minute for cloud transcription. Please keep this tab open.
-      </p>
-    </motion.div>
-  );
-}
-
-function LiveMeetingScreen({
-  meeting,
-  liveNotes,
-  onLiveNotesChange,
-  onMeetingEnd,
-}: {
-  meeting: Meeting;
-  liveNotes: string;
-  onLiveNotesChange: (value: string) => void;
-  onMeetingEnd: (recording: Blob | null) => Promise<void>;
-}) {
-  const durationSeconds = Math.max(60, meeting.duration * 60);
-  const [elapsed, setElapsed] = useState(0);
-  const [micOn, setMicOn] = useState(true);
-  const [ending, setEnding] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
-  const { state: recorderState, startRecording, stopRecording, setMuted } = useMeetingRecorder();
-
-  useEffect(() => {
-    void startRecording().catch(() => {
-      toast.error("Microphone access is required to record this meeting");
-    });
-  }, [startRecording]);
-
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setElapsed((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(timerRef.current);
-  }, []);
-
-  useEffect(() => {
-    setMuted(!micOn);
-  }, [micOn, setMuted]);
-
-  const handleEndCall = async () => {
-    if (ending) return;
-    setEnding(true);
-    try {
-      const blob = await stopRecording();
-      await onMeetingEnd(blob);
-    } finally {
-      setEnding(false);
-    }
-  };
-
-  const progress = Math.min(100, (elapsed / durationSeconds) * 100);
-  const remaining = Math.max(0, durationSeconds - elapsed);
-  const recordedLabel = formatDuration(recorderState.durationSeconds);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className="fixed inset-0 z-50 bg-primary flex flex-col"
-    >
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
-          </span>
-          <span className="text-primary-foreground font-heading font-semibold text-sm">LIVE</span>
-          {recorderState.isRecording && (
-            <Badge variant="outline" className="border-destructive/50 text-destructive bg-destructive/10">
-              REC • {recordedLabel}
-            </Badge>
-          )}
-          <span className="text-primary-foreground/60 text-sm ml-2">{meeting.title}</span>
-        </div>
-        <motion.div className="text-primary-foreground/80 font-mono text-sm text-right">
-          <div>{formatDuration(remaining)} remaining</div>
-          <div className="text-xs opacity-70">Recording uploads when you end</div>
-        </motion.div>
-      </div>
-
-      {/* Main area - simulated video grid */}
-      <div className="flex-1 p-6 flex items-center justify-center">
-        <div className="grid grid-cols-2 gap-4 max-w-3xl w-full">
-          {(meeting.stakeholders ?? []).slice(0, 4).map((s, i) => (
-            <div
-              key={i}
-              className="aspect-video rounded-xl bg-sidebar-accent flex items-center justify-center relative overflow-hidden"
-            >
-              <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center text-2xl font-heading font-bold text-secondary">
-                {s.name.split(" ").map((n) => n[0]).join("")}
-              </div>
-              <span className="absolute bottom-3 left-3 text-xs text-primary-foreground/70 bg-primary/60 px-2 py-0.5 rounded">
-                {s.name}
-              </span>
-            </div>
-          ))}
-          {/* You tile */}
-          <div className="aspect-video rounded-xl bg-sidebar-accent flex items-center justify-center relative overflow-hidden border-2 border-secondary/40">
-            <div className="w-16 h-16 rounded-full bg-secondary/30 flex items-center justify-center text-2xl font-heading font-bold text-secondary">
-              You
-            </div>
-            <span className="absolute bottom-3 left-3 text-xs text-primary-foreground/70 bg-primary/60 px-2 py-0.5 rounded">
-              You (Host)
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pb-2">
-        <Label className="text-primary-foreground/80 text-xs">
-          Live notes (backup if transcription fails — use &quot;Name: statement&quot; per line)
-        </Label>
-        <Textarea
-          value={liveNotes}
-          onChange={(e) => onLiveNotesChange(e.target.value)}
-          placeholder={"Alice: will send budget by Friday\nBob: agreed to postpone pilot to Q3"}
-          className="mt-1 min-h-[88px] bg-primary-foreground/10 border-sidebar-border text-primary-foreground placeholder:text-primary-foreground/40"
-        />
-      </div>
-
-      {/* Progress bar */}
-      <div className="px-6">
-        <Progress value={progress} className="h-1.5 bg-sidebar-accent [&>div]:bg-secondary" />
-      </div>
-
-      {/* Bottom controls */}
-      <div className="flex items-center justify-center gap-4 py-5">
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full h-12 w-12 border-sidebar-border text-primary-foreground hover:bg-sidebar-accent"
-          onClick={() => setMicOn(!micOn)}
-        >
-          {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full h-12 w-12 border-sidebar-border text-primary-foreground hover:bg-sidebar-accent"
-        >
-          <Video className="h-5 w-5" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full h-12 w-12 border-sidebar-border text-primary-foreground hover:bg-sidebar-accent"
-        >
-          <MonitorUp className="h-5 w-5" />
-        </Button>
-        <Button
-          size="icon"
-          className="rounded-full h-12 w-12 bg-destructive hover:bg-destructive/90"
-          onClick={handleEndCall}
-          disabled={ending}
-        >
-          {ending ? <Loader2 className="h-5 w-5 animate-spin" /> : <PhoneOff className="h-5 w-5" />}
-        </Button>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function MeetingDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -280,8 +76,6 @@ export default function MeetingDetail() {
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState("");
   const [generatingMom, setGeneratingMom] = useState(false);
-  const [inLiveMeeting, setInLiveMeeting] = useState(false);
-  const [postMeetingProcessing, setPostMeetingProcessing] = useState(false);
   const [downloadingFormat, setDownloadingFormat] = useState<"docx" | "pdf" | "txt" | "json" | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -291,7 +85,6 @@ export default function MeetingDetail() {
   const [momKeyPointsDraft, setMomKeyPointsDraft] = useState("");
   const [momActionItemsDraft, setMomActionItemsDraft] = useState("");
   const [uploadingAudio, setUploadingAudio] = useState(false);
-  const [liveNotes, setLiveNotes] = useState("");
   const [resendingInvites, setResendingInvites] = useState(false);
   const audioInputRef = useRef<HTMLInputElement>(null);
 
@@ -355,59 +148,14 @@ export default function MeetingDetail() {
     toast.success("Meeting started");
   };
 
-  const handleJoin = async () => {
+  const handleJoin = () => {
     if (!meeting) return;
-    await updateMeeting(meeting.id, { status: "ongoing" });
-    if (!liveNotes.trim() && meeting.description.trim()) {
-      setLiveNotes(`Host: ${meeting.description.trim()}`);
+    if (meeting.joinSlug) {
+      navigate(`/join/${meeting.joinSlug}`);
+    } else {
+      navigate(`/meetings/${meeting.id}/live`);
     }
-    setInLiveMeeting(true);
-    toast.success("You joined the meeting — add live notes for better MOM quality");
   };
-
-  const handleMeetingEnd = useCallback(
-    async (recording: Blob | null) => {
-      if (!meeting) return;
-      setPostMeetingProcessing(true);
-
-      const combinedNotes = [notes.trim(), liveNotes.trim()].filter(Boolean).join("\n");
-
-      toast.loading("Uploading recording and generating MOM...", { id: "mom-gen" });
-      try {
-        const result = await completeMeetingWithRecording(
-          meeting.id,
-          recording,
-          combinedNotes,
-        );
-        const updated = normalizeMeeting(result.meeting);
-        setMeeting(updated);
-        setNotes(updated.notes);
-        toast.dismiss("mom-gen");
-
-        const source = result.transcriptSource ?? updated.transcript?.source;
-        if (recording && recording.size > 5000) {
-          toast.success(`Recording processed (${transcriptSourceLabel(source)})`);
-        } else if (updated.mom) {
-          toast.success("MOM generated from notes");
-        }
-
-        if (updated.mom) {
-          toast.info("Review and approve the MOM below before sharing.");
-        } else {
-          toast.warning("No MOM produced. Add notes or check OPENAI_API_KEY in .env");
-        }
-      } catch (error) {
-        toast.dismiss("mom-gen");
-        const message = error instanceof Error ? error.message : "Processing failed";
-        toast.error(message);
-        await refreshMeeting();
-      } finally {
-        setInLiveMeeting(false);
-        setPostMeetingProcessing(false);
-      }
-    },
-    [meeting, notes, liveNotes, refreshMeeting],
-  );
 
   const handleResendInvites = async () => {
     if (!meeting) return;
@@ -561,16 +309,6 @@ export default function MeetingDetail() {
 
   return (
     <>
-      {postMeetingProcessing && <MeetingProcessingOverlay />}
-      {inLiveMeeting && !postMeetingProcessing && (
-        <LiveMeetingScreen
-          meeting={meeting}
-          liveNotes={liveNotes}
-          onLiveNotesChange={setLiveNotes}
-          onMeetingEnd={handleMeetingEnd}
-        />
-      )}
-
       <div className="max-w-3xl mx-auto space-y-6">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1 text-muted-foreground -ml-2">
           <ArrowLeft className="h-4 w-4" /> Back
@@ -583,9 +321,12 @@ export default function MeetingDetail() {
                 <h1 className="text-xl font-heading font-bold">{meeting.title}</h1>
                 <p className="text-muted-foreground text-sm mt-1">{meeting.description}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <TagBadge tag={meeting.tag} />
-                <StatusBadge status={meeting.status} />
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex items-center gap-2">
+                  <TagBadge tag={meeting.tag} />
+                  <StatusBadge status={meeting.status} />
+                </div>
+                <MomStakeholderBadge meeting={meeting} />
               </div>
             </div>
 
@@ -667,7 +408,7 @@ export default function MeetingDetail() {
         </Card>
 
         <Card className="p-6 space-y-4">
-          <h2 className="text-lg font-heading font-semibold">Recording &amp; Transcript</h2>
+          <h2 className="text-lg font-heading font-semibold">Recording</h2>
           <p className="text-muted-foreground text-sm">
             Upload meeting audio for speech-to-text with speaker segments, then AI extracts tasks and decisions.
           </p>
@@ -700,15 +441,7 @@ export default function MeetingDetail() {
             )}
           </motion.div>
           {meeting.transcript && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3 rounded-lg border bg-muted/20 p-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm font-medium">Transcript</p>
-                {meeting.transcript.source && (
-                  <Badge variant="secondary" className="text-xs font-normal">
-                    {transcriptSourceLabel(meeting.transcript.source)}
-                  </Badge>
-                )}
-              </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg border bg-muted/20 p-4">
               <motion.div className="max-h-64 space-y-2 overflow-y-auto text-sm">
                 {(meeting.transcript.segments ?? []).map((seg, i) => (
                   <p key={i}>

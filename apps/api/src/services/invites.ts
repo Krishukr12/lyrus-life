@@ -1,5 +1,6 @@
 import { InviteStatus, PipelineStep, prisma } from "@lyrus/db";
 import { getOrganizerEmail, sendMeetingInvites, type InviteResult } from "@lyrus/notifications";
+import { ensureMeetingJoinSlug } from "../lib/meeting-join-access.js";
 import { logAudit } from "./audit.js";
 
 export async function sendAndRecordMeetingInvites(meetingId: string): Promise<InviteResult[]> {
@@ -18,9 +19,11 @@ export async function sendAndRecordMeetingInvites(meetingId: string): Promise<In
 
   const organizerName = meeting.organizer?.name ?? "Lyrus Life Host";
   const organizerEmail = meeting.organizer?.email ?? getOrganizerEmail();
+  const joinSlug = meeting.joinSlug ?? (await ensureMeetingJoinSlug(meeting.id));
 
   const results = await sendMeetingInvites({
     meetingId: meeting.id,
+    joinSlug,
     title: meeting.title,
     description: meeting.description,
     scheduledAt: meeting.scheduledAt,

@@ -6,4 +6,5 @@ export {
   type MomShareResult,
   type SendMomToStakeholdersInput,
 } from "./mom-email.js";
-export { getOrganizerEmail, getSmtpConfig } from "./smtp-config.js";
+export { sendLoginOtpEmail, sendPasswordResetOtpEmail } from "./auth-email.js";
+export { createSmtpTransport, getOrganizerEmail, getSmtpConfig } from "./smtp-config.js";

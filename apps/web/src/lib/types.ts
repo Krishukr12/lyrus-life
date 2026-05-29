@@ -54,6 +54,7 @@ export interface Stakeholder {
     transcript?: MeetingTranscript;
     pipelineStatus?: "processing" | "failed" | null;
     invites?: MeetingInviteRecord[];
+    joinSlug?: string;
   }
   
   export interface MOM {

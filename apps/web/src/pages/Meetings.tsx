@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getMeetings } from "@/lib/api";
 import { Meeting, MeetingStatus, MeetingTag } from "@/lib/types";
 import { Card } from "@/components/ui/card";
@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge, TagBadge } from "@/components/StatusBadge";
+import { MomStakeholderBadge } from "@/components/MomStakeholderBadge";
+import { PendingMomAlert } from "@/components/PendingMomAlert";
+import { filterMeetingsPendingMom, needsMomStakeholderAction } from "@/lib/mom-status";
 import { Clock, Users, Search, CalendarDays, Plus, Sparkles, CheckCircle2, Timer, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -17,15 +20,26 @@ export default function Meetings() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [tagFilter, setTagFilter] = useState<string>("all");
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const momFilter = searchParams.get("mom") === "pending" ? "pending" : "all";
 
   useEffect(() => {
     getMeetings().then((m) => { setMeetings(m); setLoading(false); });
   }, []);
 
+  useEffect(() => {
+    if (searchParams.get("mom") === "pending") {
+      setStatusFilter("all");
+    }
+  }, [searchParams]);
+
+  const pendingMomCount = useMemo(() => filterMeetingsPendingMom(meetings).length, [meetings]);
+
   const filtered = meetings.filter((m) => {
     if (search && !m.title.toLowerCase().includes(search.toLowerCase())) return false;
     if (statusFilter !== "all" && m.status !== statusFilter) return false;
     if (tagFilter !== "all" && m.tag !== tagFilter) return false;
+    if (momFilter === "pending" && !needsMomStakeholderAction(m)) return false;
     return true;
   }).sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
 
@@ -95,6 +109,8 @@ export default function Meetings() {
         </div>
       </div>
 
+      <PendingMomAlert meetings={meetings} />
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {[
           { label: "Upcoming", value: upcoming.length, icon: Timer, tone: "text-warning", hint: `${upcomingThisWeek} this week` },
@@ -138,10 +154,28 @@ export default function Meetings() {
             <SelectItem value="vendor">Vendor</SelectItem>
           </SelectContent>
         </Select>
+        <Select
+          value={momFilter}
+          onValueChange={(v) => {
+            if (v === "pending") setSearchParams({ mom: "pending" });
+            else setSearchParams({});
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="MOM" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All MOM status</SelectItem>
+            <SelectItem value="pending">
+              Pending for stakeholders{pendingMomCount > 0 ? ` (${pendingMomCount})` : ""}
+            </SelectItem>
+          </SelectContent>
+        </Select>
         <Button variant="outline" className="gap-2" onClick={() => {
           setSearch("");
           setStatusFilter("all");
           setTagFilter("all");
+          setSearchParams({});
         }}>
           Reset Filters
         </Button>
@@ -194,16 +228,19 @@ export default function Meetings() {
                       <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {m.stakeholders.length}</span>
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0 ml-4">
-                    <TagBadge tag={m.tag} />
-                    <StatusBadge status={m.status} />
+                  <div className="flex flex-col items-end gap-2 shrink-0 ml-4">
+                    <div className="flex items-center gap-2">
+                      <TagBadge tag={m.tag} />
+                      <StatusBadge status={m.status} />
+                    </div>
+                    <MomStakeholderBadge meeting={m} />
                   </div>
                 </div>
-                <div className="mt-3 pt-3 border-t flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">
-                    MOM: <span className={m.mom ? "text-success font-medium" : "text-warning font-medium"}>{m.mom ? "Generated" : "Pending"}</span>
+                <div className="mt-3 pt-3 border-t flex items-center justify-between text-xs text-muted-foreground">
+                  <span>
+                    {m.stakeholders.length} stakeholder{m.stakeholders.length === 1 ? "" : "s"}
                   </span>
-                  <span className="text-muted-foreground">{m.stakeholders[0]?.name ?? "No owner"}{m.stakeholders.length > 1 ? ` +${m.stakeholders.length - 1}` : ""}</span>
+                  <span>{m.stakeholders[0]?.name ?? "—"}{m.stakeholders.length > 1 ? ` +${m.stakeholders.length - 1}` : ""}</span>
                 </div>
               </Card>
             </motion.div>

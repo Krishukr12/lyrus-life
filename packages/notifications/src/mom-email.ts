@@ -3,7 +3,7 @@ import path from "node:path";
 import { generateMomPdfBytes, momPdfFilename, type MomPdfInput } from "@lyrus/mom-pdf";
 import nodemailer from "nodemailer";
 import type { InviteResult } from "./email.js";
-import { getSmtpConfig } from "./smtp-config.js";
+import { createSmtpTransport, getSmtpConfig } from "./smtp-config.js";
 
 export type MomDeliveryStatus = "sent" | "logged" | "failed";
 
@@ -96,15 +96,7 @@ export async function sendMomToStakeholders(
   const smtp = getSmtpConfig(input.organizerEmail);
 
   if (smtp) {
-    const transporter = nodemailer.createTransport({
-      host: smtp.host,
-      port: smtp.port,
-      secure: smtp.secure,
-      auth: {
-        user: smtp.user,
-        pass: smtp.pass,
-      },
-    });
+    const transporter = createSmtpTransport(smtp);
 
     for (const stakeholder of input.stakeholders) {
       try {

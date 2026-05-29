@@ -1,9 +1,10 @@
 import { CreateMeetingResponse, Meeting, MOM, UserTask } from "./types";
-import { getCurrentUserDisplayName } from "./current-user";
+import { getApiAuthHandlers } from "./auth-handlers";
+import { getAccessToken } from "./token-store";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+const API_BASE = import.meta.env.VITE_API_URL ?? "/api";
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
@@ -12,23 +13,34 @@ class ApiError extends Error {
   }
 }
 
+function buildAuthHeaders(extra?: HeadersInit): HeadersInit {
+  const token = getAccessToken();
+  return {
+    ...(extra ?? {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const hasJsonBody = init?.body != null && init.body !== "";
-  const headers: HeadersInit = {
+  const headers: HeadersInit = buildAuthHeaders({
     ...(hasJsonBody ? { "Content-Type": "application/json" } : {}),
     ...(init?.headers ?? {}),
-  };
+  });
 
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
+    credentials: "include",
     headers,
   });
 
   if (!response.ok) {
     let message = response.statusText;
     try {
-      const body = (await response.json()) as { error?: unknown };
-      if (body.error) {
+      const body = (await response.json()) as { error?: unknown; message?: string };
+      if (body.message) {
+        message = body.message;
+      } else if (body.error) {
         message =
           typeof body.error === "string"
             ? body.error
@@ -37,11 +49,49 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       // ignore parse errors
     }
+
+    if (response.status === 401) {
+      getApiAuthHandlers().onUnauthorized?.();
+    }
+    if (response.status === 403) {
+      getApiAuthHandlers().onForbidden?.();
+    }
+
     throw new ApiError(message, response.status);
   }
 
   if (response.status === 204) {
     return undefined as T;
+  }
+
+  return response.json() as Promise<T>;
+}
+
+async function multipartRequest<T>(path: string, init: RequestInit): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    credentials: "include",
+    headers: buildAuthHeaders(init.headers),
+  });
+
+  if (!response.ok) {
+    let message = response.statusText;
+    try {
+      const body = (await response.json()) as { error?: string; message?: string };
+      if (body.message) message = body.message;
+      else if (body.error) message = body.error;
+    } catch {
+      // ignore
+    }
+
+    if (response.status === 401) {
+      getApiAuthHandlers().onUnauthorized?.();
+    }
+    if (response.status === 403) {
+      getApiAuthHandlers().onForbidden?.();
+    }
+
+    throw new ApiError(message, response.status);
   }
 
   return response.json() as Promise<T>;
@@ -98,10 +148,14 @@ export async function uploadMeetingAudio(meetingId: string, file: File): Promise
 
   const response = await fetch(`${API_BASE}/meetings/${meetingId}/audio`, {
     method: "POST",
+    credentials: "include",
+    headers: buildAuthHeaders(),
     body: form,
   });
 
   if (!response.ok) {
+    if (response.status === 401) getApiAuthHandlers().onUnauthorized?.();
+    if (response.status === 403) getApiAuthHandlers().onForbidden?.();
     throw new ApiError("Failed to upload audio", response.status);
   }
 }
@@ -129,23 +183,10 @@ export async function completeMeetingWithRecording(
     form.append("recording", recording, `meeting-${meetingId}.webm`);
   }
 
-  const response = await fetch(`${API_BASE}/meetings/${meetingId}/complete`, {
+  return multipartRequest<CompleteMeetingResponse>(`/meetings/${meetingId}/complete`, {
     method: "POST",
     body: form,
   });
-
-  if (!response.ok) {
-    let message = response.statusText;
-    try {
-      const body = (await response.json()) as { error?: string };
-      if (body.error) message = body.error;
-    } catch {
-      // ignore
-    }
-    throw new ApiError(message, response.status);
-  }
-
-  return response.json() as Promise<CompleteMeetingResponse>;
 }
 
 export async function generateMOM(meetingId: string): Promise<MOM> {
@@ -169,7 +210,7 @@ export async function editMOM(
 export async function approveMOM(meetingId: string): Promise<MOM> {
   return request<MOM>(`/meetings/${meetingId}/mom/approve`, {
     method: "POST",
-    body: JSON.stringify({ approvedBy: getCurrentUserDisplayName() }),
+    body: JSON.stringify({}),
   });
 }
 

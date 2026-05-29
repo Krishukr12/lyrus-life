@@ -1,6 +1,15 @@
-/**
- * Display name for the signed-in user. Replace with auth/session when available.
- */
+import type { AuthUser } from "./auth-api";
+
+let currentUser: AuthUser | null = null;
+
+export function setCurrentUser(user: AuthUser | null) {
+  currentUser = user;
+}
+
+export function getCurrentUser(): AuthUser | null {
+  return currentUser;
+}
+
 export function getCurrentUserDisplayName(): string {
-  return "Krishan Kumar Safi";
+  return currentUser?.name ?? "User";
 }

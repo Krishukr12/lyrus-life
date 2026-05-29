@@ -3,19 +3,19 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import clientModule from "../generated/client/client.js";
 import enumModule from "../generated/client/enums.js";
+import generatedModule from "../generated/client/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: resolve(__dirname, "../../../.env") });
 config({ path: resolve(__dirname, "../.env") });
 
-const clientExports =
-  (clientModule as { default?: typeof clientModule }).default ?? clientModule;
 const enumExports = (enumModule as { default?: typeof enumModule }).default ?? enumModule;
+const generatedExports =
+  (generatedModule as { default?: typeof generatedModule }).default ?? generatedModule;
 
-export const PrismaClient = clientExports.PrismaClient;
-export const Prisma = clientExports.Prisma;
+export const PrismaClient = generatedExports.PrismaClient;
+export const Prisma = generatedExports.Prisma;
 export const {
   MeetingStatus,
   MeetingTag,
@@ -24,6 +24,8 @@ export const {
   PipelineStep,
   InviteStatus,
 } = enumExports;
+export const UserRole = generatedExports.UserRole;
+export const AudioStorageBackend = generatedExports.AudioStorageBackend;
 
 export type PrismaClient = InstanceType<typeof PrismaClient>;
 
@@ -64,4 +66,4 @@ export type {
   Decision,
   Summary,
   AuditLog,
-} from "../generated/client/client.js";
+} from "../generated/client/index.js";

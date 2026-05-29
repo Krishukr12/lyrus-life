@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import nodemailer from "nodemailer";
 import { buildMeetingIcs, type CalendarEventInput } from "./ics.js";
-import { getSmtpConfig } from "./smtp-config.js";
+import { createSmtpTransport, getSmtpConfig } from "./smtp-config.js";
 
 export type InviteDeliveryStatus = "sent" | "logged" | "failed";
 
@@ -15,6 +15,7 @@ export interface InviteResult {
 
 export interface SendMeetingInvitesInput {
   meetingId: string;
+  joinSlug: string;
   title: string;
   description: string;
   scheduledAt: Date;
@@ -24,13 +25,13 @@ export interface SendMeetingInvitesInput {
   attendees: Array<{ name: string; email: string }>;
 }
 
-function getWebAppUrl(meetingId: string): string {
+function getMeetingJoinUrl(joinSlug: string): string {
   const base = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
-  return `${base}/meetings/${meetingId}`;
+  return `${base}/join/${joinSlug}`;
 }
 
 function buildInviteHtml(input: SendMeetingInvitesInput): string {
-  const joinUrl = getWebAppUrl(input.meetingId);
+  const joinUrl = getMeetingJoinUrl(input.joinSlug);
   const when = input.scheduledAt.toLocaleString(undefined, {
     weekday: "long",
     year: "numeric",
@@ -48,11 +49,12 @@ function buildInviteHtml(input: SendMeetingInvitesInput): string {
       <p><strong>Organizer:</strong> ${input.organizerName} (${input.organizerEmail})</p>
       <p style="margin-top: 24px;">
         <a href="${joinUrl}" style="background: #0d9488; color: white; padding: 12px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">
-          Open meeting in Lyrus Life
+          Join meeting
         </a>
       </p>
       <p style="color: #666; font-size: 13px; margin-top: 24px;">
-        A calendar invite (.ics) is attached. Recording and MOM generation will be handled in the platform after the meeting.
+        Sign in with your work email to join. Only invited colleagues on your organization domain can enter.
+        A calendar invite (.ics) is attached.
       </p>
     </div>
   `.trim();
@@ -79,7 +81,7 @@ export async function sendMeetingInvites(
   }
 
   const end = new Date(input.scheduledAt.getTime() + input.durationMinutes * 60_000);
-  const joinUrl = getWebAppUrl(input.meetingId);
+  const joinUrl = getMeetingJoinUrl(input.joinSlug);
 
   const calendarBase: CalendarEventInput = {
     uid: `lyrus-meeting-${input.meetingId}@lyrus.life`,
@@ -109,15 +111,7 @@ export async function sendMeetingInvites(
   const smtp = getSmtpConfig(input.organizerEmail);
 
   if (smtp) {
-    const transporter = nodemailer.createTransport({
-      host: smtp.host,
-      port: smtp.port,
-      secure: smtp.secure,
-      auth: {
-        user: smtp.user,
-        pass: smtp.pass,
-      },
-    });
+    const transporter = createSmtpTransport(smtp);
 
     for (const attendee of input.attendees) {
       try {

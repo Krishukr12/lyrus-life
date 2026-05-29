@@ -115,6 +115,10 @@ export async function transcribeAudio(input: TranscribeAudioInput): Promise<Tran
         input.filePath,
         input.meetingId ?? "unknown",
         input.participants,
+        {
+          existingS3Key: input.s3Key,
+          existingS3Bucket: input.s3Bucket,
+        },
       );
     } catch (awsErr) {
       if (process.env.OPENAI_API_KEY) {

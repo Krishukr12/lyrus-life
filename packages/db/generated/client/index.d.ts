@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model AuthOtp
+ * 
+ */
+export type AuthOtp = $Result.DefaultSelection<Prisma.$AuthOtpPayload>
+/**
  * Model Meeting
  * 
  */
@@ -144,6 +149,22 @@ export const InviteStatus: {
 
 export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus]
 
+
+export const AudioStorageBackend: {
+  LOCAL: 'LOCAL',
+  S3: 'S3'
+};
+
+export type AudioStorageBackend = (typeof AudioStorageBackend)[keyof typeof AudioStorageBackend]
+
+
+export const UserRole: {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+};
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
 }
 
 export type MeetingStatus = $Enums.MeetingStatus
@@ -169,6 +190,14 @@ export const PipelineStep: typeof $Enums.PipelineStep
 export type InviteStatus = $Enums.InviteStatus
 
 export const InviteStatus: typeof $Enums.InviteStatus
+
+export type AudioStorageBackend = $Enums.AudioStorageBackend
+
+export const AudioStorageBackend: typeof $Enums.AudioStorageBackend
+
+export type UserRole = $Enums.UserRole
+
+export const UserRole: typeof $Enums.UserRole
 
 /**
  * ##  Prisma Client ʲˢ
@@ -300,6 +329,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.authOtp`: Exposes CRUD operations for the **AuthOtp** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AuthOtps
+    * const authOtps = await prisma.authOtp.findMany()
+    * ```
+    */
+  get authOtp(): Prisma.AuthOtpDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.meeting`: Exposes CRUD operations for the **Meeting** model.
@@ -845,6 +884,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    AuthOtp: 'AuthOtp',
     Meeting: 'Meeting',
     MeetingInvite: 'MeetingInvite',
     MeetingParticipant: 'MeetingParticipant',
@@ -871,7 +911,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "meeting" | "meetingInvite" | "meetingParticipant" | "audioFile" | "transcript" | "transcriptSegment" | "mom" | "actionItem" | "decision" | "summary" | "auditLog"
+      modelProps: "user" | "authOtp" | "meeting" | "meetingInvite" | "meetingParticipant" | "audioFile" | "transcript" | "transcriptSegment" | "mom" | "actionItem" | "decision" | "summary" | "auditLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -946,6 +986,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      AuthOtp: {
+        payload: Prisma.$AuthOtpPayload<ExtArgs>
+        fields: Prisma.AuthOtpFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AuthOtpFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AuthOtpFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>
+          }
+          findFirst: {
+            args: Prisma.AuthOtpFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AuthOtpFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>
+          }
+          findMany: {
+            args: Prisma.AuthOtpFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>[]
+          }
+          create: {
+            args: Prisma.AuthOtpCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>
+          }
+          createMany: {
+            args: Prisma.AuthOtpCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AuthOtpCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>[]
+          }
+          delete: {
+            args: Prisma.AuthOtpDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>
+          }
+          update: {
+            args: Prisma.AuthOtpUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>
+          }
+          deleteMany: {
+            args: Prisma.AuthOtpDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AuthOtpUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AuthOtpUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>[]
+          }
+          upsert: {
+            args: Prisma.AuthOtpUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuthOtpPayload>
+          }
+          aggregate: {
+            args: Prisma.AuthOtpAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAuthOtp>
+          }
+          groupBy: {
+            args: Prisma.AuthOtpGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AuthOtpGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AuthOtpCountArgs<ExtArgs>
+            result: $Utils.Optional<AuthOtpCountAggregateOutputType> | number
           }
         }
       }
@@ -1872,6 +1986,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    authOtp?: AuthOtpOmit
     meeting?: MeetingOmit
     meetingInvite?: MeetingInviteOmit
     meetingParticipant?: MeetingParticipantOmit
@@ -1966,12 +2081,14 @@ export namespace Prisma {
     organizedMeetings: number
     ownedTasks: number
     auditLogs: number
+    otpCodes: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organizedMeetings?: boolean | UserCountOutputTypeCountOrganizedMeetingsArgs
     ownedTasks?: boolean | UserCountOutputTypeCountOwnedTasksArgs
     auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
+    otpCodes?: boolean | UserCountOutputTypeCountOtpCodesArgs
   }
 
   // Custom InputTypes
@@ -2004,6 +2121,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AuditLogWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountOtpCodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuthOtpWhereInput
   }
 
 
@@ -2132,6 +2256,8 @@ export namespace Prisma {
     id: string | null
     email: string | null
     name: string | null
+    passwordHash: string | null
+    role: $Enums.UserRole | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2140,6 +2266,8 @@ export namespace Prisma {
     id: string | null
     email: string | null
     name: string | null
+    passwordHash: string | null
+    role: $Enums.UserRole | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2148,6 +2276,8 @@ export namespace Prisma {
     id: number
     email: number
     name: number
+    passwordHash: number
+    role: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2158,6 +2288,8 @@ export namespace Prisma {
     id?: true
     email?: true
     name?: true
+    passwordHash?: true
+    role?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2166,6 +2298,8 @@ export namespace Prisma {
     id?: true
     email?: true
     name?: true
+    passwordHash?: true
+    role?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2174,6 +2308,8 @@ export namespace Prisma {
     id?: true
     email?: true
     name?: true
+    passwordHash?: true
+    role?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2255,6 +2391,8 @@ export namespace Prisma {
     id: string
     email: string
     name: string
+    passwordHash: string | null
+    role: $Enums.UserRole
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -2280,11 +2418,14 @@ export namespace Prisma {
     id?: boolean
     email?: boolean
     name?: boolean
+    passwordHash?: boolean
+    role?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     organizedMeetings?: boolean | User$organizedMeetingsArgs<ExtArgs>
     ownedTasks?: boolean | User$ownedTasksArgs<ExtArgs>
     auditLogs?: boolean | User$auditLogsArgs<ExtArgs>
+    otpCodes?: boolean | User$otpCodesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2292,6 +2433,8 @@ export namespace Prisma {
     id?: boolean
     email?: boolean
     name?: boolean
+    passwordHash?: boolean
+    role?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2300,6 +2443,8 @@ export namespace Prisma {
     id?: boolean
     email?: boolean
     name?: boolean
+    passwordHash?: boolean
+    role?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2308,15 +2453,18 @@ export namespace Prisma {
     id?: boolean
     email?: boolean
     name?: boolean
+    passwordHash?: boolean
+    role?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "passwordHash" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organizedMeetings?: boolean | User$organizedMeetingsArgs<ExtArgs>
     ownedTasks?: boolean | User$ownedTasksArgs<ExtArgs>
     auditLogs?: boolean | User$auditLogsArgs<ExtArgs>
+    otpCodes?: boolean | User$otpCodesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2328,11 +2476,14 @@ export namespace Prisma {
       organizedMeetings: Prisma.$MeetingPayload<ExtArgs>[]
       ownedTasks: Prisma.$ActionItemPayload<ExtArgs>[]
       auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+      otpCodes: Prisma.$AuthOtpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       email: string
       name: string
+      passwordHash: string | null
+      role: $Enums.UserRole
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -2732,6 +2883,7 @@ export namespace Prisma {
     organizedMeetings<T extends User$organizedMeetingsArgs<ExtArgs> = {}>(args?: Subset<T, User$organizedMeetingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MeetingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     ownedTasks<T extends User$ownedTasksArgs<ExtArgs> = {}>(args?: Subset<T, User$ownedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     auditLogs<T extends User$auditLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    otpCodes<T extends User$otpCodesArgs<ExtArgs> = {}>(args?: Subset<T, User$otpCodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2764,6 +2916,8 @@ export namespace Prisma {
     readonly id: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
+    readonly passwordHash: FieldRef<"User", 'String'>
+    readonly role: FieldRef<"User", 'UserRole'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -3231,6 +3385,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.otpCodes
+   */
+  export type User$otpCodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    where?: AuthOtpWhereInput
+    orderBy?: AuthOtpOrderByWithRelationInput | AuthOtpOrderByWithRelationInput[]
+    cursor?: AuthOtpWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AuthOtpScalarFieldEnum | AuthOtpScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3246,6 +3424,1082 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AuthOtp
+   */
+
+  export type AggregateAuthOtp = {
+    _count: AuthOtpCountAggregateOutputType | null
+    _min: AuthOtpMinAggregateOutputType | null
+    _max: AuthOtpMaxAggregateOutputType | null
+  }
+
+  export type AuthOtpMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    codeHash: string | null
+    expiresAt: Date | null
+    usedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type AuthOtpMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    codeHash: string | null
+    expiresAt: Date | null
+    usedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type AuthOtpCountAggregateOutputType = {
+    id: number
+    userId: number
+    codeHash: number
+    expiresAt: number
+    usedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AuthOtpMinAggregateInputType = {
+    id?: true
+    userId?: true
+    codeHash?: true
+    expiresAt?: true
+    usedAt?: true
+    createdAt?: true
+  }
+
+  export type AuthOtpMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    codeHash?: true
+    expiresAt?: true
+    usedAt?: true
+    createdAt?: true
+  }
+
+  export type AuthOtpCountAggregateInputType = {
+    id?: true
+    userId?: true
+    codeHash?: true
+    expiresAt?: true
+    usedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AuthOtpAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuthOtp to aggregate.
+     */
+    where?: AuthOtpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuthOtps to fetch.
+     */
+    orderBy?: AuthOtpOrderByWithRelationInput | AuthOtpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AuthOtpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuthOtps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuthOtps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AuthOtps
+    **/
+    _count?: true | AuthOtpCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AuthOtpMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AuthOtpMaxAggregateInputType
+  }
+
+  export type GetAuthOtpAggregateType<T extends AuthOtpAggregateArgs> = {
+        [P in keyof T & keyof AggregateAuthOtp]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAuthOtp[P]>
+      : GetScalarType<T[P], AggregateAuthOtp[P]>
+  }
+
+
+
+
+  export type AuthOtpGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuthOtpWhereInput
+    orderBy?: AuthOtpOrderByWithAggregationInput | AuthOtpOrderByWithAggregationInput[]
+    by: AuthOtpScalarFieldEnum[] | AuthOtpScalarFieldEnum
+    having?: AuthOtpScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AuthOtpCountAggregateInputType | true
+    _min?: AuthOtpMinAggregateInputType
+    _max?: AuthOtpMaxAggregateInputType
+  }
+
+  export type AuthOtpGroupByOutputType = {
+    id: string
+    userId: string
+    codeHash: string
+    expiresAt: Date
+    usedAt: Date | null
+    createdAt: Date
+    _count: AuthOtpCountAggregateOutputType | null
+    _min: AuthOtpMinAggregateOutputType | null
+    _max: AuthOtpMaxAggregateOutputType | null
+  }
+
+  type GetAuthOtpGroupByPayload<T extends AuthOtpGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AuthOtpGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AuthOtpGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AuthOtpGroupByOutputType[P]>
+            : GetScalarType<T[P], AuthOtpGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AuthOtpSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    codeHash?: boolean
+    expiresAt?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["authOtp"]>
+
+  export type AuthOtpSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    codeHash?: boolean
+    expiresAt?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["authOtp"]>
+
+  export type AuthOtpSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    codeHash?: boolean
+    expiresAt?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["authOtp"]>
+
+  export type AuthOtpSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    codeHash?: boolean
+    expiresAt?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type AuthOtpOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "codeHash" | "expiresAt" | "usedAt" | "createdAt", ExtArgs["result"]["authOtp"]>
+  export type AuthOtpInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AuthOtpIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AuthOtpIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $AuthOtpPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AuthOtp"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      codeHash: string
+      expiresAt: Date
+      usedAt: Date | null
+      createdAt: Date
+    }, ExtArgs["result"]["authOtp"]>
+    composites: {}
+  }
+
+  type AuthOtpGetPayload<S extends boolean | null | undefined | AuthOtpDefaultArgs> = $Result.GetResult<Prisma.$AuthOtpPayload, S>
+
+  type AuthOtpCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AuthOtpFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AuthOtpCountAggregateInputType | true
+    }
+
+  export interface AuthOtpDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AuthOtp'], meta: { name: 'AuthOtp' } }
+    /**
+     * Find zero or one AuthOtp that matches the filter.
+     * @param {AuthOtpFindUniqueArgs} args - Arguments to find a AuthOtp
+     * @example
+     * // Get one AuthOtp
+     * const authOtp = await prisma.authOtp.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AuthOtpFindUniqueArgs>(args: SelectSubset<T, AuthOtpFindUniqueArgs<ExtArgs>>): Prisma__AuthOtpClient<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AuthOtp that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AuthOtpFindUniqueOrThrowArgs} args - Arguments to find a AuthOtp
+     * @example
+     * // Get one AuthOtp
+     * const authOtp = await prisma.authOtp.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AuthOtpFindUniqueOrThrowArgs>(args: SelectSubset<T, AuthOtpFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AuthOtpClient<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AuthOtp that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuthOtpFindFirstArgs} args - Arguments to find a AuthOtp
+     * @example
+     * // Get one AuthOtp
+     * const authOtp = await prisma.authOtp.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AuthOtpFindFirstArgs>(args?: SelectSubset<T, AuthOtpFindFirstArgs<ExtArgs>>): Prisma__AuthOtpClient<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AuthOtp that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuthOtpFindFirstOrThrowArgs} args - Arguments to find a AuthOtp
+     * @example
+     * // Get one AuthOtp
+     * const authOtp = await prisma.authOtp.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AuthOtpFindFirstOrThrowArgs>(args?: SelectSubset<T, AuthOtpFindFirstOrThrowArgs<ExtArgs>>): Prisma__AuthOtpClient<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AuthOtps that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuthOtpFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AuthOtps
+     * const authOtps = await prisma.authOtp.findMany()
+     * 
+     * // Get first 10 AuthOtps
+     * const authOtps = await prisma.authOtp.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const authOtpWithIdOnly = await prisma.authOtp.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AuthOtpFindManyArgs>(args?: SelectSubset<T, AuthOtpFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AuthOtp.
+     * @param {AuthOtpCreateArgs} args - Arguments to create a AuthOtp.
+     * @example
+     * // Create one AuthOtp
+     * const AuthOtp = await prisma.authOtp.create({
+     *   data: {
+     *     // ... data to create a AuthOtp
+     *   }
+     * })
+     * 
+     */
+    create<T extends AuthOtpCreateArgs>(args: SelectSubset<T, AuthOtpCreateArgs<ExtArgs>>): Prisma__AuthOtpClient<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AuthOtps.
+     * @param {AuthOtpCreateManyArgs} args - Arguments to create many AuthOtps.
+     * @example
+     * // Create many AuthOtps
+     * const authOtp = await prisma.authOtp.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AuthOtpCreateManyArgs>(args?: SelectSubset<T, AuthOtpCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AuthOtps and returns the data saved in the database.
+     * @param {AuthOtpCreateManyAndReturnArgs} args - Arguments to create many AuthOtps.
+     * @example
+     * // Create many AuthOtps
+     * const authOtp = await prisma.authOtp.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AuthOtps and only return the `id`
+     * const authOtpWithIdOnly = await prisma.authOtp.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AuthOtpCreateManyAndReturnArgs>(args?: SelectSubset<T, AuthOtpCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AuthOtp.
+     * @param {AuthOtpDeleteArgs} args - Arguments to delete one AuthOtp.
+     * @example
+     * // Delete one AuthOtp
+     * const AuthOtp = await prisma.authOtp.delete({
+     *   where: {
+     *     // ... filter to delete one AuthOtp
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AuthOtpDeleteArgs>(args: SelectSubset<T, AuthOtpDeleteArgs<ExtArgs>>): Prisma__AuthOtpClient<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AuthOtp.
+     * @param {AuthOtpUpdateArgs} args - Arguments to update one AuthOtp.
+     * @example
+     * // Update one AuthOtp
+     * const authOtp = await prisma.authOtp.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AuthOtpUpdateArgs>(args: SelectSubset<T, AuthOtpUpdateArgs<ExtArgs>>): Prisma__AuthOtpClient<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AuthOtps.
+     * @param {AuthOtpDeleteManyArgs} args - Arguments to filter AuthOtps to delete.
+     * @example
+     * // Delete a few AuthOtps
+     * const { count } = await prisma.authOtp.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AuthOtpDeleteManyArgs>(args?: SelectSubset<T, AuthOtpDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AuthOtps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuthOtpUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AuthOtps
+     * const authOtp = await prisma.authOtp.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AuthOtpUpdateManyArgs>(args: SelectSubset<T, AuthOtpUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AuthOtps and returns the data updated in the database.
+     * @param {AuthOtpUpdateManyAndReturnArgs} args - Arguments to update many AuthOtps.
+     * @example
+     * // Update many AuthOtps
+     * const authOtp = await prisma.authOtp.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AuthOtps and only return the `id`
+     * const authOtpWithIdOnly = await prisma.authOtp.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AuthOtpUpdateManyAndReturnArgs>(args: SelectSubset<T, AuthOtpUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AuthOtp.
+     * @param {AuthOtpUpsertArgs} args - Arguments to update or create a AuthOtp.
+     * @example
+     * // Update or create a AuthOtp
+     * const authOtp = await prisma.authOtp.upsert({
+     *   create: {
+     *     // ... data to create a AuthOtp
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AuthOtp we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AuthOtpUpsertArgs>(args: SelectSubset<T, AuthOtpUpsertArgs<ExtArgs>>): Prisma__AuthOtpClient<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AuthOtps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuthOtpCountArgs} args - Arguments to filter AuthOtps to count.
+     * @example
+     * // Count the number of AuthOtps
+     * const count = await prisma.authOtp.count({
+     *   where: {
+     *     // ... the filter for the AuthOtps we want to count
+     *   }
+     * })
+    **/
+    count<T extends AuthOtpCountArgs>(
+      args?: Subset<T, AuthOtpCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AuthOtpCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AuthOtp.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuthOtpAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AuthOtpAggregateArgs>(args: Subset<T, AuthOtpAggregateArgs>): Prisma.PrismaPromise<GetAuthOtpAggregateType<T>>
+
+    /**
+     * Group by AuthOtp.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuthOtpGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AuthOtpGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AuthOtpGroupByArgs['orderBy'] }
+        : { orderBy?: AuthOtpGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AuthOtpGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAuthOtpGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AuthOtp model
+   */
+  readonly fields: AuthOtpFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AuthOtp.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AuthOtpClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AuthOtp model
+   */
+  interface AuthOtpFieldRefs {
+    readonly id: FieldRef<"AuthOtp", 'String'>
+    readonly userId: FieldRef<"AuthOtp", 'String'>
+    readonly codeHash: FieldRef<"AuthOtp", 'String'>
+    readonly expiresAt: FieldRef<"AuthOtp", 'DateTime'>
+    readonly usedAt: FieldRef<"AuthOtp", 'DateTime'>
+    readonly createdAt: FieldRef<"AuthOtp", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AuthOtp findUnique
+   */
+  export type AuthOtpFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which AuthOtp to fetch.
+     */
+    where: AuthOtpWhereUniqueInput
+  }
+
+  /**
+   * AuthOtp findUniqueOrThrow
+   */
+  export type AuthOtpFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which AuthOtp to fetch.
+     */
+    where: AuthOtpWhereUniqueInput
+  }
+
+  /**
+   * AuthOtp findFirst
+   */
+  export type AuthOtpFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which AuthOtp to fetch.
+     */
+    where?: AuthOtpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuthOtps to fetch.
+     */
+    orderBy?: AuthOtpOrderByWithRelationInput | AuthOtpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuthOtps.
+     */
+    cursor?: AuthOtpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuthOtps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuthOtps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuthOtps.
+     */
+    distinct?: AuthOtpScalarFieldEnum | AuthOtpScalarFieldEnum[]
+  }
+
+  /**
+   * AuthOtp findFirstOrThrow
+   */
+  export type AuthOtpFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which AuthOtp to fetch.
+     */
+    where?: AuthOtpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuthOtps to fetch.
+     */
+    orderBy?: AuthOtpOrderByWithRelationInput | AuthOtpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuthOtps.
+     */
+    cursor?: AuthOtpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuthOtps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuthOtps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuthOtps.
+     */
+    distinct?: AuthOtpScalarFieldEnum | AuthOtpScalarFieldEnum[]
+  }
+
+  /**
+   * AuthOtp findMany
+   */
+  export type AuthOtpFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * Filter, which AuthOtps to fetch.
+     */
+    where?: AuthOtpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuthOtps to fetch.
+     */
+    orderBy?: AuthOtpOrderByWithRelationInput | AuthOtpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AuthOtps.
+     */
+    cursor?: AuthOtpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuthOtps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuthOtps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuthOtps.
+     */
+    distinct?: AuthOtpScalarFieldEnum | AuthOtpScalarFieldEnum[]
+  }
+
+  /**
+   * AuthOtp create
+   */
+  export type AuthOtpCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AuthOtp.
+     */
+    data: XOR<AuthOtpCreateInput, AuthOtpUncheckedCreateInput>
+  }
+
+  /**
+   * AuthOtp createMany
+   */
+  export type AuthOtpCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AuthOtps.
+     */
+    data: AuthOtpCreateManyInput | AuthOtpCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AuthOtp createManyAndReturn
+   */
+  export type AuthOtpCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * The data used to create many AuthOtps.
+     */
+    data: AuthOtpCreateManyInput | AuthOtpCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AuthOtp update
+   */
+  export type AuthOtpUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AuthOtp.
+     */
+    data: XOR<AuthOtpUpdateInput, AuthOtpUncheckedUpdateInput>
+    /**
+     * Choose, which AuthOtp to update.
+     */
+    where: AuthOtpWhereUniqueInput
+  }
+
+  /**
+   * AuthOtp updateMany
+   */
+  export type AuthOtpUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AuthOtps.
+     */
+    data: XOR<AuthOtpUpdateManyMutationInput, AuthOtpUncheckedUpdateManyInput>
+    /**
+     * Filter which AuthOtps to update
+     */
+    where?: AuthOtpWhereInput
+    /**
+     * Limit how many AuthOtps to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AuthOtp updateManyAndReturn
+   */
+  export type AuthOtpUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * The data used to update AuthOtps.
+     */
+    data: XOR<AuthOtpUpdateManyMutationInput, AuthOtpUncheckedUpdateManyInput>
+    /**
+     * Filter which AuthOtps to update
+     */
+    where?: AuthOtpWhereInput
+    /**
+     * Limit how many AuthOtps to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AuthOtp upsert
+   */
+  export type AuthOtpUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AuthOtp to update in case it exists.
+     */
+    where: AuthOtpWhereUniqueInput
+    /**
+     * In case the AuthOtp found by the `where` argument doesn't exist, create a new AuthOtp with this data.
+     */
+    create: XOR<AuthOtpCreateInput, AuthOtpUncheckedCreateInput>
+    /**
+     * In case the AuthOtp was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AuthOtpUpdateInput, AuthOtpUncheckedUpdateInput>
+  }
+
+  /**
+   * AuthOtp delete
+   */
+  export type AuthOtpDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
+    /**
+     * Filter which AuthOtp to delete.
+     */
+    where: AuthOtpWhereUniqueInput
+  }
+
+  /**
+   * AuthOtp deleteMany
+   */
+  export type AuthOtpDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuthOtps to delete
+     */
+    where?: AuthOtpWhereInput
+    /**
+     * Limit how many AuthOtps to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AuthOtp without action
+   */
+  export type AuthOtpDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuthOtp
+     */
+    select?: AuthOtpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuthOtp
+     */
+    omit?: AuthOtpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuthOtpInclude<ExtArgs> | null
   }
 
 
@@ -3281,6 +4535,10 @@ export namespace Prisma {
     calendarEventId: string | null
     recordingUrl: string | null
     organizerId: string | null
+    joinSlug: string | null
+    liveStartedAt: Date | null
+    liveBroadcastAt: Date | null
+    liveEndedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3297,6 +4555,10 @@ export namespace Prisma {
     calendarEventId: string | null
     recordingUrl: string | null
     organizerId: string | null
+    joinSlug: string | null
+    liveStartedAt: Date | null
+    liveBroadcastAt: Date | null
+    liveEndedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3313,6 +4575,10 @@ export namespace Prisma {
     calendarEventId: number
     recordingUrl: number
     organizerId: number
+    joinSlug: number
+    liveStartedAt: number
+    liveBroadcastAt: number
+    liveEndedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3339,6 +4605,10 @@ export namespace Prisma {
     calendarEventId?: true
     recordingUrl?: true
     organizerId?: true
+    joinSlug?: true
+    liveStartedAt?: true
+    liveBroadcastAt?: true
+    liveEndedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3355,6 +4625,10 @@ export namespace Prisma {
     calendarEventId?: true
     recordingUrl?: true
     organizerId?: true
+    joinSlug?: true
+    liveStartedAt?: true
+    liveBroadcastAt?: true
+    liveEndedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3371,6 +4645,10 @@ export namespace Prisma {
     calendarEventId?: true
     recordingUrl?: true
     organizerId?: true
+    joinSlug?: true
+    liveStartedAt?: true
+    liveBroadcastAt?: true
+    liveEndedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3474,6 +4752,10 @@ export namespace Prisma {
     calendarEventId: string | null
     recordingUrl: string | null
     organizerId: string | null
+    joinSlug: string | null
+    liveStartedAt: Date | null
+    liveBroadcastAt: Date | null
+    liveEndedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: MeetingCountAggregateOutputType | null
@@ -3509,6 +4791,10 @@ export namespace Prisma {
     calendarEventId?: boolean
     recordingUrl?: boolean
     organizerId?: boolean
+    joinSlug?: boolean
+    liveStartedAt?: boolean
+    liveBroadcastAt?: boolean
+    liveEndedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
@@ -3536,6 +4822,10 @@ export namespace Prisma {
     calendarEventId?: boolean
     recordingUrl?: boolean
     organizerId?: boolean
+    joinSlug?: boolean
+    liveStartedAt?: boolean
+    liveBroadcastAt?: boolean
+    liveEndedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
@@ -3553,6 +4843,10 @@ export namespace Prisma {
     calendarEventId?: boolean
     recordingUrl?: boolean
     organizerId?: boolean
+    joinSlug?: boolean
+    liveStartedAt?: boolean
+    liveBroadcastAt?: boolean
+    liveEndedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
@@ -3570,11 +4864,15 @@ export namespace Prisma {
     calendarEventId?: boolean
     recordingUrl?: boolean
     organizerId?: boolean
+    joinSlug?: boolean
+    liveStartedAt?: boolean
+    liveBroadcastAt?: boolean
+    liveEndedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MeetingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "scheduledAt" | "durationMinutes" | "status" | "tag" | "notes" | "calendarEventId" | "recordingUrl" | "organizerId" | "createdAt" | "updatedAt", ExtArgs["result"]["meeting"]>
+  export type MeetingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "scheduledAt" | "durationMinutes" | "status" | "tag" | "notes" | "calendarEventId" | "recordingUrl" | "organizerId" | "joinSlug" | "liveStartedAt" | "liveBroadcastAt" | "liveEndedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["meeting"]>
   export type MeetingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
     participants?: boolean | Meeting$participantsArgs<ExtArgs>
@@ -3621,6 +4919,10 @@ export namespace Prisma {
       calendarEventId: string | null
       recordingUrl: string | null
       organizerId: string | null
+      joinSlug: string | null
+      liveStartedAt: Date | null
+      liveBroadcastAt: Date | null
+      liveEndedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["meeting"]>
@@ -4067,6 +5369,10 @@ export namespace Prisma {
     readonly calendarEventId: FieldRef<"Meeting", 'String'>
     readonly recordingUrl: FieldRef<"Meeting", 'String'>
     readonly organizerId: FieldRef<"Meeting", 'String'>
+    readonly joinSlug: FieldRef<"Meeting", 'String'>
+    readonly liveStartedAt: FieldRef<"Meeting", 'DateTime'>
+    readonly liveBroadcastAt: FieldRef<"Meeting", 'DateTime'>
+    readonly liveEndedAt: FieldRef<"Meeting", 'DateTime'>
     readonly createdAt: FieldRef<"Meeting", 'DateTime'>
     readonly updatedAt: FieldRef<"Meeting", 'DateTime'>
   }
@@ -6884,6 +8190,7 @@ export namespace Prisma {
     id: string | null
     meetingId: string | null
     storageKey: string | null
+    storageBackend: $Enums.AudioStorageBackend | null
     mimeType: string | null
     sizeBytes: number | null
     createdAt: Date | null
@@ -6893,6 +8200,7 @@ export namespace Prisma {
     id: string | null
     meetingId: string | null
     storageKey: string | null
+    storageBackend: $Enums.AudioStorageBackend | null
     mimeType: string | null
     sizeBytes: number | null
     createdAt: Date | null
@@ -6902,6 +8210,7 @@ export namespace Prisma {
     id: number
     meetingId: number
     storageKey: number
+    storageBackend: number
     mimeType: number
     sizeBytes: number
     createdAt: number
@@ -6921,6 +8230,7 @@ export namespace Prisma {
     id?: true
     meetingId?: true
     storageKey?: true
+    storageBackend?: true
     mimeType?: true
     sizeBytes?: true
     createdAt?: true
@@ -6930,6 +8240,7 @@ export namespace Prisma {
     id?: true
     meetingId?: true
     storageKey?: true
+    storageBackend?: true
     mimeType?: true
     sizeBytes?: true
     createdAt?: true
@@ -6939,6 +8250,7 @@ export namespace Prisma {
     id?: true
     meetingId?: true
     storageKey?: true
+    storageBackend?: true
     mimeType?: true
     sizeBytes?: true
     createdAt?: true
@@ -7035,6 +8347,7 @@ export namespace Prisma {
     id: string
     meetingId: string
     storageKey: string
+    storageBackend: $Enums.AudioStorageBackend
     mimeType: string
     sizeBytes: number
     createdAt: Date
@@ -7063,6 +8376,7 @@ export namespace Prisma {
     id?: boolean
     meetingId?: boolean
     storageKey?: boolean
+    storageBackend?: boolean
     mimeType?: boolean
     sizeBytes?: boolean
     createdAt?: boolean
@@ -7073,6 +8387,7 @@ export namespace Prisma {
     id?: boolean
     meetingId?: boolean
     storageKey?: boolean
+    storageBackend?: boolean
     mimeType?: boolean
     sizeBytes?: boolean
     createdAt?: boolean
@@ -7083,6 +8398,7 @@ export namespace Prisma {
     id?: boolean
     meetingId?: boolean
     storageKey?: boolean
+    storageBackend?: boolean
     mimeType?: boolean
     sizeBytes?: boolean
     createdAt?: boolean
@@ -7093,12 +8409,13 @@ export namespace Prisma {
     id?: boolean
     meetingId?: boolean
     storageKey?: boolean
+    storageBackend?: boolean
     mimeType?: boolean
     sizeBytes?: boolean
     createdAt?: boolean
   }
 
-  export type AudioFileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "meetingId" | "storageKey" | "mimeType" | "sizeBytes" | "createdAt", ExtArgs["result"]["audioFile"]>
+  export type AudioFileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "meetingId" | "storageKey" | "storageBackend" | "mimeType" | "sizeBytes" | "createdAt", ExtArgs["result"]["audioFile"]>
   export type AudioFileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     meeting?: boolean | MeetingDefaultArgs<ExtArgs>
   }
@@ -7118,6 +8435,7 @@ export namespace Prisma {
       id: string
       meetingId: string
       storageKey: string
+      storageBackend: $Enums.AudioStorageBackend
       mimeType: string
       sizeBytes: number
       createdAt: Date
@@ -7548,6 +8866,7 @@ export namespace Prisma {
     readonly id: FieldRef<"AudioFile", 'String'>
     readonly meetingId: FieldRef<"AudioFile", 'String'>
     readonly storageKey: FieldRef<"AudioFile", 'String'>
+    readonly storageBackend: FieldRef<"AudioFile", 'AudioStorageBackend'>
     readonly mimeType: FieldRef<"AudioFile", 'String'>
     readonly sizeBytes: FieldRef<"AudioFile", 'Int'>
     readonly createdAt: FieldRef<"AudioFile", 'DateTime'>
@@ -15934,11 +17253,25 @@ export namespace Prisma {
     id: 'id',
     email: 'email',
     name: 'name',
+    passwordHash: 'passwordHash',
+    role: 'role',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const AuthOtpScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    codeHash: 'codeHash',
+    expiresAt: 'expiresAt',
+    usedAt: 'usedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type AuthOtpScalarFieldEnum = (typeof AuthOtpScalarFieldEnum)[keyof typeof AuthOtpScalarFieldEnum]
 
 
   export const MeetingScalarFieldEnum: {
@@ -15953,6 +17286,10 @@ export namespace Prisma {
     calendarEventId: 'calendarEventId',
     recordingUrl: 'recordingUrl',
     organizerId: 'organizerId',
+    joinSlug: 'joinSlug',
+    liveStartedAt: 'liveStartedAt',
+    liveBroadcastAt: 'liveBroadcastAt',
+    liveEndedAt: 'liveEndedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -15988,6 +17325,7 @@ export namespace Prisma {
     id: 'id',
     meetingId: 'meetingId',
     storageKey: 'storageKey',
+    storageBackend: 'storageBackend',
     mimeType: 'mimeType',
     sizeBytes: 'sizeBytes',
     createdAt: 'createdAt'
@@ -16165,6 +17503,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'UserRole'
+   */
+  export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+  /**
+   * Reference to a field of type 'UserRole[]'
+   */
+  export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -16231,6 +17583,20 @@ export namespace Prisma {
    * Reference to a field of type 'InviteStatus[]'
    */
   export type ListEnumInviteStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InviteStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AudioStorageBackend'
+   */
+  export type EnumAudioStorageBackendFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AudioStorageBackend'>
+    
+
+
+  /**
+   * Reference to a field of type 'AudioStorageBackend[]'
+   */
+  export type ListEnumAudioStorageBackendFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AudioStorageBackend[]'>
     
 
 
@@ -16321,22 +17687,28 @@ export namespace Prisma {
     id?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
+    passwordHash?: StringNullableFilter<"User"> | string | null
+    role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     organizedMeetings?: MeetingListRelationFilter
     ownedTasks?: ActionItemListRelationFilter
     auditLogs?: AuditLogListRelationFilter
+    otpCodes?: AuthOtpListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrder
+    passwordHash?: SortOrderInput | SortOrder
+    role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     organizedMeetings?: MeetingOrderByRelationAggregateInput
     ownedTasks?: ActionItemOrderByRelationAggregateInput
     auditLogs?: AuditLogOrderByRelationAggregateInput
+    otpCodes?: AuthOtpOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -16346,17 +17718,22 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringFilter<"User"> | string
+    passwordHash?: StringNullableFilter<"User"> | string | null
+    role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     organizedMeetings?: MeetingListRelationFilter
     ownedTasks?: ActionItemListRelationFilter
     auditLogs?: AuditLogListRelationFilter
+    otpCodes?: AuthOtpListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrder
+    passwordHash?: SortOrderInput | SortOrder
+    role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -16371,8 +17748,70 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
     name?: StringWithAggregatesFilter<"User"> | string
+    passwordHash?: StringNullableWithAggregatesFilter<"User"> | string | null
+    role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type AuthOtpWhereInput = {
+    AND?: AuthOtpWhereInput | AuthOtpWhereInput[]
+    OR?: AuthOtpWhereInput[]
+    NOT?: AuthOtpWhereInput | AuthOtpWhereInput[]
+    id?: StringFilter<"AuthOtp"> | string
+    userId?: StringFilter<"AuthOtp"> | string
+    codeHash?: StringFilter<"AuthOtp"> | string
+    expiresAt?: DateTimeFilter<"AuthOtp"> | Date | string
+    usedAt?: DateTimeNullableFilter<"AuthOtp"> | Date | string | null
+    createdAt?: DateTimeFilter<"AuthOtp"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type AuthOtpOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    expiresAt?: SortOrder
+    usedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type AuthOtpWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AuthOtpWhereInput | AuthOtpWhereInput[]
+    OR?: AuthOtpWhereInput[]
+    NOT?: AuthOtpWhereInput | AuthOtpWhereInput[]
+    userId?: StringFilter<"AuthOtp"> | string
+    codeHash?: StringFilter<"AuthOtp"> | string
+    expiresAt?: DateTimeFilter<"AuthOtp"> | Date | string
+    usedAt?: DateTimeNullableFilter<"AuthOtp"> | Date | string | null
+    createdAt?: DateTimeFilter<"AuthOtp"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type AuthOtpOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    expiresAt?: SortOrder
+    usedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: AuthOtpCountOrderByAggregateInput
+    _max?: AuthOtpMaxOrderByAggregateInput
+    _min?: AuthOtpMinOrderByAggregateInput
+  }
+
+  export type AuthOtpScalarWhereWithAggregatesInput = {
+    AND?: AuthOtpScalarWhereWithAggregatesInput | AuthOtpScalarWhereWithAggregatesInput[]
+    OR?: AuthOtpScalarWhereWithAggregatesInput[]
+    NOT?: AuthOtpScalarWhereWithAggregatesInput | AuthOtpScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AuthOtp"> | string
+    userId?: StringWithAggregatesFilter<"AuthOtp"> | string
+    codeHash?: StringWithAggregatesFilter<"AuthOtp"> | string
+    expiresAt?: DateTimeWithAggregatesFilter<"AuthOtp"> | Date | string
+    usedAt?: DateTimeNullableWithAggregatesFilter<"AuthOtp"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"AuthOtp"> | Date | string
   }
 
   export type MeetingWhereInput = {
@@ -16390,6 +17829,10 @@ export namespace Prisma {
     calendarEventId?: StringNullableFilter<"Meeting"> | string | null
     recordingUrl?: StringNullableFilter<"Meeting"> | string | null
     organizerId?: StringNullableFilter<"Meeting"> | string | null
+    joinSlug?: StringNullableFilter<"Meeting"> | string | null
+    liveStartedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    liveBroadcastAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    liveEndedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     createdAt?: DateTimeFilter<"Meeting"> | Date | string
     updatedAt?: DateTimeFilter<"Meeting"> | Date | string
     organizer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -16416,6 +17859,10 @@ export namespace Prisma {
     calendarEventId?: SortOrderInput | SortOrder
     recordingUrl?: SortOrderInput | SortOrder
     organizerId?: SortOrderInput | SortOrder
+    joinSlug?: SortOrderInput | SortOrder
+    liveStartedAt?: SortOrderInput | SortOrder
+    liveBroadcastAt?: SortOrderInput | SortOrder
+    liveEndedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     organizer?: UserOrderByWithRelationInput
@@ -16432,6 +17879,7 @@ export namespace Prisma {
 
   export type MeetingWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    joinSlug?: string
     AND?: MeetingWhereInput | MeetingWhereInput[]
     OR?: MeetingWhereInput[]
     NOT?: MeetingWhereInput | MeetingWhereInput[]
@@ -16445,6 +17893,9 @@ export namespace Prisma {
     calendarEventId?: StringNullableFilter<"Meeting"> | string | null
     recordingUrl?: StringNullableFilter<"Meeting"> | string | null
     organizerId?: StringNullableFilter<"Meeting"> | string | null
+    liveStartedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    liveBroadcastAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    liveEndedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     createdAt?: DateTimeFilter<"Meeting"> | Date | string
     updatedAt?: DateTimeFilter<"Meeting"> | Date | string
     organizer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -16457,7 +17908,7 @@ export namespace Prisma {
     summary?: XOR<SummaryNullableScalarRelationFilter, SummaryWhereInput> | null
     auditLogs?: AuditLogListRelationFilter
     invites?: MeetingInviteListRelationFilter
-  }, "id">
+  }, "id" | "joinSlug">
 
   export type MeetingOrderByWithAggregationInput = {
     id?: SortOrder
@@ -16471,6 +17922,10 @@ export namespace Prisma {
     calendarEventId?: SortOrderInput | SortOrder
     recordingUrl?: SortOrderInput | SortOrder
     organizerId?: SortOrderInput | SortOrder
+    joinSlug?: SortOrderInput | SortOrder
+    liveStartedAt?: SortOrderInput | SortOrder
+    liveBroadcastAt?: SortOrderInput | SortOrder
+    liveEndedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: MeetingCountOrderByAggregateInput
@@ -16495,6 +17950,10 @@ export namespace Prisma {
     calendarEventId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
     recordingUrl?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
     organizerId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    joinSlug?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    liveStartedAt?: DateTimeNullableWithAggregatesFilter<"Meeting"> | Date | string | null
+    liveBroadcastAt?: DateTimeNullableWithAggregatesFilter<"Meeting"> | Date | string | null
+    liveEndedAt?: DateTimeNullableWithAggregatesFilter<"Meeting"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Meeting"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Meeting"> | Date | string
   }
@@ -16626,6 +18085,7 @@ export namespace Prisma {
     id?: StringFilter<"AudioFile"> | string
     meetingId?: StringFilter<"AudioFile"> | string
     storageKey?: StringFilter<"AudioFile"> | string
+    storageBackend?: EnumAudioStorageBackendFilter<"AudioFile"> | $Enums.AudioStorageBackend
     mimeType?: StringFilter<"AudioFile"> | string
     sizeBytes?: IntFilter<"AudioFile"> | number
     createdAt?: DateTimeFilter<"AudioFile"> | Date | string
@@ -16636,6 +18096,7 @@ export namespace Prisma {
     id?: SortOrder
     meetingId?: SortOrder
     storageKey?: SortOrder
+    storageBackend?: SortOrder
     mimeType?: SortOrder
     sizeBytes?: SortOrder
     createdAt?: SortOrder
@@ -16649,6 +18110,7 @@ export namespace Prisma {
     NOT?: AudioFileWhereInput | AudioFileWhereInput[]
     meetingId?: StringFilter<"AudioFile"> | string
     storageKey?: StringFilter<"AudioFile"> | string
+    storageBackend?: EnumAudioStorageBackendFilter<"AudioFile"> | $Enums.AudioStorageBackend
     mimeType?: StringFilter<"AudioFile"> | string
     sizeBytes?: IntFilter<"AudioFile"> | number
     createdAt?: DateTimeFilter<"AudioFile"> | Date | string
@@ -16659,6 +18121,7 @@ export namespace Prisma {
     id?: SortOrder
     meetingId?: SortOrder
     storageKey?: SortOrder
+    storageBackend?: SortOrder
     mimeType?: SortOrder
     sizeBytes?: SortOrder
     createdAt?: SortOrder
@@ -16676,6 +18139,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"AudioFile"> | string
     meetingId?: StringWithAggregatesFilter<"AudioFile"> | string
     storageKey?: StringWithAggregatesFilter<"AudioFile"> | string
+    storageBackend?: EnumAudioStorageBackendWithAggregatesFilter<"AudioFile"> | $Enums.AudioStorageBackend
     mimeType?: StringWithAggregatesFilter<"AudioFile"> | string
     sizeBytes?: IntWithAggregatesFilter<"AudioFile"> | number
     createdAt?: DateTimeWithAggregatesFilter<"AudioFile"> | Date | string
@@ -17205,50 +18669,64 @@ export namespace Prisma {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
     organizedMeetings?: MeetingCreateNestedManyWithoutOrganizerInput
     ownedTasks?: ActionItemCreateNestedManyWithoutOwnerInput
     auditLogs?: AuditLogCreateNestedManyWithoutUserInput
+    otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
     organizedMeetings?: MeetingUncheckedCreateNestedManyWithoutOrganizerInput
     ownedTasks?: ActionItemUncheckedCreateNestedManyWithoutOwnerInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
+    otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizedMeetings?: MeetingUpdateManyWithoutOrganizerNestedInput
     ownedTasks?: ActionItemUpdateManyWithoutOwnerNestedInput
     auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
+    otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizedMeetings?: MeetingUncheckedUpdateManyWithoutOrganizerNestedInput
     ownedTasks?: ActionItemUncheckedUpdateManyWithoutOwnerNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
+    otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17257,6 +18735,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17265,8 +18745,72 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuthOtpCreateInput = {
+    id?: string
+    codeHash: string
+    expiresAt: Date | string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutOtpCodesInput
+  }
+
+  export type AuthOtpUncheckedCreateInput = {
+    id?: string
+    userId: string
+    codeHash: string
+    expiresAt: Date | string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type AuthOtpUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutOtpCodesNestedInput
+  }
+
+  export type AuthOtpUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuthOtpCreateManyInput = {
+    id?: string
+    userId: string
+    codeHash: string
+    expiresAt: Date | string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type AuthOtpUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuthOtpUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MeetingCreateInput = {
@@ -17280,6 +18824,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -17306,6 +18854,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -17330,6 +18882,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -17356,6 +18912,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -17381,6 +18941,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17396,6 +18960,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17412,6 +18980,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17543,6 +19115,7 @@ export namespace Prisma {
   export type AudioFileCreateInput = {
     id?: string
     storageKey: string
+    storageBackend?: $Enums.AudioStorageBackend
     mimeType: string
     sizeBytes: number
     createdAt?: Date | string
@@ -17553,6 +19126,7 @@ export namespace Prisma {
     id?: string
     meetingId: string
     storageKey: string
+    storageBackend?: $Enums.AudioStorageBackend
     mimeType: string
     sizeBytes: number
     createdAt?: Date | string
@@ -17561,6 +19135,7 @@ export namespace Prisma {
   export type AudioFileUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumAudioStorageBackendFieldUpdateOperationsInput | $Enums.AudioStorageBackend
     mimeType?: StringFieldUpdateOperationsInput | string
     sizeBytes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17571,6 +19146,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     meetingId?: StringFieldUpdateOperationsInput | string
     storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumAudioStorageBackendFieldUpdateOperationsInput | $Enums.AudioStorageBackend
     mimeType?: StringFieldUpdateOperationsInput | string
     sizeBytes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17580,6 +19156,7 @@ export namespace Prisma {
     id?: string
     meetingId: string
     storageKey: string
+    storageBackend?: $Enums.AudioStorageBackend
     mimeType: string
     sizeBytes: number
     createdAt?: Date | string
@@ -17588,6 +19165,7 @@ export namespace Prisma {
   export type AudioFileUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumAudioStorageBackendFieldUpdateOperationsInput | $Enums.AudioStorageBackend
     mimeType?: StringFieldUpdateOperationsInput | string
     sizeBytes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17597,6 +19175,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     meetingId?: StringFieldUpdateOperationsInput | string
     storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumAudioStorageBackendFieldUpdateOperationsInput | $Enums.AudioStorageBackend
     mimeType?: StringFieldUpdateOperationsInput | string
     sizeBytes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18172,6 +19751,28 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type EnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -18201,6 +19802,17 @@ export namespace Prisma {
     none?: AuditLogWhereInput
   }
 
+  export type AuthOtpListRelationFilter = {
+    every?: AuthOtpWhereInput
+    some?: AuthOtpWhereInput
+    none?: AuthOtpWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type MeetingOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -18213,10 +19825,16 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type AuthOtpOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrder
+    passwordHash?: SortOrder
+    role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18225,6 +19843,8 @@ export namespace Prisma {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrder
+    passwordHash?: SortOrder
+    role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18233,6 +19853,8 @@ export namespace Prisma {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrder
+    passwordHash?: SortOrder
+    role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18255,6 +19877,34 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
+  }
+
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -18267,6 +19917,63 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type AuthOtpCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    expiresAt?: SortOrder
+    usedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuthOtpMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    expiresAt?: SortOrder
+    usedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuthOtpMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    expiresAt?: SortOrder
+    usedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -18292,21 +19999,6 @@ export namespace Prisma {
     in?: $Enums.MeetingTag[] | ListEnumMeetingTagFieldRefInput<$PrismaModel>
     notIn?: $Enums.MeetingTag[] | ListEnumMeetingTagFieldRefInput<$PrismaModel>
     not?: NestedEnumMeetingTagFilter<$PrismaModel> | $Enums.MeetingTag
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type UserNullableScalarRelationFilter = {
@@ -18353,11 +20045,6 @@ export namespace Prisma {
     none?: MeetingInviteWhereInput
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
   export type MeetingParticipantOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -18386,6 +20073,10 @@ export namespace Prisma {
     calendarEventId?: SortOrder
     recordingUrl?: SortOrder
     organizerId?: SortOrder
+    joinSlug?: SortOrder
+    liveStartedAt?: SortOrder
+    liveBroadcastAt?: SortOrder
+    liveEndedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18406,6 +20097,10 @@ export namespace Prisma {
     calendarEventId?: SortOrder
     recordingUrl?: SortOrder
     organizerId?: SortOrder
+    joinSlug?: SortOrder
+    liveStartedAt?: SortOrder
+    liveBroadcastAt?: SortOrder
+    liveEndedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18422,6 +20117,10 @@ export namespace Prisma {
     calendarEventId?: SortOrder
     recordingUrl?: SortOrder
     organizerId?: SortOrder
+    joinSlug?: SortOrder
+    liveStartedAt?: SortOrder
+    liveBroadcastAt?: SortOrder
+    liveEndedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18464,24 +20163,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMeetingTagFilter<$PrismaModel>
     _max?: NestedEnumMeetingTagFilter<$PrismaModel>
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type EnumInviteStatusFilter<$PrismaModel = never> = {
@@ -18560,10 +20241,18 @@ export namespace Prisma {
     role?: SortOrder
   }
 
+  export type EnumAudioStorageBackendFilter<$PrismaModel = never> = {
+    equals?: $Enums.AudioStorageBackend | EnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    in?: $Enums.AudioStorageBackend[] | ListEnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AudioStorageBackend[] | ListEnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    not?: NestedEnumAudioStorageBackendFilter<$PrismaModel> | $Enums.AudioStorageBackend
+  }
+
   export type AudioFileCountOrderByAggregateInput = {
     id?: SortOrder
     meetingId?: SortOrder
     storageKey?: SortOrder
+    storageBackend?: SortOrder
     mimeType?: SortOrder
     sizeBytes?: SortOrder
     createdAt?: SortOrder
@@ -18577,6 +20266,7 @@ export namespace Prisma {
     id?: SortOrder
     meetingId?: SortOrder
     storageKey?: SortOrder
+    storageBackend?: SortOrder
     mimeType?: SortOrder
     sizeBytes?: SortOrder
     createdAt?: SortOrder
@@ -18586,6 +20276,7 @@ export namespace Prisma {
     id?: SortOrder
     meetingId?: SortOrder
     storageKey?: SortOrder
+    storageBackend?: SortOrder
     mimeType?: SortOrder
     sizeBytes?: SortOrder
     createdAt?: SortOrder
@@ -18593,6 +20284,16 @@ export namespace Prisma {
 
   export type AudioFileSumOrderByAggregateInput = {
     sizeBytes?: SortOrder
+  }
+
+  export type EnumAudioStorageBackendWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AudioStorageBackend | EnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    in?: $Enums.AudioStorageBackend[] | ListEnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AudioStorageBackend[] | ListEnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    not?: NestedEnumAudioStorageBackendWithAggregatesFilter<$PrismaModel> | $Enums.AudioStorageBackend
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAudioStorageBackendFilter<$PrismaModel>
+    _max?: NestedEnumAudioStorageBackendFilter<$PrismaModel>
   }
 
   export type TranscriptSegmentListRelationFilter = {
@@ -18764,17 +20465,6 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type MomCountOrderByAggregateInput = {
     id?: SortOrder
     meetingId?: SortOrder
@@ -18852,20 +20542,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumTaskPriorityFilter<$PrismaModel = never> = {
@@ -19135,6 +20811,13 @@ export namespace Prisma {
     connect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
   }
 
+  export type AuthOtpCreateNestedManyWithoutUserInput = {
+    create?: XOR<AuthOtpCreateWithoutUserInput, AuthOtpUncheckedCreateWithoutUserInput> | AuthOtpCreateWithoutUserInput[] | AuthOtpUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AuthOtpCreateOrConnectWithoutUserInput | AuthOtpCreateOrConnectWithoutUserInput[]
+    createMany?: AuthOtpCreateManyUserInputEnvelope
+    connect?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+  }
+
   export type MeetingUncheckedCreateNestedManyWithoutOrganizerInput = {
     create?: XOR<MeetingCreateWithoutOrganizerInput, MeetingUncheckedCreateWithoutOrganizerInput> | MeetingCreateWithoutOrganizerInput[] | MeetingUncheckedCreateWithoutOrganizerInput[]
     connectOrCreate?: MeetingCreateOrConnectWithoutOrganizerInput | MeetingCreateOrConnectWithoutOrganizerInput[]
@@ -19156,8 +20839,23 @@ export namespace Prisma {
     connect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
   }
 
+  export type AuthOtpUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<AuthOtpCreateWithoutUserInput, AuthOtpUncheckedCreateWithoutUserInput> | AuthOtpCreateWithoutUserInput[] | AuthOtpUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AuthOtpCreateOrConnectWithoutUserInput | AuthOtpCreateOrConnectWithoutUserInput[]
+    createMany?: AuthOtpCreateManyUserInputEnvelope
+    connect?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type EnumUserRoleFieldUpdateOperationsInput = {
+    set?: $Enums.UserRole
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -19206,6 +20904,20 @@ export namespace Prisma {
     deleteMany?: AuditLogScalarWhereInput | AuditLogScalarWhereInput[]
   }
 
+  export type AuthOtpUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AuthOtpCreateWithoutUserInput, AuthOtpUncheckedCreateWithoutUserInput> | AuthOtpCreateWithoutUserInput[] | AuthOtpUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AuthOtpCreateOrConnectWithoutUserInput | AuthOtpCreateOrConnectWithoutUserInput[]
+    upsert?: AuthOtpUpsertWithWhereUniqueWithoutUserInput | AuthOtpUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AuthOtpCreateManyUserInputEnvelope
+    set?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+    disconnect?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+    delete?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+    connect?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+    update?: AuthOtpUpdateWithWhereUniqueWithoutUserInput | AuthOtpUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AuthOtpUpdateManyWithWhereWithoutUserInput | AuthOtpUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AuthOtpScalarWhereInput | AuthOtpScalarWhereInput[]
+  }
+
   export type MeetingUncheckedUpdateManyWithoutOrganizerNestedInput = {
     create?: XOR<MeetingCreateWithoutOrganizerInput, MeetingUncheckedCreateWithoutOrganizerInput> | MeetingCreateWithoutOrganizerInput[] | MeetingUncheckedCreateWithoutOrganizerInput[]
     connectOrCreate?: MeetingCreateOrConnectWithoutOrganizerInput | MeetingCreateOrConnectWithoutOrganizerInput[]
@@ -19246,6 +20958,38 @@ export namespace Prisma {
     update?: AuditLogUpdateWithWhereUniqueWithoutUserInput | AuditLogUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AuditLogUpdateManyWithWhereWithoutUserInput | AuditLogUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: AuditLogScalarWhereInput | AuditLogScalarWhereInput[]
+  }
+
+  export type AuthOtpUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AuthOtpCreateWithoutUserInput, AuthOtpUncheckedCreateWithoutUserInput> | AuthOtpCreateWithoutUserInput[] | AuthOtpUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AuthOtpCreateOrConnectWithoutUserInput | AuthOtpCreateOrConnectWithoutUserInput[]
+    upsert?: AuthOtpUpsertWithWhereUniqueWithoutUserInput | AuthOtpUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AuthOtpCreateManyUserInputEnvelope
+    set?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+    disconnect?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+    delete?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+    connect?: AuthOtpWhereUniqueInput | AuthOtpWhereUniqueInput[]
+    update?: AuthOtpUpdateWithWhereUniqueWithoutUserInput | AuthOtpUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AuthOtpUpdateManyWithWhereWithoutUserInput | AuthOtpUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AuthOtpScalarWhereInput | AuthOtpScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutOtpCodesInput = {
+    create?: XOR<UserCreateWithoutOtpCodesInput, UserUncheckedCreateWithoutOtpCodesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOtpCodesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type UserUpdateOneRequiredWithoutOtpCodesNestedInput = {
+    create?: XOR<UserCreateWithoutOtpCodesInput, UserUncheckedCreateWithoutOtpCodesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOtpCodesInput
+    upsert?: UserUpsertWithoutOtpCodesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOtpCodesInput, UserUpdateWithoutOtpCodesInput>, UserUncheckedUpdateWithoutOtpCodesInput>
   }
 
   export type UserCreateNestedOneWithoutOrganizedMeetingsInput = {
@@ -19388,10 +21132,6 @@ export namespace Prisma {
 
   export type EnumMeetingTagFieldUpdateOperationsInput = {
     set?: $Enums.MeetingTag
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
   }
 
   export type UserUpdateOneWithoutOrganizedMeetingsNestedInput = {
@@ -19670,6 +21410,10 @@ export namespace Prisma {
     connect?: MeetingWhereUniqueInput
   }
 
+  export type EnumAudioStorageBackendFieldUpdateOperationsInput = {
+    set?: $Enums.AudioStorageBackend
+  }
+
   export type MeetingUpdateOneRequiredWithoutAudioFilesNestedInput = {
     create?: XOR<MeetingCreateWithoutAudioFilesInput, MeetingUncheckedCreateWithoutAudioFilesInput>
     connectOrCreate?: MeetingCreateOrConnectWithoutAudioFilesInput
@@ -19772,10 +21516,6 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type MeetingUpdateOneRequiredWithoutMomNestedInput = {
@@ -19902,6 +21642,27 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -19941,6 +21702,44 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
+  }
+
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -19955,6 +21754,31 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedEnumMeetingStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.MeetingStatus | EnumMeetingStatusFieldRefInput<$PrismaModel>
     in?: $Enums.MeetingStatus[] | ListEnumMeetingStatusFieldRefInput<$PrismaModel>
@@ -19967,20 +21791,6 @@ export namespace Prisma {
     in?: $Enums.MeetingTag[] | ListEnumMeetingTagFieldRefInput<$PrismaModel>
     notIn?: $Enums.MeetingTag[] | ListEnumMeetingTagFieldRefInput<$PrismaModel>
     not?: NestedEnumMeetingTagFilter<$PrismaModel> | $Enums.MeetingTag
-  }
-
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -20030,34 +21840,6 @@ export namespace Prisma {
     _max?: NestedEnumMeetingTagFilter<$PrismaModel>
   }
 
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedEnumInviteStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.InviteStatus | EnumInviteStatusFieldRefInput<$PrismaModel>
     in?: $Enums.InviteStatus[] | ListEnumInviteStatusFieldRefInput<$PrismaModel>
@@ -20073,6 +21855,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumInviteStatusFilter<$PrismaModel>
     _max?: NestedEnumInviteStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAudioStorageBackendFilter<$PrismaModel = never> = {
+    equals?: $Enums.AudioStorageBackend | EnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    in?: $Enums.AudioStorageBackend[] | ListEnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AudioStorageBackend[] | ListEnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    not?: NestedEnumAudioStorageBackendFilter<$PrismaModel> | $Enums.AudioStorageBackend
+  }
+
+  export type NestedEnumAudioStorageBackendWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AudioStorageBackend | EnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    in?: $Enums.AudioStorageBackend[] | ListEnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AudioStorageBackend[] | ListEnumAudioStorageBackendFieldRefInput<$PrismaModel>
+    not?: NestedEnumAudioStorageBackendWithAggregatesFilter<$PrismaModel> | $Enums.AudioStorageBackend
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAudioStorageBackendFilter<$PrismaModel>
+    _max?: NestedEnumAudioStorageBackendFilter<$PrismaModel>
   }
 
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
@@ -20122,17 +21921,6 @@ export namespace Prisma {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -20163,20 +21951,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumTaskPriorityFilter<$PrismaModel = never> = {
@@ -20264,6 +22038,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
@@ -20288,6 +22066,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -20379,6 +22161,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type AuthOtpCreateWithoutUserInput = {
+    id?: string
+    codeHash: string
+    expiresAt: Date | string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type AuthOtpUncheckedCreateWithoutUserInput = {
+    id?: string
+    codeHash: string
+    expiresAt: Date | string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type AuthOtpCreateOrConnectWithoutUserInput = {
+    where: AuthOtpWhereUniqueInput
+    create: XOR<AuthOtpCreateWithoutUserInput, AuthOtpUncheckedCreateWithoutUserInput>
+  }
+
+  export type AuthOtpCreateManyUserInputEnvelope = {
+    data: AuthOtpCreateManyUserInput | AuthOtpCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type MeetingUpsertWithWhereUniqueWithoutOrganizerInput = {
     where: MeetingWhereUniqueInput
     update: XOR<MeetingUpdateWithoutOrganizerInput, MeetingUncheckedUpdateWithoutOrganizerInput>
@@ -20410,6 +22218,10 @@ export namespace Prisma {
     calendarEventId?: StringNullableFilter<"Meeting"> | string | null
     recordingUrl?: StringNullableFilter<"Meeting"> | string | null
     organizerId?: StringNullableFilter<"Meeting"> | string | null
+    joinSlug?: StringNullableFilter<"Meeting"> | string | null
+    liveStartedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    liveBroadcastAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    liveEndedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     createdAt?: DateTimeFilter<"Meeting"> | Date | string
     updatedAt?: DateTimeFilter<"Meeting"> | Date | string
   }
@@ -20478,24 +22290,126 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"AuditLog"> | Date | string
   }
 
+  export type AuthOtpUpsertWithWhereUniqueWithoutUserInput = {
+    where: AuthOtpWhereUniqueInput
+    update: XOR<AuthOtpUpdateWithoutUserInput, AuthOtpUncheckedUpdateWithoutUserInput>
+    create: XOR<AuthOtpCreateWithoutUserInput, AuthOtpUncheckedCreateWithoutUserInput>
+  }
+
+  export type AuthOtpUpdateWithWhereUniqueWithoutUserInput = {
+    where: AuthOtpWhereUniqueInput
+    data: XOR<AuthOtpUpdateWithoutUserInput, AuthOtpUncheckedUpdateWithoutUserInput>
+  }
+
+  export type AuthOtpUpdateManyWithWhereWithoutUserInput = {
+    where: AuthOtpScalarWhereInput
+    data: XOR<AuthOtpUpdateManyMutationInput, AuthOtpUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type AuthOtpScalarWhereInput = {
+    AND?: AuthOtpScalarWhereInput | AuthOtpScalarWhereInput[]
+    OR?: AuthOtpScalarWhereInput[]
+    NOT?: AuthOtpScalarWhereInput | AuthOtpScalarWhereInput[]
+    id?: StringFilter<"AuthOtp"> | string
+    userId?: StringFilter<"AuthOtp"> | string
+    codeHash?: StringFilter<"AuthOtp"> | string
+    expiresAt?: DateTimeFilter<"AuthOtp"> | Date | string
+    usedAt?: DateTimeNullableFilter<"AuthOtp"> | Date | string | null
+    createdAt?: DateTimeFilter<"AuthOtp"> | Date | string
+  }
+
+  export type UserCreateWithoutOtpCodesInput = {
+    id?: string
+    email: string
+    name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organizedMeetings?: MeetingCreateNestedManyWithoutOrganizerInput
+    ownedTasks?: ActionItemCreateNestedManyWithoutOwnerInput
+    auditLogs?: AuditLogCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutOtpCodesInput = {
+    id?: string
+    email: string
+    name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organizedMeetings?: MeetingUncheckedCreateNestedManyWithoutOrganizerInput
+    ownedTasks?: ActionItemUncheckedCreateNestedManyWithoutOwnerInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutOtpCodesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutOtpCodesInput, UserUncheckedCreateWithoutOtpCodesInput>
+  }
+
+  export type UserUpsertWithoutOtpCodesInput = {
+    update: XOR<UserUpdateWithoutOtpCodesInput, UserUncheckedUpdateWithoutOtpCodesInput>
+    create: XOR<UserCreateWithoutOtpCodesInput, UserUncheckedCreateWithoutOtpCodesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutOtpCodesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutOtpCodesInput, UserUncheckedUpdateWithoutOtpCodesInput>
+  }
+
+  export type UserUpdateWithoutOtpCodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organizedMeetings?: MeetingUpdateManyWithoutOrganizerNestedInput
+    ownedTasks?: ActionItemUpdateManyWithoutOwnerNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutOtpCodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organizedMeetings?: MeetingUncheckedUpdateManyWithoutOrganizerNestedInput
+    ownedTasks?: ActionItemUncheckedUpdateManyWithoutOwnerNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutOrganizedMeetingsInput = {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
     ownedTasks?: ActionItemCreateNestedManyWithoutOwnerInput
     auditLogs?: AuditLogCreateNestedManyWithoutUserInput
+    otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOrganizedMeetingsInput = {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
     ownedTasks?: ActionItemUncheckedCreateNestedManyWithoutOwnerInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
+    otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOrganizedMeetingsInput = {
@@ -20530,6 +22444,7 @@ export namespace Prisma {
   export type AudioFileCreateWithoutMeetingInput = {
     id?: string
     storageKey: string
+    storageBackend?: $Enums.AudioStorageBackend
     mimeType: string
     sizeBytes: number
     createdAt?: Date | string
@@ -20538,6 +22453,7 @@ export namespace Prisma {
   export type AudioFileUncheckedCreateWithoutMeetingInput = {
     id?: string
     storageKey: string
+    storageBackend?: $Enums.AudioStorageBackend
     mimeType: string
     sizeBytes: number
     createdAt?: Date | string
@@ -20771,20 +22687,26 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownedTasks?: ActionItemUpdateManyWithoutOwnerNestedInput
     auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
+    otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrganizedMeetingsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ownedTasks?: ActionItemUncheckedUpdateManyWithoutOwnerNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
+    otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MeetingParticipantUpsertWithWhereUniqueWithoutMeetingInput = {
@@ -20837,6 +22759,7 @@ export namespace Prisma {
     id?: StringFilter<"AudioFile"> | string
     meetingId?: StringFilter<"AudioFile"> | string
     storageKey?: StringFilter<"AudioFile"> | string
+    storageBackend?: EnumAudioStorageBackendFilter<"AudioFile"> | $Enums.AudioStorageBackend
     mimeType?: StringFilter<"AudioFile"> | string
     sizeBytes?: IntFilter<"AudioFile"> | number
     createdAt?: DateTimeFilter<"AudioFile"> | Date | string
@@ -21042,6 +22965,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -21067,6 +22994,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -21106,6 +23037,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -21131,6 +23066,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -21154,6 +23093,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -21179,6 +23122,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
@@ -21218,6 +23165,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -21243,6 +23194,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
@@ -21266,6 +23221,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -21291,6 +23250,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -21330,6 +23293,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -21355,6 +23322,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -21378,6 +23349,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -21403,6 +23378,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -21470,6 +23449,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -21495,6 +23478,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -21603,6 +23590,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -21628,6 +23619,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -21667,6 +23662,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -21692,6 +23691,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -21715,6 +23718,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -21740,6 +23747,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -21761,20 +23772,26 @@ export namespace Prisma {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
     organizedMeetings?: MeetingCreateNestedManyWithoutOrganizerInput
     auditLogs?: AuditLogCreateNestedManyWithoutUserInput
+    otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedTasksInput = {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
     organizedMeetings?: MeetingUncheckedCreateNestedManyWithoutOrganizerInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
+    otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedTasksInput = {
@@ -21804,6 +23821,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -21829,6 +23850,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -21856,20 +23881,26 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizedMeetings?: MeetingUpdateManyWithoutOrganizerNestedInput
     auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
+    otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedTasksInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizedMeetings?: MeetingUncheckedUpdateManyWithoutOrganizerNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
+    otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MeetingCreateWithoutDecisionsInput = {
@@ -21883,6 +23914,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -21908,6 +23943,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -21947,6 +23986,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -21972,6 +24015,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -21995,6 +24042,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -22020,6 +24071,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -22059,6 +24114,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -22084,6 +24143,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -22107,6 +24170,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
@@ -22132,6 +24199,10 @@ export namespace Prisma {
     calendarEventId?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
@@ -22153,20 +24224,26 @@ export namespace Prisma {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
     organizedMeetings?: MeetingCreateNestedManyWithoutOrganizerInput
     ownedTasks?: ActionItemCreateNestedManyWithoutOwnerInput
+    otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
     id?: string
     email: string
     name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
     organizedMeetings?: MeetingUncheckedCreateNestedManyWithoutOrganizerInput
     ownedTasks?: ActionItemUncheckedCreateNestedManyWithoutOwnerInput
+    otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -22196,6 +24273,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
@@ -22221,6 +24302,10 @@ export namespace Prisma {
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -22248,20 +24333,26 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizedMeetings?: MeetingUpdateManyWithoutOrganizerNestedInput
     ownedTasks?: ActionItemUpdateManyWithoutOwnerNestedInput
+    otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organizedMeetings?: MeetingUncheckedUpdateManyWithoutOrganizerNestedInput
     ownedTasks?: ActionItemUncheckedUpdateManyWithoutOwnerNestedInput
+    otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MeetingCreateManyOrganizerInput = {
@@ -22275,6 +24366,10 @@ export namespace Prisma {
     notes?: string
     calendarEventId?: string | null
     recordingUrl?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -22303,6 +24398,14 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type AuthOtpCreateManyUserInput = {
+    id?: string
+    codeHash: string
+    expiresAt: Date | string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
   export type MeetingUpdateWithoutOrganizerInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
@@ -22314,6 +24417,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
@@ -22338,6 +24445,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
@@ -22362,6 +24473,10 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22438,6 +24553,30 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AuthOtpUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuthOtpUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuthOtpUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MeetingParticipantCreateManyMeetingInput = {
     id?: string
     name: string
@@ -22448,6 +24587,7 @@ export namespace Prisma {
   export type AudioFileCreateManyMeetingInput = {
     id?: string
     storageKey: string
+    storageBackend?: $Enums.AudioStorageBackend
     mimeType: string
     sizeBytes: number
     createdAt?: Date | string
@@ -22517,6 +24657,7 @@ export namespace Prisma {
   export type AudioFileUpdateWithoutMeetingInput = {
     id?: StringFieldUpdateOperationsInput | string
     storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumAudioStorageBackendFieldUpdateOperationsInput | $Enums.AudioStorageBackend
     mimeType?: StringFieldUpdateOperationsInput | string
     sizeBytes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22525,6 +24666,7 @@ export namespace Prisma {
   export type AudioFileUncheckedUpdateWithoutMeetingInput = {
     id?: StringFieldUpdateOperationsInput | string
     storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumAudioStorageBackendFieldUpdateOperationsInput | $Enums.AudioStorageBackend
     mimeType?: StringFieldUpdateOperationsInput | string
     sizeBytes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22533,6 +24675,7 @@ export namespace Prisma {
   export type AudioFileUncheckedUpdateManyWithoutMeetingInput = {
     id?: StringFieldUpdateOperationsInput | string
     storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumAudioStorageBackendFieldUpdateOperationsInput | $Enums.AudioStorageBackend
     mimeType?: StringFieldUpdateOperationsInput | string
     sizeBytes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

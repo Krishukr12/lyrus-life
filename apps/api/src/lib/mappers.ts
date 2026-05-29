@@ -87,6 +87,7 @@ export interface WebMeeting {
     error?: string;
     sentAt: string;
   }>;
+  joinSlug?: string;
 }
 
 export interface WebUserTask {
@@ -184,6 +185,7 @@ export function mapMeeting(meeting: MeetingWithRelations): WebMeeting {
     status: mapDbStatus(meeting.status),
     tag: mapDbTag(meeting.tag),
     notes: meeting.notes,
+    joinSlug: meeting.joinSlug ?? undefined,
   };
 
   if (meeting.status === "PROCESSING") {

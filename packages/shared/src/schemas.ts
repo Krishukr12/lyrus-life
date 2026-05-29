@@ -71,3 +71,24 @@ export const transcriptionResultSchema = z.object({
 });
 
 export type TranscriptionResult = z.infer<typeof transcriptionResultSchema>;
+
+export const loginPasswordSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    resetToken: z.string().min(1),
+    code: z.string().regex(/^\d{6}$/, "Enter the 6-digit code from your email"),
+    newPassword: z.string().min(8, "New password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Confirm your new password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "New passwords do not match",
+    path: ["confirmPassword"],
+  });
