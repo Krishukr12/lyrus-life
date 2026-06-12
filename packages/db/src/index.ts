@@ -31,6 +31,7 @@ export const MomTemplateSource = generatedExports.MomTemplateSource;
 export const InvoiceStatus = generatedExports.InvoiceStatus;
 export const PaymentStatus = generatedExports.PaymentStatus;
 export const InvoiceDeliveryStatus = generatedExports.InvoiceDeliveryStatus;
+export const OrganizationInvitationStatus = generatedExports.OrganizationInvitationStatus;
 
 export type PrismaClient = InstanceType<typeof PrismaClient>;
 
@@ -83,4 +84,5 @@ export type {
   InvoiceDelivery,
   BillingEvent,
   PricingChangeLog,
+  OrganizationInvitation,
 } from "../generated/client/index.js";

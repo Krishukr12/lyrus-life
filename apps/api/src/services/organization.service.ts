@@ -129,6 +129,20 @@ export const organizationService = {
             code: organization.code,
             slug: organization.slug,
             adminUserId: admin.id,
+            adminEmail: admin.email,
+          },
+        },
+      });
+
+      await tx.tenantAuditLog.create({
+        data: {
+          organizationId: organization.id,
+          userId: admin.id,
+          action: "user.created",
+          metadata: {
+            targetUserId: admin.id,
+            role: admin.role,
+            source: "onboarding",
           },
         },
       });

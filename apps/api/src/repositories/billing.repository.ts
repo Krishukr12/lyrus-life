@@ -67,7 +67,7 @@ export const billingRepository = {
       include: {
         billingProfile: true,
         users: {
-          where: { status: "ACTIVE", role: { in: ["ORG_ADMIN", "MANAGER", "EMPLOYEE"] } },
+          where: { status: "ACTIVE", role: { in: ["ORG_ADMIN", "MANAGER", "EMPLOYEE", "VIEWER"] } },
           select: { id: true },
         },
       },
@@ -80,7 +80,7 @@ export const billingRepository = {
       include: {
         billingProfile: true,
         users: {
-          where: { status: "ACTIVE", role: { in: ["ORG_ADMIN", "MANAGER", "EMPLOYEE"] } },
+          where: { status: "ACTIVE", role: { in: ["ORG_ADMIN", "MANAGER", "EMPLOYEE", "VIEWER"] } },
           select: { id: true },
         },
       },

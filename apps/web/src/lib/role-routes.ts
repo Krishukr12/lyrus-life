@@ -6,8 +6,9 @@ export function homePathForRole(role: string): string {
     case "SUPER_ADMIN":
       return ADMIN_APP_URL;
     case "ORG_ADMIN":
+      return "/";
     case "MANAGER":
-      return "/org";
+      return "/";
     default:
       return "/";
   }
@@ -22,5 +23,10 @@ export function getAdminAppUrl(): string {
 }
 
 export function canAccessOrgPortal(role: string): boolean {
-  return role === "ORG_ADMIN" || role === "MANAGER" || role === "EMPLOYEE";
+  return (
+    role === "ORG_ADMIN" ||
+    role === "MANAGER" ||
+    role === "EMPLOYEE" ||
+    role === "VIEWER"
+  );
 }

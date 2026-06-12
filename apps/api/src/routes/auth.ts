@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { OrganizationStatus, UserStatus, prisma } from "@lyrus/db";
 import {
+  acceptInvitationSchema,
   changePasswordSchema,
   forgotPasswordSchema,
   loginPasswordSchema,
   resetPasswordSchema,
+  setRequiredPasswordSchema,
 } from "@lyrus/shared";
 import { sendPasswordResetOtpEmail } from "@lyrus/notifications";
 import {
@@ -27,6 +29,10 @@ import { authenticate, requireAuthUser } from "../middleware/authenticate.js";
 import { authRateLimiter } from "../middleware/security.js";
 import { userRepository } from "../repositories/user.repository.js";
 import { logTenantAudit } from "../services/tenant-audit.service.js";
+import {
+  InvitationError,
+  invitationService,
+} from "../services/invitation.service.js";
 import { hashPassword, verifyPassword, verifyPasswordAndMaybeUpgrade } from "../utils/password.js";
 import type { Response } from "express";
 
@@ -248,6 +254,7 @@ export function createAuthRouter(): Router {
         data: {
           passwordHash: await hashPassword(parsed.data.newPassword),
           mustChangePassword: false,
+          emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
         },
       });
 
@@ -255,6 +262,55 @@ export function createAuthRouter(): Router {
         organizationId: user.organizationId,
         userId: user.id,
         action: "auth.password_changed",
+        metadata: { firstLogin: !user.emailVerifiedAt },
+      });
+
+      res.json({ ok: true });
+    }),
+  );
+
+  router.post(
+    "/auth/set-required-password",
+    authenticate,
+    asyncHandler(async (req, res) => {
+      const parsed = setRequiredPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          error: "validation_error",
+          message: zodErrorMessage(parsed.error),
+        });
+        return;
+      }
+
+      const authUser = requireAuthUser(req);
+      const user = await prisma.user.findUnique({ where: { id: authUser.id } });
+      if (!user) {
+        res.status(401).json({ error: "unauthorized", message: "User not found" });
+        return;
+      }
+
+      if (!user.mustChangePassword) {
+        res.status(400).json({
+          error: "invalid_state",
+          message: "Password change is not required for this account",
+        });
+        return;
+      }
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash: await hashPassword(parsed.data.newPassword),
+          mustChangePassword: false,
+          emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
+        },
+      });
+
+      await logTenantAudit({
+        organizationId: user.organizationId,
+        userId: user.id,
+        action: "auth.password_changed",
+        metadata: { firstLogin: !user.emailVerifiedAt, requiredReset: true },
       });
 
       res.json({ ok: true });
@@ -367,6 +423,73 @@ export function createAuthRouter(): Router {
             error: "invalid_reset",
             message: err.message,
           });
+          return;
+        }
+        throw err;
+      }
+    }),
+  );
+
+  router.get(
+    "/auth/invitation",
+    asyncHandler(async (req, res) => {
+      const token = typeof req.query.token === "string" ? req.query.token : "";
+      if (!token) {
+        res.status(400).json({ error: "validation_error", message: "Token is required" });
+        return;
+      }
+      try {
+        const invitation = await invitationService.getInvitationByToken(token);
+        res.json(invitation);
+      } catch (err) {
+        if (err instanceof InvitationError) {
+          res.status(err.statusCode).json({ error: err.code, message: err.message });
+          return;
+        }
+        throw err;
+      }
+    }),
+  );
+
+  router.post(
+    "/auth/accept-invitation",
+    asyncHandler(async (req, res) => {
+      const parsed = acceptInvitationSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          error: "validation_error",
+          message: zodErrorMessage(parsed.error),
+        });
+        return;
+      }
+
+      try {
+        const result = await invitationService.acceptInvitation(
+          parsed.data.token,
+          parsed.data.password,
+        );
+        res.json(
+          await issueSession(res, {
+            id: result.user.id,
+            email: result.user.email,
+            name: result.user.name,
+            role: result.user.role,
+            organizationId: result.user.organizationId,
+            mustChangePassword: false,
+            organization: result.organization
+              ? {
+                  id: result.organization.id,
+                  name: result.organization.name,
+                  slug: result.organization.slug,
+                  status: result.organization.status,
+                  subscriptionPlan: result.organization.subscriptionPlan,
+                }
+              : null,
+          }),
+        );
+      } catch (err) {
+        if (err instanceof InvitationError) {
+          res.status(err.statusCode).json({ error: err.code, message: err.message });
           return;
         }
         throw err;

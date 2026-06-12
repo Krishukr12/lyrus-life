@@ -1,4 +1,4 @@
-export type TenantUserRole = "SUPER_ADMIN" | "ORG_ADMIN" | "MANAGER" | "EMPLOYEE";
+export type TenantUserRole = "SUPER_ADMIN" | "ORG_ADMIN" | "MANAGER" | "EMPLOYEE" | "VIEWER";
 
 export interface OrganizationSummary {
   id: string;

@@ -20,6 +20,7 @@ import {
   countOrganizationMeetings,
 } from "../../lib/plan-limits.js";
 import { billingService } from "../../services/billing.service.js";
+import { getSeatUsageSummary } from "../../services/seat-billing.service.js";
 import { organizationRepository } from "../../repositories/organization.repository.js";
 
 export function createOrganizationSettingsRouter(): Router {
@@ -82,13 +83,12 @@ export function createOrganizationSettingsRouter(): Router {
         return;
       }
 
-      const [activeUsers, totalMeetings, billingDetail] = await Promise.all([
-        countActiveOrganizationSeats(tenant.organizationId),
+      const [seatSummary, totalMeetings, billingDetail] = await Promise.all([
+        getSeatUsageSummary(tenant.organizationId),
         countOrganizationMeetings(tenant.organizationId),
         billingService.getCustomerBillingDetail(tenant.organizationId),
       ]);
       const plan = org.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
-      const includedUsers = getIncludedSeats(plan);
       const meetingLimit = getMeetingLimit(plan);
       let canAddUser = true;
       try {
@@ -99,16 +99,23 @@ export function createOrganizationSettingsRouter(): Router {
 
       res.json({
         subscriptionPlan: org.subscriptionPlan,
-        activeUsers,
-        includedUsers,
-        additionalUsers: Math.max(0, activeUsers - includedUsers),
+        planLabel: seatSummary.planLabel,
+        activeUsers: seatSummary.activeSeats,
+        includedUsers: seatSummary.includedSeats,
+        pendingInvitations: seatSummary.pendingInvitations,
+        usedSeats: seatSummary.usedSeats,
+        availableSeats: seatSummary.availableSeats,
+        additionalUsers: seatSummary.additionalSeats,
+        extraSeatPriceMonthlyInr: seatSummary.extraSeatPriceMonthlyInr,
         maxUsers: null,
         meetingLimit,
         totalMeetings,
         canAddUser,
         billingStatus: billingDetail?.billingStatus ?? "PENDING",
-        monthlyAmountInr: billingDetail?.monthlyAmountInr ?? 0,
-        totalAmountInr: billingDetail?.totalAmountInr ?? 0,
+        billingCycle: seatSummary.billingCycle,
+        monthlyAmountInr: seatSummary.monthlySubtotalInr,
+        totalAmountInr: seatSummary.totalInr,
+        projectedAnnualCostInr: seatSummary.projectedAnnualCostInr,
       });
     }),
   );

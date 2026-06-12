@@ -144,7 +144,7 @@ export const adminApi = {
     ),
 
   resetOrganizationEmployeePassword: (organizationId: string, userId: string) =>
-    request<{ temporaryPassword: string }>(
+    request<{ temporaryPassword: string; email: string; emailSent?: boolean }>(
       `/admin/organizations/${organizationId}/employees/${userId}/reset-password`,
       { method: "POST" },
     ),

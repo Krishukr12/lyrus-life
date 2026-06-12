@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Settings } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,13 +60,16 @@ export default function OrgSettingsPage() {
   });
 
   if (isLoading) {
-    return <div className="p-8 text-muted-foreground">Loading settings…</div>;
+    return <div className="text-muted-foreground">Loading settings…</div>;
   }
 
   return (
-    <div className="p-8 max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Organization settings</h1>
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <Settings className="h-6 w-6 text-primary" />
+          Organization settings
+        </h1>
         <p className="text-muted-foreground text-sm mt-1">
           Manage branding and defaults for your organization.
         </p>

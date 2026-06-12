@@ -6,6 +6,10 @@ import {
   ListChecks,
   ChartNoAxesCombined,
   LogOut,
+  Building2,
+  UserCog,
+  Settings,
+  ScrollText,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +19,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -24,12 +29,19 @@ import { Button } from "@/components/ui/button";
 
 const companyName = import.meta.env.VITE_COMPANY_NAME ?? "Lyrus Life";
 
-const navItems = [
+const workspaceNavItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Meetings", url: "/meetings", icon: Users },
   { title: "Tasks", url: "/tasks", icon: ListChecks },
   { title: "Calendar", url: "/calendar", icon: CalendarDays },
   { title: "Insights", url: "/insights", icon: ChartNoAxesCombined },
+];
+
+const organizationNavItems = [
+  { title: "Overview", url: "/organization", icon: Building2, end: true },
+  { title: "User Management", url: "/organization/users", icon: UserCog, end: true },
+  { title: "Settings", url: "/organization/settings", icon: Settings, end: true },
+  { title: "Activity Log", url: "/organization/activity", icon: ScrollText, end: true },
 ];
 
 export function AppSidebar() {
@@ -38,6 +50,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { user, organization, logout } = useAuth();
   const headerTitle = organization?.name ?? companyName;
+  const isOrgAdmin = user?.role === "ORG_ADMIN";
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
@@ -68,9 +81,10 @@ export function AppSidebar() {
         )}
 
         <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel>Workspace</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
+              {workspaceNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
@@ -88,6 +102,31 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isOrgAdmin ? (
+          <SidebarGroup className="mt-2">
+            {!collapsed && <SidebarGroupLabel>Organization</SidebarGroupLabel>}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {organizationNavItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        end={item.end}
+                        className="hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                        activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      >
+                        <item.icon className="mr-3 h-4 w-4" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ) : null}
 
         <div className={`mt-auto px-4 pb-6 ${collapsed ? "text-center" : ""}`}>
           {!collapsed && user && (

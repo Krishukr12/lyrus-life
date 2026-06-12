@@ -271,7 +271,29 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   mustChangePassword: 'mustChangePassword',
+  emailVerifiedAt: 'emailVerifiedAt',
+  invitedById: 'invitedById',
   lastLoginAt: 'lastLoginAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrganizationInvitationScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  email: 'email',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  role: 'role',
+  tokenHash: 'tokenHash',
+  status: 'status',
+  invitedById: 'invitedById',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  mobile: 'mobile',
+  designation: 'designation',
+  department: 'department',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -557,13 +579,21 @@ exports.UserRole = exports.$Enums.UserRole = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   ORG_ADMIN: 'ORG_ADMIN',
   MANAGER: 'MANAGER',
-  EMPLOYEE: 'EMPLOYEE'
+  EMPLOYEE: 'EMPLOYEE',
+  VIEWER: 'VIEWER'
 };
 
 exports.UserStatus = exports.$Enums.UserStatus = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE',
   SUSPENDED: 'SUSPENDED'
+};
+
+exports.OrganizationInvitationStatus = exports.$Enums.OrganizationInvitationStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  EXPIRED: 'EXPIRED',
+  CANCELLED: 'CANCELLED'
 };
 
 exports.MeetingStatus = exports.$Enums.MeetingStatus = {
@@ -648,6 +678,7 @@ exports.Prisma.ModelName = {
   PricingChangeLog: 'PricingChangeLog',
   Organization: 'Organization',
   User: 'User',
+  OrganizationInvitation: 'OrganizationInvitation',
   EmployeeProfile: 'EmployeeProfile',
   TenantAuditLog: 'TenantAuditLog',
   AuthOtp: 'AuthOtp',

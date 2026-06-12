@@ -25,7 +25,7 @@ export function createOrganizationUsersRouter(): Router {
 
   router.get(
     "/organizations/dashboard",
-    authorize([UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE]),
+    authorize([UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE, UserRole.VIEWER]),
     asyncHandler(async (req, res) => {
       const tenant = req.tenant!;
       const stats = await organizationRepository.getOrgDashboardStats(tenant.organizationId);
@@ -85,7 +85,11 @@ export function createOrganizationUsersRouter(): Router {
         });
       } catch (err) {
         if (err instanceof UserManagementError) {
-          res.status(err.statusCode).json({ error: err.code, message: err.message });
+          res.status(err.statusCode).json({
+            error: err.code,
+            message: err.message,
+            billingPreview: err.preview,
+          });
           return;
         }
         throw err;
@@ -95,13 +99,16 @@ export function createOrganizationUsersRouter(): Router {
 
   router.get(
     "/organizations/users/:id",
-    authorize([UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE]),
+    authorize([UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE, UserRole.VIEWER]),
     asyncHandler(async (req, res) => {
       const tenant = req.tenant!;
       const userId = requireRouteParam(req.params.id, "id");
       const actor = requireAuthUser(req);
 
-      if (actor.role === UserRole.EMPLOYEE && actor.id !== userId) {
+      if (
+        (actor.role === UserRole.EMPLOYEE || actor.role === UserRole.VIEWER) &&
+        actor.id !== userId
+      ) {
         res.status(403).json({ error: "forbidden", message: "Employees can only view their own profile" });
         return;
       }

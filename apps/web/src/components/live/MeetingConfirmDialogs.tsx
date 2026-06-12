@@ -66,8 +66,8 @@ export function MeetingEndDialog({
           <AlertDialogTitle>End meeting for everyone?</AlertDialogTitle>
           <AlertDialogDescription className="text-white/60">
             {inWaitingRoom
-              ? "This closes the waiting room and live session for everyone, uploads your recording, and generates minutes. This cannot be undone."
-              : "This stops the live session for all participants, uploads your recording, and starts minutes generation. This cannot be undone."}
+              ? "This closes the waiting room and live session for everyone, uploads the mixed audio from all participants, and generates minutes. This cannot be undone."
+              : "This stops the live session for all participants, uploads the mixed audio from everyone, and starts minutes generation. This cannot be undone."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

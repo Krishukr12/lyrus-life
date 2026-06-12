@@ -33,7 +33,7 @@ export const organizationAdminService = {
       throw new OrganizationAdminError("not_found", "Organization not found", 404);
     }
 
-    const employeeRoles = [UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE];
+    const employeeRoles = [UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE, UserRole.VIEWER];
     const [activeEmployees, billingDetail] = await Promise.all([
       prisma.user.count({
         where: {

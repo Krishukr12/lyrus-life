@@ -23,6 +23,7 @@ export type MeetingRoomLayoutProps = {
   joinUrl?: string | null;
   onCopyJoinLink?: () => void;
   recordingActive?: boolean;
+  recordingTrackCount?: number;
   sessionStartedAt?: string | null;
   isLive?: boolean;
   video: ReactNode;
@@ -43,6 +44,7 @@ export function MeetingRoomLayout({
   joinUrl,
   onCopyJoinLink,
   recordingActive,
+  recordingTrackCount,
   sessionStartedAt,
   isLive = true,
   video,
@@ -87,6 +89,9 @@ export function MeetingRoomLayout({
               >
                 <Radio className="h-3 w-3 animate-pulse" />
                 Recording
+                {(recordingTrackCount ?? 0) > 0
+                  ? ` · ${recordingTrackCount} audio${recordingTrackCount === 1 ? "" : " tracks"}`
+                  : ""}
               </Badge>
             )}
             <MeetingConnectionBadge />

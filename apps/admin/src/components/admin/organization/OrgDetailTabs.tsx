@@ -273,7 +273,13 @@ export function OrgEmployeesTab({ organizationId }: { organizationId: string }) 
   const resetPw = useMutation({
     mutationFn: (userId: string) => adminApi.resetOrganizationEmployeePassword(organizationId, userId),
     onSuccess: (res) => {
-      toast.success(`Temporary password: ${res.temporaryPassword}`, { duration: 20000 });
+      if (res.emailSent) {
+        toast.success(`Password reset email sent to ${res.email}`);
+      } else {
+        toast.success(`Password reset. Temporary password: ${res.temporaryPassword}`, {
+          duration: 20000,
+        });
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });

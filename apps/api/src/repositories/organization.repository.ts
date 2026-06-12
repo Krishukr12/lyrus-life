@@ -92,7 +92,7 @@ export const organizationRepository = {
         prisma.organization.count(),
         prisma.organization.count({ where: { status: OrganizationStatus.ACTIVE } }),
         prisma.user.count({
-          where: { role: { in: ["ORG_ADMIN", "MANAGER", "EMPLOYEE"] } },
+          where: { role: { in: ["ORG_ADMIN", "MANAGER", "EMPLOYEE", "VIEWER"] } },
         }),
         prisma.meeting.count(),
       ]);

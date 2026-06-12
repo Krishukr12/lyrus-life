@@ -30,7 +30,7 @@ export const userRepository = {
   async listOrganizationUsers(filters: OrgUserListFilters) {
     const where: Prisma.UserWhereInput = {
       organizationId: filters.organizationId,
-      role: { in: [UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE] },
+      role: { in: [UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE, UserRole.VIEWER] },
     };
     if (filters.status) where.status = filters.status;
     if (filters.role) where.role = filters.role;

@@ -98,6 +98,13 @@ export function createMeetingsRouter(): Router {
 
   router.post("/meetings", asyncHandler(async (req, res) => {
     const user = requireAuthUser(req);
+    if (user.role === "VIEWER") {
+      res.status(403).json({
+        error: "forbidden",
+        message: "Viewers cannot create meetings",
+      });
+      return;
+    }
     const parsed = createMeetingSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: parsed.error.flatten() });

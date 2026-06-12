@@ -38,6 +38,19 @@ export async function assertMeetingAccess(
     return;
   }
 
+  if (user.role === UserRole.VIEWER) {
+    if (!user.organizationId || meeting.organizationId !== user.organizationId) {
+      throw new HttpAuthError(403, "forbidden", "You're not authorized to do so");
+    }
+    const isParticipant = meeting.participants.some(
+      (p) => p.email.toLowerCase() === user.email.toLowerCase(),
+    );
+    if (meeting.organizerId !== user.id && !isParticipant) {
+      throw new HttpAuthError(403, "forbidden", "You're not authorized to do so");
+    }
+    return;
+  }
+
   const isOrganizer = meeting.organizerId === user.id;
   const isParticipant = meeting.participants.some(
     (p) => p.email.toLowerCase() === user.email.toLowerCase(),
@@ -71,6 +84,15 @@ export function meetingsListWhere(user: {
 
   if (!user.organizationId) {
     return { id: "__none__" };
+  }
+
+  if (user.role === UserRole.VIEWER) {
+    return {
+      organizationId: user.organizationId,
+      participants: {
+        some: { email: { equals: user.email, mode: "insensitive" as const } },
+      },
+    };
   }
 
   return {

@@ -1,19 +1,30 @@
 import { UserRole, UserStatus, prisma } from "@lyrus/db";
-import { sendEmployeeInviteEmail } from "@lyrus/notifications";
+import { sendEmployeeInviteEmail, sendEmployeePasswordResetEmail } from "@lyrus/notifications";
 import type { createOrgUserSchema, updateOrgUserSchema } from "@lyrus/shared";
 import type { z } from "zod";
-import { assertOrganizationCanAddUser, PlanLimitError } from "../lib/plan-limits.js";
+import {
+  assertOrganizationCanAddUser,
+  countActiveOrganizationSeats,
+  getIncludedSeats,
+  PlanLimitError,
+} from "../lib/plan-limits.js";
 import { userRepository } from "../repositories/user.repository.js";
 import { logTenantAudit } from "./tenant-audit.service.js";
+import {
+  buildSeatBillingPreview,
+  recordSeatChangeEvent,
+} from "./seat-billing.service.js";
 import { generateTemporaryPassword } from "../utils/slug.js";
 import { fullName } from "../utils/user-name.js";
 import { hashPassword } from "../utils/password.js";
+import type { PlanTier } from "../lib/billing-calculator.js";
 
 export class UserManagementError extends Error {
   constructor(
     public code: string,
     message: string,
     public statusCode = 400,
+    public preview?: Awaited<ReturnType<typeof buildSeatBillingPreview>>,
   ) {
     super(message);
   }
@@ -42,6 +53,25 @@ async function sendInviteEmail(
   }
 }
 
+async function sendPasswordResetEmail(
+  organizationName: string,
+  user: { email: string; name: string },
+  temporaryPassword: string,
+): Promise<boolean> {
+  try {
+    return await sendEmployeePasswordResetEmail({
+      to: user.email,
+      name: user.name,
+      organizationName,
+      temporaryPassword,
+      loginUrl: inviteLoginUrl(),
+    });
+  } catch (err) {
+    console.warn("Failed to send password reset email", err);
+    return false;
+  }
+}
+
 export const userManagementService = {
   async createEmployee(
     actorId: string,
@@ -65,10 +95,20 @@ export const userManagementService = {
 
     const org = await prisma.organization.findUnique({
       where: { id: organizationId },
-      select: { name: true },
+      select: { name: true, subscriptionPlan: true },
     });
     if (!org) {
       throw new UserManagementError("not_found", "Organization not found", 404);
+    }
+
+    const preview = await buildSeatBillingPreview(organizationId, 1);
+    if (preview.requiresConfirmation && !input.confirmAdditionalSeats) {
+      throw new UserManagementError(
+        "seat_limit_confirmation_required",
+        "Adding this user will exceed your included seats. Confirmation required.",
+        402,
+        preview,
+      );
     }
 
     const temporaryPassword = generateTemporaryPassword();
@@ -95,6 +135,18 @@ export const userManagementService = {
 
     await sendInviteEmail(org.name, user, temporaryPassword);
 
+    const activeSeats = await countActiveOrganizationSeats(organizationId);
+    const includedSeats = getIncludedSeats(org.subscriptionPlan as PlanTier);
+
+    await recordSeatChangeEvent(organizationId, actorId, {
+      action: "user.created",
+      activeSeats,
+      includedSeats,
+      additionalSeats: Math.max(0, activeSeats - includedSeats),
+      targetUserId: user.id,
+      targetEmail: user.email,
+    });
+
     await logTenantAudit({
       organizationId,
       userId: actorId,
@@ -102,7 +154,7 @@ export const userManagementService = {
       metadata: { targetUserId: user.id, role: user.role },
     });
 
-    return { user, temporaryPassword };
+    return { user, temporaryPassword, billingPreview: preview };
   },
 
   async updateEmployee(
@@ -154,6 +206,36 @@ export const userManagementService = {
       },
     );
 
+    if (input.status === UserStatus.ACTIVE && existing.status !== UserStatus.ACTIVE) {
+      const org = await prisma.organization.findUnique({
+        where: { id: organizationId },
+        select: { subscriptionPlan: true },
+      });
+      const activeSeats = await countActiveOrganizationSeats(organizationId);
+      const includedSeats = getIncludedSeats(org!.subscriptionPlan as PlanTier);
+      await recordSeatChangeEvent(organizationId, actorId, {
+        action: "user.activated",
+        activeSeats,
+        includedSeats,
+        additionalSeats: Math.max(0, activeSeats - includedSeats),
+        targetUserId: userId,
+      });
+    } else if (input.status === UserStatus.INACTIVE && existing.status === UserStatus.ACTIVE) {
+      const org = await prisma.organization.findUnique({
+        where: { id: organizationId },
+        select: { subscriptionPlan: true },
+      });
+      const activeSeats = await countActiveOrganizationSeats(organizationId);
+      const includedSeats = getIncludedSeats(org!.subscriptionPlan as PlanTier);
+      await recordSeatChangeEvent(organizationId, actorId, {
+        action: "user.deactivated",
+        activeSeats,
+        includedSeats,
+        additionalSeats: Math.max(0, activeSeats - includedSeats),
+        targetUserId: userId,
+      });
+    }
+
     await logTenantAudit({
       organizationId,
       userId: actorId,
@@ -185,6 +267,14 @@ export const userManagementService = {
       throw new UserManagementError("not_found", "User not found", 404);
     }
 
+    const org = await prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: { name: true },
+    });
+    if (!org) {
+      throw new UserManagementError("not_found", "Organization not found", 404);
+    }
+
     const temporaryPassword = generateTemporaryPassword();
     const passwordHash = await hashPassword(temporaryPassword);
 
@@ -193,6 +283,42 @@ export const userManagementService = {
       mustChangePassword: true,
     });
 
+    const emailSent = await sendPasswordResetEmail(org.name, existing, temporaryPassword);
+
+    await logTenantAudit({
+      organizationId,
+      userId: actorId,
+      action: "user.password_reset",
+      metadata: { targetUserId: userId, emailSent },
+    });
+
+    return { temporaryPassword, email: existing.email, emailSent };
+  },
+
+  async resendInvite(actorId: string, organizationId: string, userId: string) {
+    const existing = await userRepository.findByIdInOrganization(userId, organizationId);
+    if (!existing) {
+      throw new UserManagementError("not_found", "User not found", 404);
+    }
+
+    const org = await prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: { name: true },
+    });
+    if (!org) {
+      throw new UserManagementError("not_found", "Organization not found", 404);
+    }
+
+    const temporaryPassword = generateTemporaryPassword();
+    const passwordHash = await hashPassword(temporaryPassword);
+
+    await userRepository.updateOrganizationUser(userId, organizationId, {
+      passwordHash,
+      mustChangePassword: true,
+    });
+
+    await sendInviteEmail(org.name, existing, temporaryPassword);
+
     await logTenantAudit({
       organizationId,
       userId: actorId,
@@ -200,26 +326,14 @@ export const userManagementService = {
       metadata: { targetUserId: userId },
     });
 
-    return { temporaryPassword, email: existing.email };
-  },
-
-  async resendInvite(actorId: string, organizationId: string, userId: string) {
-    const result = await this.resetEmployeePassword(actorId, organizationId, userId);
-    const existing = await userRepository.findByIdInOrganization(userId, organizationId);
-    const org = await prisma.organization.findUnique({
-      where: { id: organizationId },
-      select: { name: true },
-    });
-    if (existing && org) {
-      await sendInviteEmail(org.name, existing, result.temporaryPassword);
-    }
     await logTenantAudit({
       organizationId,
       userId: actorId,
       action: "user.invite_resent",
       metadata: { targetUserId: userId },
     });
-    return result;
+
+    return { temporaryPassword, email: existing.email, emailSent: true };
   },
 
   async forcePasswordChange(actorId: string, organizationId: string, userId: string) {

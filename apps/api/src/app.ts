@@ -15,7 +15,9 @@ import { createAdminDashboardRouter } from "./routes/admin/dashboard.js";
 import { createAdminMomTemplatesRouter } from "./routes/admin/mom-templates.js";
 import { MomTemplateServiceError } from "./services/mom-template.service.js";
 import { createOrganizationUsersRouter } from "./routes/organization/users.js";
+import { createOrganizationInvitationsRouter } from "./routes/organization/invitations.js";
 import { createOrganizationSettingsRouter } from "./routes/organization/settings.js";
+import { InvitationError } from "./services/invitation.service.js";
 import { PlanLimitError } from "./lib/plan-limits.js";
 import { createLiveRouter } from "./routes/live.js";
 import { createMeetingsRouter } from "./routes/meetings.js";
@@ -50,6 +52,7 @@ export function createApp(corsOrigins: string[]): Express {
   protectedApi.use(createAdminBillingRouter());
   protectedApi.use(createAdminMomTemplatesRouter());
   protectedApi.use(createOrganizationUsersRouter());
+  protectedApi.use(createOrganizationInvitationsRouter());
   protectedApi.use(createOrganizationSettingsRouter());
   protectedApi.use(createMeetingsRouter());
   app.use(protectedApi);
@@ -63,8 +66,16 @@ export function createApp(corsOrigins: string[]): Express {
       res.status(err.statusCode).json({ error: err.code, message: err.message });
       return;
     }
-    if (err instanceof OrganizationServiceError || err instanceof UserManagementError) {
-      res.status(err.statusCode).json({ error: err.code, message: err.message });
+    if (
+      err instanceof OrganizationServiceError ||
+      err instanceof UserManagementError ||
+      err instanceof InvitationError
+    ) {
+      const body: Record<string, unknown> = { error: err.code, message: err.message };
+      if ("preview" in err && err.preview) {
+        body.billingPreview = err.preview;
+      }
+      res.status(err.statusCode).json(body);
       return;
     }
     if (err instanceof BillingServiceError) {

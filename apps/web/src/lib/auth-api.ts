@@ -161,6 +161,58 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
   return session?.user ?? null;
 }
 
+export async function setRequiredPassword(
+  newPassword: string,
+  confirmPassword: string,
+): Promise<void> {
+  const token = (await import("./token-store.js")).getAccessToken();
+  await authRequest<{ ok: boolean }>("/auth/set-required-password", {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ newPassword, confirmPassword }),
+  });
+}
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+  confirmPassword: string,
+): Promise<void> {
+  const token = (await import("./token-store.js")).getAccessToken();
+  await authRequest<{ ok: boolean }>("/auth/change-password", {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+  });
+}
+
+export interface InvitationDetails {
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  organizationName: string;
+  invitedBy: string;
+  expiresAt: string;
+}
+
+export async function fetchInvitationDetails(token: string): Promise<InvitationDetails> {
+  return authRequest<InvitationDetails>(`/auth/invitation?token=${encodeURIComponent(token)}`);
+}
+
+export async function acceptInvitation(
+  token: string,
+  password: string,
+  confirmPassword: string,
+): Promise<AuthSession> {
+  const data = await authRequest<AuthSession>("/auth/accept-invitation", {
+    method: "POST",
+    body: JSON.stringify({ token, password, confirmPassword }),
+  });
+  setAccessToken(data.token);
+  return data;
+}
+
 export async function logout(): Promise<void> {
   const token = (await import("./token-store.js")).getAccessToken();
   try {

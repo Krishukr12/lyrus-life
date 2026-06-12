@@ -27,7 +27,7 @@ export default function ImpersonatePage() {
           setError("Impersonation session could not be established.");
           return;
         }
-        navigate("/org", { replace: true });
+        navigate("/organization", { replace: true });
       } catch (e) {
         if (!cancelled) {
           setError(e instanceof Error ? e.message : "Impersonation failed");

@@ -66,6 +66,14 @@ enum UserRole {
   ORG_ADMIN
   MANAGER
   EMPLOYEE
+  VIEWER
+}
+
+enum OrganizationInvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
 }
 
 enum UserStatus {
@@ -320,6 +328,7 @@ model Organization {
   invoices        Invoice[]
   payments        Payment[]
   billingEvents   BillingEvent[]
+  invitations     OrganizationInvitation[]
 
   @@index([status])
   @@index([subscriptionPlan])
@@ -339,22 +348,56 @@ model User {
   role           UserRole   @default(EMPLOYEE)
   status         UserStatus @default(ACTIVE)
   mustChangePassword Boolean @default(false)
+  emailVerifiedAt    DateTime?
+  invitedById        String?
   lastLoginAt    DateTime?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  organization      Organization?     @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  employeeProfile   EmployeeProfile?
-  organizedMeetings Meeting[]         @relation("MeetingOrganizer")
-  ownedTasks        ActionItem[]      @relation("TaskOwner")
-  auditLogs         AuditLog[]
-  tenantAuditLogs   TenantAuditLog[]
-  otpCodes          AuthOtp[]
+  organization       Organization?            @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  invitedBy          User?                    @relation("UserInvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  invitedUsers       User[]                   @relation("UserInvitedBy")
+  employeeProfile    EmployeeProfile?
+  organizedMeetings  Meeting[]                @relation("MeetingOrganizer")
+  ownedTasks         ActionItem[]             @relation("TaskOwner")
+  auditLogs          AuditLog[]
+  tenantAuditLogs    TenantAuditLog[]
+  otpCodes           AuthOtp[]
+  sentInvitations    OrganizationInvitation[] @relation("InvitationSentBy")
+  acceptedInvitation OrganizationInvitation?  @relation("InvitationAcceptedUser")
 
   @@index([organizationId])
   @@index([organizationId, status])
   @@index([organizationId, role])
   @@index([role])
+}
+
+model OrganizationInvitation {
+  id             String                       @id @default(cuid())
+  organizationId String
+  email          String
+  firstName      String
+  lastName       String
+  role           UserRole                     @default(EMPLOYEE)
+  tokenHash      String                       @unique
+  status         OrganizationInvitationStatus @default(PENDING)
+  invitedById    String
+  userId         String?                      @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  mobile         String?
+  designation    String?
+  department     String?
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    User         @relation("InvitationSentBy", fields: [invitedById], references: [id], onDelete: Cascade)
+  user         User?        @relation("InvitationAcceptedUser", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([organizationId, email])
+  @@index([expiresAt])
 }
 
 model EmployeeProfile {

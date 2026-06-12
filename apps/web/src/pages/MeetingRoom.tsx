@@ -18,7 +18,7 @@ import {
   startLiveMeeting,
 } from "@/lib/live-api";
 import { useLiveMeetingSocket } from "@/hooks/use-live-meeting-socket";
-import { useMeetingRecorder } from "@/hooks/use-meeting-recorder";
+import { MeetingRoomRecorder, type MeetingRoomRecorderHandle } from "@/components/live/MeetingRoomRecorder";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Meeting } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,9 @@ export default function MeetingRoom() {
   const [claimHostOnJoin, setClaimHostOnJoin] = useState(false);
   const [startingMeeting, setStartingMeeting] = useState(false);
   const [sessionStartedAt, setSessionStartedAt] = useState<string | null>(null);
+  const [recordingTrackCount, setRecordingTrackCount] = useState(0);
   const notesSyncingRef = useRef(false);
+  const recorderRef = useRef<MeetingRoomRecorderHandle | null>(null);
   const goLiveRef = useRef<() => void>(() => {});
 
   goLiveRef.current = () => {
@@ -75,7 +77,10 @@ export default function MeetingRoom() {
     },
   );
 
-  const { startRecording, stopRecording } = useMeetingRecorder();
+  const handleRecordingChange = useCallback((active: boolean, trackCount: number) => {
+    setRecordingActive(active);
+    setRecordingTrackCount(trackCount);
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -134,21 +139,6 @@ export default function MeetingRoom() {
     return () => clearInterval(timer);
   }, [id, isLive]);
 
-  useEffect(() => {
-    if (!isOrganizerHost) return;
-    let cancelled = false;
-    void startRecording()
-      .then(() => {
-        if (!cancelled) setRecordingActive(true);
-      })
-      .catch(() => {
-        toast.error("Microphone access is required to record this meeting for transcription");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [isOrganizerHost, startRecording]);
-
   const handleNotesChange = (value: string) => {
     setLiveNotes(value);
     if (!notesSyncingRef.current) {
@@ -188,7 +178,7 @@ export default function MeetingRoom() {
     setProcessing(true);
 
     try {
-      const recording = await stopRecording();
+      const recording = (await recorderRef.current?.stopRecording()) ?? null;
       const { socketNotes } = await endLiveSession(id).catch(() => ({ socketNotes: "" }));
 
       const combinedNotes = [meeting.notes?.trim(), liveNotes.trim(), socketNotes.trim()]
@@ -200,7 +190,7 @@ export default function MeetingRoom() {
       toast.dismiss("mom-gen");
 
       if (recording && recording.size > 5000) {
-        toast.success("Recording processed");
+        toast.success("Recording processed from all participants");
       } else if (result.meeting.mom) {
         toast.success("MOM generated from notes");
       }
@@ -215,7 +205,7 @@ export default function MeetingRoom() {
     } finally {
       setEnding(false);
     }
-  }, [ending, id, liveNotes, meeting, navigate, stopRecording]);
+  }, [ending, id, liveNotes, meeting, navigate]);
 
   if (loading) {
     return <MeetingRoomOverlay message="Joining meeting room…" />;
@@ -251,6 +241,11 @@ export default function MeetingRoom() {
         {...meetingLiveKitRoomProps}
       >
         <MeetingHostProvider hostUserId={hostUserId} hostName={hostName}>
+          <MeetingRoomRecorder
+            ref={recorderRef}
+            enabled={isOrganizerHost}
+            onRecordingChange={handleRecordingChange}
+          />
           <MeetingRoomShell
             meetingId={id!}
             meetingTitle={meeting.title}
@@ -267,6 +262,7 @@ export default function MeetingRoom() {
             onNotesOpenChange={setNotesOpen}
             onNotesChange={handleNotesChange}
             recordingActive={recordingActive}
+            recordingTrackCount={recordingTrackCount}
             sessionStartedAt={sessionStartedAt}
             ending={ending}
             startingMeeting={startingMeeting}
@@ -317,6 +313,7 @@ type MeetingRoomShellProps = {
   onNotesOpenChange: (open: boolean) => void;
   onNotesChange: (value: string) => void;
   recordingActive: boolean;
+  recordingTrackCount: number;
   sessionStartedAt: string | null;
   ending: boolean;
   startingMeeting: boolean;
@@ -342,6 +339,7 @@ function MeetingRoomShell({
   onNotesOpenChange,
   onNotesChange,
   recordingActive,
+  recordingTrackCount,
   sessionStartedAt,
   ending,
   startingMeeting,
@@ -398,6 +396,7 @@ function MeetingRoomShell({
         joinUrl={joinUrl}
         onCopyJoinLink={onCopyJoinLink}
         recordingActive={recordingActive}
+        recordingTrackCount={recordingTrackCount}
         sessionStartedAt={sessionStartedAt}
         isLive={isLive}
         video={

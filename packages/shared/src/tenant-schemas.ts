@@ -7,6 +7,7 @@ export const tenantUserRoleSchema = z.enum([
   "ORG_ADMIN",
   "MANAGER",
   "EMPLOYEE",
+  "VIEWER",
 ]);
 
 export const organizationStatusSchema = z.enum(["ACTIVE", "SUSPENDED", "PENDING"]);
@@ -18,6 +19,17 @@ export const userStatusSchema = z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]);
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(8),
+    newPassword: z.string().min(8, "New password must be at least 8 characters"),
+    confirmPassword: z.string().min(8),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+/** Used when mustChangePassword is true — no current password required. */
+export const setRequiredPasswordSchema = z
+  .object({
     newPassword: z.string().min(8, "New password must be at least 8 characters"),
     confirmPassword: z.string().min(8),
   })
@@ -100,7 +112,7 @@ export const updateOrganizationSchema = z.object({
   status: organizationStatusSchema.optional(),
 });
 
-export const orgMemberRoleSchema = z.enum(["ORG_ADMIN", "MANAGER", "EMPLOYEE"]);
+export const orgMemberRoleSchema = z.enum(["ORG_ADMIN", "MANAGER", "EMPLOYEE", "VIEWER"]);
 
 export const createOrgUserSchema = z.object({
   firstName: z.string().min(1).max(80),
@@ -112,6 +124,27 @@ export const createOrgUserSchema = z.object({
   department: z.string().max(120).optional(),
   employeeCode: z.string().max(64).optional(),
   joiningDate: z.string().datetime().optional(),
+  confirmAdditionalSeats: z.boolean().optional(),
+});
+
+export const inviteOrgUserSchema = z.object({
+  firstName: z.string().min(1).max(80),
+  lastName: z.string().min(1).max(80),
+  email: z.string().email(),
+  mobile: z.string().max(30).optional(),
+  role: orgMemberRoleSchema.default("EMPLOYEE"),
+  designation: z.string().max(120).optional(),
+  department: z.string().max(120).optional(),
+  confirmAdditionalSeats: z.boolean().optional(),
+});
+
+export const acceptInvitationSchema = z.object({
+  token: z.string().min(1),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(8),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 export const updateOrgUserSchema = z.object({

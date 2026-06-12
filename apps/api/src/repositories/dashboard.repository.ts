@@ -36,7 +36,7 @@ export const dashboardRepository = {
   },
 
   async getUserCounts() {
-    const employeeRoles = [UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE];
+    const employeeRoles = [UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE, UserRole.VIEWER];
     const d30 = new Date();
     d30.setDate(d30.getDate() - 30);
 

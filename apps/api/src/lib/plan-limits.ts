@@ -8,7 +8,12 @@ import {
 import type { PlanTier } from "./billing-calculator.js";
 import { PLAN_INCLUDED_ALLOWANCES } from "./billing-defaults.js";
 
-const SEAT_ROLES = [UserRole.ORG_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE] as const;
+const SEAT_ROLES = [
+  UserRole.ORG_ADMIN,
+  UserRole.MANAGER,
+  UserRole.EMPLOYEE,
+  UserRole.VIEWER,
+] as const;
 
 export class PlanLimitError extends Error {
   constructor(
@@ -26,6 +31,16 @@ export async function countActiveOrganizationSeats(organizationId: string): Prom
       organizationId,
       status: UserStatus.ACTIVE,
       role: { in: [...SEAT_ROLES] },
+    },
+  });
+}
+
+export async function countPendingInvitationSeats(organizationId: string): Promise<number> {
+  return prisma.organizationInvitation.count({
+    where: {
+      organizationId,
+      status: "PENDING",
+      expiresAt: { gt: new Date() },
     },
   });
 }
