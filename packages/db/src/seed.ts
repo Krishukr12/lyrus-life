@@ -1,59 +1,76 @@
-import { config } from "dotenv";
-import { resolve } from "node:path";
 import { hashSecret } from "@lyrus/auth";
-import { UserRole, prisma } from "./index.js";
+import "./load-env.js";
+import { UserRole, UserStatus, prisma } from "./index.js";
 
-config({ path: resolve(process.cwd(), "../../.env") });
-config({ path: resolve(process.cwd(), ".env") });
+function fullName(firstName: string, lastName: string) {
+  return `${firstName} ${lastName}`.trim();
+}
 
-type SeedUser = {
+async function upsertSuperAdmin(input: {
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   password: string;
-  role: (typeof UserRole)[keyof typeof UserRole];
-};
-
-async function upsertUser(user: SeedUser) {
-  const email = user.email.toLowerCase();
-  const passwordHash = await hashSecret(user.password);
+}) {
+  const email = input.email.toLowerCase();
+  const passwordHash = await hashSecret(input.password);
+  const name = fullName(input.firstName, input.lastName);
 
   await prisma.user.upsert({
     where: { email },
     create: {
       email,
-      name: user.name,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      name,
       passwordHash,
-      role: user.role,
+      role: UserRole.SUPER_ADMIN,
+      status: UserStatus.ACTIVE,
+      organizationId: null,
     },
     update: {
-      name: user.name,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      name,
       passwordHash,
-      role: user.role,
+      role: UserRole.SUPER_ADMIN,
+      status: UserStatus.ACTIVE,
+      organizationId: null,
     },
   });
 
-  console.info(`Seeded user: ${email}`);
+  console.info(`Seeded super admin: ${email}`);
+}
+
+async function seedPlatformPricing() {
+  await prisma.platformPricingConfig.upsert({
+    where: { id: "default" },
+    create: {
+      id: "default",
+      starterMonthlyInr: 999,
+      starterYearlyInr: 9_999,
+      growthMonthlyInr: 2_999,
+      growthYearlyInr: 29_999,
+      enterpriseBaseMonthlyInr: 9_999,
+      extraUserMonthlyInr: 99,
+      extraLocationMonthlyInr: 499,
+      gstPercent: 18,
+      freeTrialDays: 14,
+    },
+    update: {},
+  });
+  console.info("Seeded platform pricing config (defaults)");
 }
 
 async function main() {
-  const users: SeedUser[] = [
-    {
-      email: (process.env.SEED_ADMIN_EMAIL ?? "admin@lyrus.life").toLowerCase(),
-      name: process.env.SEED_ADMIN_NAME ?? "Admin User",
-      password: process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe123!",
-      role: UserRole.ADMIN,
-    },
-    {
-      email: (process.env.SEED_KRISHAN_EMAIL ?? "krishan.kumar@virtualedge.in").toLowerCase(),
-      name: process.env.SEED_KRISHAN_NAME ?? "Krishan Kumar Safi",
-      password: process.env.SEED_KRISHAN_PASSWORD ?? "LyrusVirt@2026",
-      role: UserRole.ADMIN,
-    },
-  ];
+  await upsertSuperAdmin({
+    email: "krishan.kumar@virtualedge.in".toLowerCase(),
+    firstName: process.env.SEED_SUPER_ADMIN_FIRST_NAME ?? "Krishan",
+    lastName: process.env.SEED_SUPER_ADMIN_LAST_NAME ?? "Kumar",
+    password: process.env.SEED_SUPER_ADMIN_PASSWORD ?? "Krishukrishan1211@",
+  });
 
-  for (const user of users) {
-    await upsertUser(user);
-  }
+  await seedPlatformPricing();
 }
 
 main()

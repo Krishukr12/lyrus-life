@@ -120,14 +120,90 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.PlatformPricingConfigScalarFieldEnum = {
+  id: 'id',
+  starterMonthlyInr: 'starterMonthlyInr',
+  starterYearlyInr: 'starterYearlyInr',
+  growthMonthlyInr: 'growthMonthlyInr',
+  growthYearlyInr: 'growthYearlyInr',
+  enterpriseBaseMonthlyInr: 'enterpriseBaseMonthlyInr',
+  extraUserMonthlyInr: 'extraUserMonthlyInr',
+  extraLocationMonthlyInr: 'extraLocationMonthlyInr',
+  gstPercent: 'gstPercent',
+  freeTrialDays: 'freeTrialDays',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrganizationBillingScalarFieldEnum = {
+  organizationId: 'organizationId',
+  activeLocations: 'activeLocations',
+  billingStatus: 'billingStatus',
+  billingCycle: 'billingCycle',
+  nextBillingDate: 'nextBillingDate',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrganizationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  slug: 'slug',
+  legalName: 'legalName',
+  primaryContactName: 'primaryContactName',
+  industry: 'industry',
+  email: 'email',
+  phone: 'phone',
+  website: 'website',
+  companySize: 'companySize',
+  country: 'country',
+  state: 'state',
+  city: 'city',
+  logoUrl: 'logoUrl',
+  address: 'address',
+  timezone: 'timezone',
+  meetingDefaultDurationMinutes: 'meetingDefaultDurationMinutes',
+  status: 'status',
+  subscriptionPlan: 'subscriptionPlan',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
+  organizationId: 'organizationId',
+  firstName: 'firstName',
+  lastName: 'lastName',
   email: 'email',
+  mobile: 'mobile',
   name: 'name',
   passwordHash: 'passwordHash',
   role: 'role',
+  status: 'status',
+  mustChangePassword: 'mustChangePassword',
+  lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.EmployeeProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  designation: 'designation',
+  department: 'department',
+  employeeCode: 'employeeCode',
+  joiningDate: 'joiningDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TenantAuditLogScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  userId: 'userId',
+  action: 'action',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.AuthOtpScalarFieldEnum = {
@@ -141,6 +217,7 @@ exports.Prisma.AuthOtpScalarFieldEnum = {
 
 exports.Prisma.MeetingScalarFieldEnum = {
   id: 'id',
+  organizationId: 'organizationId',
   title: 'title',
   description: 'description',
   scheduledAt: 'scheduledAt',
@@ -151,6 +228,7 @@ exports.Prisma.MeetingScalarFieldEnum = {
   calendarEventId: 'calendarEventId',
   recordingUrl: 'recordingUrl',
   organizerId: 'organizerId',
+  livekitRoomId: 'livekitRoomId',
   joinSlug: 'joinSlug',
   liveStartedAt: 'liveStartedAt',
   liveBroadcastAt: 'liveBroadcastAt',
@@ -272,12 +350,12 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -296,9 +374,36 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+exports.BillingStatus = exports.$Enums.BillingStatus = {
+  ACTIVE: 'ACTIVE',
+  PENDING: 'PENDING',
+  OVERDUE: 'OVERDUE',
+  TRIAL: 'TRIAL'
+};
+
+exports.OrganizationStatus = exports.$Enums.OrganizationStatus = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  PENDING: 'PENDING'
+};
+
+exports.SubscriptionPlan = exports.$Enums.SubscriptionPlan = {
+  STARTER: 'STARTER',
+  PROFESSIONAL: 'PROFESSIONAL',
+  ENTERPRISE: 'ENTERPRISE'
+};
+
 exports.UserRole = exports.$Enums.UserRole = {
-  USER: 'USER',
-  ADMIN: 'ADMIN'
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ORG_ADMIN: 'ORG_ADMIN',
+  MANAGER: 'MANAGER',
+  EMPLOYEE: 'EMPLOYEE'
+};
+
+exports.UserStatus = exports.$Enums.UserStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  SUSPENDED: 'SUSPENDED'
 };
 
 exports.MeetingStatus = exports.$Enums.MeetingStatus = {
@@ -356,7 +461,12 @@ exports.PipelineStep = exports.$Enums.PipelineStep = {
 };
 
 exports.Prisma.ModelName = {
+  PlatformPricingConfig: 'PlatformPricingConfig',
+  OrganizationBilling: 'OrganizationBilling',
+  Organization: 'Organization',
   User: 'User',
+  EmployeeProfile: 'EmployeeProfile',
+  TenantAuditLog: 'TenantAuditLog',
   AuthOtp: 'AuthOtp',
   Meeting: 'Meeting',
   MeetingInvite: 'MeetingInvite',

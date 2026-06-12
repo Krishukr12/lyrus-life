@@ -103,6 +103,7 @@ export default function Login() {
       await login(email.trim(), password, redirectTo);
       toast.success(`Welcome to ${companyName}`);
     } catch (err) {
+      if (err instanceof Error && err.message === "SUPER_ADMIN_REDIRECT") return;
       toast.error(err instanceof Error ? err.message : "Sign in failed");
     } finally {
       setBusy(false);

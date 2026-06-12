@@ -5,6 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  envDir: path.resolve(__dirname, "../.."),
   server: {
     host: "::",
     port: 8080,
@@ -13,12 +14,12 @@ export default defineConfig(({ mode }) => ({
     },
     proxy: {
       "/api": {
-        target: "http://localhost:3001",
+        target: "http://127.0.0.1:3001",
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/api/, ""),
       },
       "/socket.io": {
-        target: "http://localhost:3001",
+        target: "http://127.0.0.1:3001",
         changeOrigin: true,
         ws: true,
       },

@@ -8,6 +8,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
+    public code?: string,
   ) {
     super(message);
   }
@@ -36,15 +37,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     let message = response.statusText;
+    let code: string | undefined;
     try {
       const body = (await response.json()) as { error?: unknown; message?: string };
+      if (typeof body.error === "string") code = body.error;
       if (body.message) {
         message = body.message;
-      } else if (body.error) {
-        message =
-          typeof body.error === "string"
-            ? body.error
-            : JSON.stringify(body.error);
+      } else if (body.error && typeof body.error !== "string") {
+        message = JSON.stringify(body.error);
       }
     } catch {
       // ignore parse errors
@@ -54,10 +54,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       getApiAuthHandlers().onUnauthorized?.();
     }
     if (response.status === 403) {
-      getApiAuthHandlers().onForbidden?.();
+      if (code === "organization_suspended" || code === "organization_pending") {
+        getApiAuthHandlers().onOrganizationBlocked?.(message);
+      } else {
+        getApiAuthHandlers().onForbidden?.();
+      }
     }
 
-    throw new ApiError(message, response.status);
+    throw new ApiError(message, response.status, code);
   }
 
   if (response.status === 204) {

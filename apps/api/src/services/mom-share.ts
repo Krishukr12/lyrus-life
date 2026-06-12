@@ -36,7 +36,7 @@ export async function sendMomToStakeholdersOnApproval(
 
   const keyPoints = Array.isArray(meeting.mom.keyPoints) ? (meeting.mom.keyPoints as string[]) : [];
   const actionItems = Array.isArray(meeting.mom.actionItems)
-    ? (meeting.mom.actionItems as MomPdfActionItem[])
+    ? (meeting.mom.actionItems as unknown as MomPdfActionItem[])
     : [];
 
   const { date } = formatDateTime(meeting.scheduledAt);

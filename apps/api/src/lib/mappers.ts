@@ -4,15 +4,17 @@ import type {
   Meeting,
   MeetingInvite,
   MeetingParticipant,
-  MeetingStatus,
-  MeetingTag,
   Mom,
   Summary,
-  TaskPriority,
-  TaskStatus,
   Transcript,
   TranscriptSegment,
 } from "@lyrus/db";
+import type {
+  MeetingStatusType,
+  MeetingTagType,
+  TaskPriorityType,
+  TaskStatusType,
+} from "../types/enums.js";
 
 type MeetingWithRelations = Meeting & {
   participants: MeetingParticipant[];
@@ -102,7 +104,7 @@ export interface WebUserTask {
   remindedAt?: string;
 }
 
-function mapDbStatus(status: MeetingStatus): WebMeeting["status"] {
+function mapDbStatus(status: MeetingStatusType): WebMeeting["status"] {
   switch (status) {
     case "ONGOING":
       return "ongoing";
@@ -117,11 +119,11 @@ function mapDbStatus(status: MeetingStatus): WebMeeting["status"] {
   }
 }
 
-function mapDbTag(tag: MeetingTag): WebMeeting["tag"] {
+function mapDbTag(tag: MeetingTagType): WebMeeting["tag"] {
   return tag.toLowerCase() as WebMeeting["tag"];
 }
 
-function mapTaskStatus(status: TaskStatus): WebUserTask["status"] {
+function mapTaskStatus(status: TaskStatusType): WebUserTask["status"] {
   switch (status) {
     case "IN_PROGRESS":
       return "in_progress";
@@ -243,7 +245,7 @@ export function mapActionItemToTask(
   };
 }
 
-export function mapPriority(priority?: string): TaskPriority {
+export function mapPriority(priority?: string): TaskPriorityType {
   switch (priority?.toLowerCase()) {
     case "high":
       return "HIGH";

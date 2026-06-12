@@ -17,6 +17,9 @@ export function createSmtpTransport(smtp: SmtpConfig) {
     port: smtp.port,
     secure: smtp.secure,
     requireTLS: !smtp.secure && smtp.port === 587,
+    connectionTimeout: 8_000,
+    greetingTimeout: 8_000,
+    socketTimeout: 8_000,
     auth: {
       user: smtp.user,
       pass: smtp.pass,

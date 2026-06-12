@@ -1,4 +1,6 @@
 import { UserRole, prisma } from "@lyrus/db";
+
+type UserRoleType = (typeof UserRole)[keyof typeof UserRole];
 import { isEmailDomainAllowed } from "./auth-config.js";
 import { HttpAuthError } from "./meeting-access.js";
 
@@ -56,13 +58,14 @@ export function assertInvitedToMeeting(meeting: MeetingJoinContext, email: strin
 
 export function assertCanJoinMeeting(
   meeting: MeetingJoinContext,
-  user: { id: string; email: string; role: UserRole },
+  user: { id: string; email: string; role: UserRoleType },
 ): { isHost: boolean } {
   assertEmailAllowedForOrganization(user.email);
   assertInvitedToMeeting(meeting, user.email);
 
   const isHost =
-    user.role === UserRole.ADMIN ||
+    user.role === UserRole.SUPER_ADMIN ||
+    user.role === UserRole.ORG_ADMIN ||
     meeting.organizerId === user.id ||
     Boolean(
       meeting.organizer?.email && normalizeEmail(meeting.organizer.email) === normalizeEmail(user.email),

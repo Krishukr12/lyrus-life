@@ -1,8 +1,9 @@
 import { PipelineStep, prisma, type Prisma } from "@lyrus/db";
+import type { PipelineStepType } from "../types/enums.js";
 
 export async function logAudit(
   meetingId: string | null,
-  action: PipelineStep,
+  action: PipelineStepType,
   details?: Prisma.InputJsonValue,
   userId?: string,
 ) {

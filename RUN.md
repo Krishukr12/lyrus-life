@@ -1,42 +1,59 @@
 docker compose up -d
 
-# LiveKit (required for live video meetings)
-docker compose up livekit -d
-# Verify: curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:7880/   → should print 200
-# If video stays "Offline", recreate after config changes:
-#   docker compose up livekit -d --force-recreate
-#
-# .env (must match livekit.yaml keys):
-#   LIVEKIT_URL=ws://127.0.0.1:7880
-#   LIVEKIT_API_KEY=devkey
-#   LIVEKIT_API_SECRET=secret
-# If you open the app via a LAN IP (e.g. http://192.168.x.x:8080), set:
-#   LIVEKIT_PUBLIC_URL=ws://192.168.x.x:7880
+## Node.js (required)
 
-# Live meeting behavior
-# - Waiting room: mic/camera work before the host starts — participants can talk early
-# - Host: "Start for everyone" begins the official live session; "End meeting" runs recording + MOM pipeline
-# - Anyone can Leave without ending for others; host role passes to the next person if the host leaves
-# - When everyone leaves, the session auto-ends after LIVE_EMPTY_ROOM_MS (default 3 seconds, set 300000 for 5 min)
+Prisma 7 needs **Node 20.19+, 22.12+, or 24.0+**. **Node 23 is not supported.**
 
-# Meeting join security
-# - Email "Join meeting" links go to /join/{slug} (not the dashboard).
-# - User must sign in with an ALLOWED_EMAIL_DOMAINS address.
-# - Only invited participants (or the host) can enter the live room.
-# - Anonymous / guest join by name is disabled.
+```bash
+node -v   # must NOT be v23.x
 
-# Recordings storage (local vs private S3)
-# - Default STORAGE_BACKEND=auto → S3 when AWS_S3_BUCKET is set, else ./uploads
-# - Recordings are never public; download via authenticated API only
-# - See docs/STORAGE.md for bucket policy, IAM, and migration
+# Option A — nvm (recommended; see .nvmrc)
+nvm install
+nvm use
 
-# Auth setup (first time)
-# 1. Copy .env.example → .env and set JWT_SECRET, EMAIL_* for OTP mail
-# 2. pnpm install
-# 3. pnpm --filter @lyrus/db db:migrate
-# 4. pnpm --filter @lyrus/db db:seed
-# 5. Sign in at http://localhost:8080/login
-#    - krishan.kumar@virtualedge.in / LyrusVirt@2026 (change at /settings after login)
-#    - admin@lyrus.life / ChangeMe123!
+# Option B — Homebrew node@22 (already installed on this machine)
+export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+node -v   # should show v22.12+
 
+pnpm install
+```
+
+## Multi-tenant setup
+
+```bash
+pnpm db:generate
+pnpm db:pre-migrate   # existing DBs only
+pnpm db:push:force
+pnpm db:seed
+pnpm dev              # starts api + web + admin via turbo
+```
+
+**Database:** For local Postgres, run `docker compose up -d` and use the `DATABASE_URL` from `.env.example`. For AWS RDS, your IP must be allowed in the RDS security group — otherwise login/auth will hang or return Prisma timeouts.
+
+**Node version:** use Node 22 (`nvm use` — see `.nvmrc`). Node 23 is unsupported and can break Prisma.
+
+If login shows **Internal Server Error** with a Prisma `findUnique` message, the API cannot reach Postgres (wrong `DATABASE_URL`) or the API process is crash-looping. Stop all dev servers (`Ctrl+C`), ensure only one thing listens on `3001`, then run `pnpm dev` again.
+```
+
+Billing module: after schema changes, `pnpm db:push` creates `PlatformPricingConfig` and `OrganizationBilling`. `db:seed` loads default INR pricing.
+
+# Apps
+# | App   | Port | Purpose                          |
+# |-------|------|----------------------------------|
+# | web   | 8080 | Organization portal + meetings   |
+# | admin | 8081 | Internal super admin portal      |
+# | api   | 3001 | Shared backend                   |
+
+# Seed accounts
+# | Role        | Email                   | Password      | App   |
+# |-------------|-------------------------|---------------|-------|
+# | Super Admin | superadmin@lyrus.life   | ChangeMe123!  | admin |
+# | Org Admin   | admin@demo-corp.example | ChangeMe123!  | web   |
+
+# Run individual apps
+# pnpm --filter admin dev
+# pnpm --filter web dev
+# pnpm --filter api dev
+
+# Architecture: docs/MULTI_TENANT_ARCHITECTURE.md
 

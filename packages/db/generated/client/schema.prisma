@@ -62,23 +62,161 @@ enum AudioStorageBackend {
 }
 
 enum UserRole {
-  USER
-  ADMIN
+  SUPER_ADMIN
+  ORG_ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum SubscriptionPlan {
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum BillingStatus {
+  ACTIVE
+  PENDING
+  OVERDUE
+  TRIAL
+}
+
+/// Singleton platform pricing (INR) for Indian market billing.
+model PlatformPricingConfig {
+  id                       String   @id @default("default")
+  starterMonthlyInr        Int
+  starterYearlyInr         Int
+  growthMonthlyInr         Int
+  growthYearlyInr          Int
+  enterpriseBaseMonthlyInr Int
+  extraUserMonthlyInr      Int
+  extraLocationMonthlyInr  Int
+  gstPercent               Decimal  @db.Decimal(5, 2)
+  freeTrialDays            Int
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}
+
+/// Per-tenant billing overrides (locations, cycle, status).
+model OrganizationBilling {
+  organizationId  String        @id
+  activeLocations Int           @default(0)
+  billingStatus   BillingStatus @default(PENDING)
+  billingCycle    String        @default("monthly")
+  nextBillingDate DateTime?
+  updatedAt       DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Organization {
+  id                            String             @id @default(cuid())
+  name                          String
+  code                          String?            @unique
+  slug                          String             @unique
+  legalName                     String?
+  primaryContactName            String?
+  industry                      String?
+  email                         String
+  phone                         String?
+  website                       String?
+  companySize                   String?
+  country                       String?
+  state                         String?
+  city                          String?
+  logoUrl                       String?
+  address                       String?
+  timezone                      String             @default("Asia/Kolkata")
+  meetingDefaultDurationMinutes Int                @default(60)
+  status                        OrganizationStatus @default(ACTIVE)
+  subscriptionPlan              SubscriptionPlan   @default(STARTER)
+  createdAt                     DateTime           @default(now())
+  updatedAt                     DateTime           @updatedAt
+
+  users          User[]
+  meetings       Meeting[]
+  auditEvents    TenantAuditLog[]
+  billingProfile OrganizationBilling?
+
+  @@index([status])
+  @@index([subscriptionPlan])
+  @@index([createdAt])
+  @@index([code])
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String
-  passwordHash String?
-  role         UserRole @default(USER)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                 String     @id @default(cuid())
+  organizationId     String?
+  firstName          String     @default("")
+  lastName           String     @default("")
+  email              String     @unique
+  mobile             String?
+  name               String
+  passwordHash       String?
+  role               UserRole   @default(EMPLOYEE)
+  status             UserStatus @default(ACTIVE)
+  mustChangePassword Boolean    @default(false)
+  lastLoginAt        DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 
-  organizedMeetings Meeting[]    @relation("MeetingOrganizer")
-  ownedTasks        ActionItem[] @relation("TaskOwner")
+  organization      Organization?    @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  employeeProfile   EmployeeProfile?
+  organizedMeetings Meeting[]        @relation("MeetingOrganizer")
+  ownedTasks        ActionItem[]     @relation("TaskOwner")
   auditLogs         AuditLog[]
+  tenantAuditLogs   TenantAuditLog[]
   otpCodes          AuthOtp[]
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, role])
+  @@index([role])
+}
+
+model EmployeeProfile {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  designation  String?
+  department   String?
+  employeeCode String?
+  joiningDate  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([department])
+  @@index([employeeCode])
+}
+
+model TenantAuditLog {
+  id             String   @id @default(cuid())
+  organizationId String?
+  userId         String?
+  action         String
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
 }
 
 model AuthOtp {
@@ -97,6 +235,7 @@ model AuthOtp {
 
 model Meeting {
   id              String        @id @default(cuid())
+  organizationId  String?
   title           String
   description     String        @default("")
   scheduledAt     DateTime
@@ -107,6 +246,7 @@ model Meeting {
   calendarEventId String?
   recordingUrl    String?
   organizerId     String?
+  livekitRoomId   String?
   joinSlug        String?       @unique
   liveStartedAt   DateTime?
   liveBroadcastAt DateTime?
@@ -114,6 +254,7 @@ model Meeting {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
+  organization Organization?        @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   organizer    User?                @relation("MeetingOrganizer", fields: [organizerId], references: [id])
   participants MeetingParticipant[]
   audioFiles   AudioFile[]
@@ -125,8 +266,12 @@ model Meeting {
   auditLogs    AuditLog[]
   invites      MeetingInvite[]
 
+  @@index([organizationId, scheduledAt])
+  @@index([organizationId, status])
+  @@index([organizationId, createdAt])
   @@index([scheduledAt])
   @@index([status])
+  @@index([organizerId])
 }
 
 model MeetingInvite {

@@ -1,0 +1,166 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --admin-primary: 222 47% 11%;
+    --admin-secondary: 217 33% 17%;
+    --admin-accent: 221 83% 53%;
+    --admin-success: 142 76% 36%;
+    --admin-warning: 38 92% 50%;
+    --admin-danger: 0 72% 51%;
+    --admin-bg: 210 40% 98%;
+    --admin-card: 0 0% 100%;
+    --admin-border: 220 13% 91%;
+    --admin-radius: 14px;
+
+    --background: var(--admin-bg);
+    --foreground: var(--admin-primary);
+    --card: var(--admin-card);
+    --card-foreground: var(--admin-primary);
+    --popover: var(--admin-card);
+    --popover-foreground: var(--admin-primary);
+    --primary: var(--admin-primary);
+    --primary-foreground: 210 40% 98%;
+    --secondary: 214 32% 95%;
+    --secondary-foreground: var(--admin-primary);
+    --muted: 214 32% 95%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 214 95% 96%;
+    --accent-foreground: var(--admin-accent);
+    --destructive: var(--admin-danger);
+    --destructive-foreground: 0 0% 100%;
+    --border: var(--admin-border);
+    --input: var(--admin-border);
+    --ring: var(--admin-accent);
+    --radius: 0.875rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-[#f8fafc] text-[hsl(var(--admin-primary))] antialiased;
+    font-family: "Inter", system-ui, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer components {
+  .admin-card {
+    @apply rounded-[14px] border border-[#e5e7eb] bg-white;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    @apply transition-shadow duration-200;
+  }
+
+  .admin-card-hover {
+    @apply admin-card hover:shadow-md hover:border-slate-200;
+  }
+
+  .admin-card-accent {
+    @apply admin-card relative overflow-hidden;
+  }
+
+  .admin-card-accent::before {
+    content: "";
+    @apply absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500;
+  }
+
+  .admin-metric-card {
+    @apply admin-card-accent p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-px;
+  }
+
+  .admin-panel-header {
+    @apply flex items-center justify-between gap-3 px-5 py-4 border-b border-[#e5e7eb];
+  }
+
+  .admin-panel-title {
+    @apply text-sm font-semibold text-slate-900 tracking-tight;
+  }
+
+  .admin-table-wrap {
+    @apply overflow-x-auto;
+  }
+
+  .admin-table-wrap thead {
+    @apply sticky top-0 z-10 bg-slate-50/95 backdrop-blur-sm;
+  }
+
+  .admin-table-wrap tbody tr {
+    @apply transition-colors duration-150 hover:bg-slate-50/80;
+  }
+
+  .admin-sidebar {
+    @apply flex flex-col shrink-0 border-r border-slate-800/60 overflow-hidden;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.97) 0%, rgba(15, 23, 42, 0.99) 100%);
+    backdrop-filter: blur(12px);
+  }
+
+  .admin-sidebar-link {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-400 transition-all duration-200 ease-out;
+    @apply hover:bg-white/10 hover:text-white;
+  }
+
+  .admin-sidebar-link-active {
+    @apply bg-gradient-to-r from-blue-500/25 to-indigo-500/15 text-white shadow-md shadow-blue-900/20 ring-1 ring-blue-400/35;
+  }
+
+  .admin-sidebar-link-active svg {
+    @apply text-blue-400;
+  }
+
+  .admin-env-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400;
+  }
+
+  .admin-kbd {
+    @apply inline-flex items-center rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-500;
+  }
+
+  .admin-search-bar {
+    @apply h-9 w-full rounded-[10px] border border-[#e5e7eb] bg-slate-50/80 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400;
+    @apply transition-colors focus:bg-white focus:border-blue-300 focus:ring-2 focus:ring-blue-500/10 focus:outline-none;
+    @apply md:pr-[4.75rem];
+  }
+
+  .admin-status-dot {
+    @apply h-2 w-2 rounded-full shrink-0;
+  }
+
+  .admin-status-dot-ok {
+    @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)];
+  }
+
+  .admin-status-dot-warn {
+    @apply bg-amber-400;
+  }
+
+  .admin-status-dot-muted {
+    @apply bg-slate-400;
+  }
+
+  .admin-shell {
+    background-color: #f4f6f9;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.08), transparent),
+      radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.05), transparent 40%);
+  }
+
+  .admin-main {
+    background-image: radial-gradient(circle, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: 0 0;
+  }
+
+  .admin-hero-mesh {
+    background-image:
+      radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.1) 0, transparent 45%),
+      radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.06) 0, transparent 50%);
+  }
+}

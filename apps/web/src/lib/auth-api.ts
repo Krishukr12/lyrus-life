@@ -7,11 +7,26 @@ export interface AuthUser {
   email: string;
   name: string;
   role: string;
+  organizationId?: string | null;
+  mustChangePassword?: boolean;
+}
+
+export interface AuthOrganization {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  subscriptionPlan: string;
+  logoUrl?: string | null;
+  email?: string;
+  phone?: string | null;
+  timezone?: string;
 }
 
 export interface AuthSession {
   user: AuthUser;
   token: string;
+  organization?: AuthOrganization | null;
 }
 
 function parseAuthErrorBody(body: unknown, fallback: string): string {
@@ -102,7 +117,12 @@ export async function resetPasswordWithOtp(
   return data;
 }
 
-export async function fetchCurrentUser(): Promise<AuthUser | null> {
+export interface LoadedSession {
+  user: AuthUser;
+  organization: AuthOrganization | null;
+}
+
+export async function fetchCurrentSession(): Promise<LoadedSession | null> {
   const token = (await import("./token-store.js")).getAccessToken();
   const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
@@ -120,8 +140,25 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
     throw new Error("Failed to load session");
   }
 
-  const data = (await response.json()) as { user: AuthUser };
-  return data.user;
+  const data = (await response.json()) as {
+    user: AuthUser & { firstName?: string; lastName?: string; status?: string };
+    organization?: AuthOrganization | null;
+  };
+
+  return {
+    user: {
+      ...data.user,
+      organizationId: data.user.organizationId ?? data.organization?.id ?? null,
+      mustChangePassword: data.user.mustChangePassword ?? false,
+    },
+    organization: data.organization ?? null,
+  };
+}
+
+/** @deprecated Use fetchCurrentSession */
+export async function fetchCurrentUser(): Promise<AuthUser | null> {
+  const session = await fetchCurrentSession();
+  return session?.user ?? null;
 }
 
 export async function logout(): Promise<void> {

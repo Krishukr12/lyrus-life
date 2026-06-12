@@ -1,6 +1,7 @@
 type AuthHandlers = {
   onUnauthorized?: () => void;
   onForbidden?: () => void;
+  onOrganizationBlocked?: (message: string) => void;
 };
 
 let handlers: AuthHandlers = {};

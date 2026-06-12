@@ -36,14 +36,18 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, organization, logout } = useAuth();
+  const headerTitle = organization?.name ?? companyName;
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
       <SidebarContent className="pt-6 flex flex-col h-full">
         <div className={`px-4 mb-8 ${collapsed ? "text-center" : ""}`}>
-          <h1 className="font-heading text-sidebar-primary font-bold text-xl tracking-tight">
-            {collapsed ? companyName.slice(0, 2).toUpperCase() : companyName}
+          <h1
+            className="font-heading text-sidebar-primary font-bold text-xl tracking-tight truncate"
+            title={headerTitle}
+          >
+            {collapsed ? headerTitle.slice(0, 2).toUpperCase() : headerTitle}
           </h1>
           {!collapsed && (
             <p className="text-xs text-sidebar-foreground/60 mt-0.5">Meeting Management</p>

@@ -6,6 +6,7 @@ import {
   getLiveMeetingNotes,
   getLiveRoomParticipantCount,
 } from "../socket/live-meeting.js";
+import { logTenantAudit } from "./tenant-audit.service.js";
 
 type MeetingLiveFields = {
   status: string;
@@ -45,6 +46,11 @@ export async function openWaitingRoom(meetingId: string) {
         status: MeetingStatus.ONGOING,
         liveStartedAt: new Date(),
       },
+    });
+    await logTenantAudit({
+      organizationId: meeting.organizationId,
+      action: "meeting.started",
+      metadata: { meetingId, title: meeting.title },
     });
   }
 }
@@ -90,6 +96,12 @@ export async function endLiveSessionForMeeting(
       liveEndedAt: new Date(),
       liveBroadcastAt: null,
     },
+  });
+
+  await logTenantAudit({
+    organizationId: meeting.organizationId,
+    action: "meeting.ended",
+    metadata: { meetingId, title: meeting.title, auto: options?.auto ?? false },
   });
 
   if (options?.auto) {

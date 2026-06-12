@@ -8,8 +8,11 @@
   },
   "scripts": {
     "db:generate": "prisma generate",
+    "db:pre-migrate": "tsx scripts/pre-migrate-multi-tenant.ts",
     "db:push": "prisma db push",
+    "db:push:force": "prisma db push --accept-data-loss",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx src/seed.ts",
     "build": "prisma generate",
     "check-types": "tsc --noEmit"

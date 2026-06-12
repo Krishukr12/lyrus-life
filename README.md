@@ -7,7 +7,7 @@ AI-driven pipeline: capture meetings, transcribe audio (STT + diarization), extr
 | Path | Purpose |
 |------|---------|
 | `apps/web` | React + Vite UI (meetings, MOM review, tasks, insights) |
-| `apps/api` | Fastify REST API and processing orchestration |
+| `apps/api` | Express REST API and processing orchestration |
 | `packages/db` | Prisma schema + PostgreSQL client |
 | `packages/shared` | Zod schemas and shared types |
 | `packages/nlu` | LLM extraction (OpenAI + heuristic fallback) |

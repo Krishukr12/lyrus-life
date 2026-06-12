@@ -1,6 +1,11 @@
-import type { FastifyInstance } from "fastify";
-import { prisma } from "@lyrus/db";
-import { forgotPasswordSchema, loginPasswordSchema, resetPasswordSchema } from "@lyrus/shared";
+import { Router } from "express";
+import { OrganizationStatus, UserStatus, prisma } from "@lyrus/db";
+import {
+  changePasswordSchema,
+  forgotPasswordSchema,
+  loginPasswordSchema,
+  resetPasswordSchema,
+} from "@lyrus/shared";
 import { sendPasswordResetOtpEmail } from "@lyrus/notifications";
 import {
   ACCESS_TOKEN_COOKIE,
@@ -9,201 +14,397 @@ import {
   isEmailDomainAllowed,
 } from "../lib/auth-config.js";
 import { zodErrorMessage } from "../lib/api-errors.js";
+import { asyncHandler } from "../lib/http.js";
+import { signAccessToken } from "../lib/jwt.js";
 import {
   createPasswordResetToken,
   PasswordResetError,
   verifyPasswordResetOtp,
 } from "../lib/password-reset-token.js";
-import { generateOtpCode, hashSecret, verifySecret } from "../lib/password.js";
+import { generateOtpCode } from "@lyrus/auth";
+import { serializeOrganization, serializeUser } from "../lib/serializers.js";
 import { authenticate, requireAuthUser } from "../middleware/authenticate.js";
+import { authRateLimiter } from "../middleware/security.js";
+import { userRepository } from "../repositories/user.repository.js";
+import { logTenantAudit } from "../services/tenant-audit.service.js";
+import { hashPassword, verifyPassword, verifyPasswordAndMaybeUpgrade } from "../utils/password.js";
+import type { Response } from "express";
 
-function setAccessTokenCookie(reply: import("fastify").FastifyReply, token: string) {
+function setAccessTokenCookie(res: Response, token: string) {
   const secure = process.env.NODE_ENV === "production";
-  reply.setCookie(ACCESS_TOKEN_COOKIE, token, {
+  res.cookie(ACCESS_TOKEN_COOKIE, token, {
     path: "/",
     httpOnly: true,
     secure,
     sameSite: "lax",
-    maxAge: ACCESS_TOKEN_MAX_AGE_SEC,
+    maxAge: ACCESS_TOKEN_MAX_AGE_SEC * 1000,
   });
 }
 
-function authUserPayload(user: { id: string; email: string; name: string; role: string }) {
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-  };
-}
-
-async function signAccessToken(
-  app: FastifyInstance,
-  user: { id: string; email: string; name: string; role: string },
-) {
-  return app.jwt.sign(
+async function signUserAccessToken(user: {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  organizationId: string | null;
+}) {
+  return signAccessToken(
     {
       sub: user.id,
       email: user.email,
       name: user.name,
       role: user.role,
+      organizationId: user.organizationId,
     },
-    { expiresIn: ACCESS_TOKEN_MAX_AGE_SEC },
+    ACCESS_TOKEN_MAX_AGE_SEC,
   );
 }
 
 async function issueSession(
-  app: FastifyInstance,
-  reply: import("fastify").FastifyReply,
-  user: { id: string; email: string; name: string; role: string },
+  res: Response,
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    organizationId: string | null;
+    mustChangePassword?: boolean;
+    organization?: {
+      id: string;
+      name: string;
+      slug: string;
+      status: string;
+      subscriptionPlan: string;
+    } | null;
+  },
 ) {
-  const token = await signAccessToken(app, user);
-  setAccessTokenCookie(reply, token);
+  const token = await signUserAccessToken(user);
+  setAccessTokenCookie(res, token);
   return {
     token,
-    user: authUserPayload(user),
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      organizationId: user.organizationId,
+      mustChangePassword: user.mustChangePassword ?? false,
+    },
+    organization: user.organization ?? null,
   };
 }
 
-export async function authRoutes(app: FastifyInstance) {
-  app.post("/auth/login", async (request, reply) => {
-    const parsed = loginPasswordSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.status(400).send({
-        error: "validation_error",
-        message: zodErrorMessage(parsed.error),
-      });
-    }
+export function createAuthRouter(): Router {
+  const router = Router();
 
-    const email = parsed.data.email.toLowerCase().trim();
-    if (!isEmailDomainAllowed(email)) {
-      return reply.status(403).send({
-        error: "forbidden",
-        message: "You're not authorized to do so",
-      });
-    }
+  router.use("/auth", authRateLimiter);
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return reply.status(401).send({
-        error: "invalid_email",
-        message: "No account found with this email address.",
-      });
-    }
+  router.post(
+    "/auth/login",
+    asyncHandler(async (req, res) => {
+      const parsed = loginPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          error: "validation_error",
+          message: zodErrorMessage(parsed.error),
+        });
+        return;
+      }
 
-    if (!user.passwordHash) {
-      return reply.status(401).send({
-        error: "invalid_credentials",
-        message: "This account cannot sign in with a password.",
-      });
-    }
+      const email = parsed.data.email.toLowerCase().trim();
+      if (!isEmailDomainAllowed(email)) {
+        res.status(403).json({
+          error: "forbidden",
+          message: "You're not authorized to do so",
+        });
+        return;
+      }
 
-    const valid = await verifySecret(parsed.data.password, user.passwordHash);
-    if (!valid) {
-      return reply.status(401).send({
-        error: "invalid_password",
-        message: "Incorrect password. Please try again.",
-      });
-    }
+      const user = await userRepository.findByEmail(email);
+      if (!user) {
+        res.status(401).json({
+          error: "invalid_email",
+          message: "No account found with this email address.",
+        });
+        return;
+      }
 
-    return issueSession(app, reply, user);
-  });
+      if (user.status !== UserStatus.ACTIVE) {
+        res.status(403).json({
+          error: "account_inactive",
+          message: "Your account is not active. Contact your administrator.",
+        });
+        return;
+      }
 
-  /** Sends reset OTP by email. OTP is not stored in DB — only a signed resetToken is returned. */
-  app.post("/auth/forgot-password", async (request, reply) => {
-    const parsed = forgotPasswordSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.status(400).send({
-        error: "validation_error",
-        message: zodErrorMessage(parsed.error),
-      });
-    }
+      if (user.organization?.status === OrganizationStatus.SUSPENDED) {
+        res.status(403).json({
+          error: "organization_suspended",
+          message:
+            "Your organization account is currently suspended. Please contact your administrator.",
+        });
+        return;
+      }
 
-    const email = parsed.data.email.toLowerCase().trim();
-    if (!isEmailDomainAllowed(email)) {
-      return reply.status(403).send({
-        error: "forbidden",
-        message: "You're not authorized to do so",
-      });
-    }
+      if (user.organization?.status === OrganizationStatus.PENDING) {
+        res.status(403).json({
+          error: "organization_pending",
+          message:
+            "Your organization account is pending approval. Please contact your administrator.",
+        });
+        return;
+      }
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return {
-        ok: true,
-        message: "If this email is registered, a reset code has been sent.",
-      };
-    }
+      if (!user.passwordHash) {
+        res.status(401).json({
+          error: "invalid_credentials",
+          message: "This account cannot sign in with a password.",
+        });
+        return;
+      }
 
-    const code = generateOtpCode();
-    const resetToken = await createPasswordResetToken(app, email, code);
-
-    await sendPasswordResetOtpEmail({
-      to: user.email,
-      name: user.name,
-      code,
-      companyName: getCompanyName(),
-    });
-
-    return {
-      ok: true,
-      resetToken,
-      email: user.email,
-      message: "If this email is registered, a reset code has been sent.",
-    };
-  });
-
-  /** Verifies OTP from signed token, sets new password, and signs the user in. */
-  app.post("/auth/reset-password", async (request, reply) => {
-    const parsed = resetPasswordSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.status(400).send({
-        error: "validation_error",
-        message: zodErrorMessage(parsed.error),
-      });
-    }
-
-    try {
-      const { email } = await verifyPasswordResetOtp(
-        app,
-        parsed.data.resetToken,
-        parsed.data.code,
+      const { valid, upgradedHash } = await verifyPasswordAndMaybeUpgrade(
+        parsed.data.password,
+        user.passwordHash,
       );
+      if (!valid) {
+        res.status(401).json({
+          error: "invalid_password",
+          message: "Incorrect password. Please try again.",
+        });
+        return;
+      }
+
+      if (upgradedHash) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { passwordHash: upgradedHash },
+        });
+      }
+
+      await userRepository.updateLastLogin(user.id);
+
+      try {
+        await logTenantAudit({
+          organizationId: user.organizationId,
+          userId: user.id,
+          action: "auth.login",
+          metadata: { email: user.email },
+        });
+      } catch (auditError) {
+        console.warn("auth.login audit log failed:", auditError);
+      }
+
+      res.json(
+        await issueSession(res, {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          organizationId: user.organizationId,
+          mustChangePassword: user.mustChangePassword,
+          organization: user.organization
+            ? {
+                id: user.organization.id,
+                name: user.organization.name,
+                slug: user.organization.slug,
+                status: user.organization.status,
+                subscriptionPlan: user.organization.subscriptionPlan,
+              }
+            : null,
+        }),
+      );
+    }),
+  );
+
+  router.post(
+    "/auth/change-password",
+    authenticate,
+    asyncHandler(async (req, res) => {
+      const parsed = changePasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          error: "validation_error",
+          message: zodErrorMessage(parsed.error),
+        });
+        return;
+      }
+
+      const authUser = requireAuthUser(req);
+      const user = await prisma.user.findUnique({ where: { id: authUser.id } });
+      if (!user?.passwordHash) {
+        res.status(400).json({ error: "invalid_state", message: "Password not set for this account" });
+        return;
+      }
+
+      const currentValid = await verifyPassword(parsed.data.currentPassword, user.passwordHash);
+      if (!currentValid) {
+        res.status(401).json({ error: "invalid_password", message: "Current password is incorrect" });
+        return;
+      }
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash: await hashPassword(parsed.data.newPassword),
+          mustChangePassword: false,
+        },
+      });
+
+      await logTenantAudit({
+        organizationId: user.organizationId,
+        userId: user.id,
+        action: "auth.password_changed",
+      });
+
+      res.json({ ok: true });
+    }),
+  );
+
+  router.post(
+    "/auth/forgot-password",
+    asyncHandler(async (req, res) => {
+      const parsed = forgotPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          error: "validation_error",
+          message: zodErrorMessage(parsed.error),
+        });
+        return;
+      }
+
+      const email = parsed.data.email.toLowerCase().trim();
+      if (!isEmailDomainAllowed(email)) {
+        res.status(403).json({
+          error: "forbidden",
+          message: "You're not authorized to do so",
+        });
+        return;
+      }
 
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
-        return reply.status(401).send({
-          error: "invalid_reset",
-          message: "Invalid or expired code.",
+        res.json({
+          ok: true,
+          message: "If this email is registered, a reset code has been sent.",
         });
+        return;
       }
 
-      const passwordHash = await hashSecret(parsed.data.newPassword);
-      const updated = await prisma.user.update({
-        where: { id: user.id },
-        data: { passwordHash },
+      const code = generateOtpCode();
+      const resetToken = await createPasswordResetToken(email, code);
+
+      await sendPasswordResetOtpEmail({
+        to: user.email,
+        name: user.name,
+        code,
+        companyName: getCompanyName(),
       });
 
-      return issueSession(app, reply, updated);
-    } catch (err) {
-      if (err instanceof PasswordResetError) {
-        return reply.status(401).send({
-          error: "invalid_reset",
-          message: err.message,
+      res.json({
+        ok: true,
+        resetToken,
+        email: user.email,
+        message: "If this email is registered, a reset code has been sent.",
+      });
+    }),
+  );
+
+  router.post(
+    "/auth/reset-password",
+    asyncHandler(async (req, res) => {
+      const parsed = resetPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          error: "validation_error",
+          message: zodErrorMessage(parsed.error),
         });
+        return;
       }
-      throw err;
-    }
-  });
 
-  app.get("/auth/me", { preHandler: [authenticate] }, async (request) => {
-    const user = requireAuthUser(request);
-    return { user: authUserPayload(user) };
-  });
+      try {
+        const { email } = await verifyPasswordResetOtp(
+          parsed.data.resetToken,
+          parsed.data.code,
+        );
 
-  app.post("/auth/logout", { preHandler: [authenticate] }, async (request, reply) => {
-    requireAuthUser(request);
-    reply.clearCookie(ACCESS_TOKEN_COOKIE, { path: "/" });
-    return { ok: true };
-  });
+        const user = await userRepository.findByEmail(email);
+        if (!user) {
+          res.status(401).json({
+            error: "invalid_reset",
+            message: "Invalid or expired code.",
+          });
+          return;
+        }
+
+        const updated = await prisma.user.update({
+          where: { id: user.id },
+          data: { passwordHash: await hashPassword(parsed.data.newPassword) },
+          include: { organization: true },
+        });
+
+        res.json(
+          await issueSession(res, {
+            id: updated.id,
+            email: updated.email,
+            name: updated.name,
+            role: updated.role,
+            organizationId: updated.organizationId,
+            organization: updated.organization
+              ? {
+                  id: updated.organization.id,
+                  name: updated.organization.name,
+                  slug: updated.organization.slug,
+                  status: updated.organization.status,
+                  subscriptionPlan: updated.organization.subscriptionPlan,
+                }
+              : null,
+          }),
+        );
+      } catch (err) {
+        if (err instanceof PasswordResetError) {
+          res.status(401).json({
+            error: "invalid_reset",
+            message: err.message,
+          });
+          return;
+        }
+        throw err;
+      }
+    }),
+  );
+
+  router.get(
+    "/auth/me",
+    authenticate,
+    asyncHandler(async (req, res) => {
+      const authUser = requireAuthUser(req);
+      const user = await userRepository.findByEmail(authUser.email);
+      if (!user) {
+        res.status(401).json({ error: "unauthorized", message: "User not found" });
+        return;
+      }
+      res.json({
+        user: serializeUser(user),
+        organization: user.organization ? serializeOrganization(user.organization) : null,
+      });
+    }),
+  );
+
+  router.post(
+    "/auth/logout",
+    authenticate,
+    asyncHandler(async (req, res) => {
+      const user = requireAuthUser(req);
+      await logTenantAudit({
+        organizationId: user.organizationId,
+        userId: user.id,
+        action: "auth.logout",
+      });
+      res.clearCookie(ACCESS_TOKEN_COOKIE, { path: "/" });
+      res.json({ ok: true });
+    }),
+  );
+
+  return router;
 }

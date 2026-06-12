@@ -1,5 +1,5 @@
 import { createReadStream } from "node:fs";
-import type { FastifyInstance, FastifyReply } from "fastify";
+import { Router } from "express";
 import {
   AudioStorageBackend,
   MeetingStatus,
@@ -8,12 +8,13 @@ import {
   TaskStatus,
   prisma,
 } from "@lyrus/db";
-import { assertMeetingAccess, HttpAuthError, meetingsListWhere } from "../lib/meeting-access.js";
+import { assertMeetingAccess, meetingsListWhere } from "../lib/meeting-access.js";
 import { generateJoinSlug } from "../lib/join-slug.js";
 import { requireAuthUser } from "../middleware/authenticate.js";
 import { extractMeetingInsights } from "@lyrus/nlu";
 import { createMeetingSchema, editMomSchema, updateMeetingSchema } from "@lyrus/shared";
 import type { Prisma } from "@lyrus/db";
+import type { MeetingStatusType, MeetingTagType } from "../types/enums.js";
 import { parseActionDeadline } from "../lib/deadline.js";
 import {
   extractionToMomPayload,
@@ -37,6 +38,9 @@ import {
 import { localFilePath } from "../services/storage/local.js";
 import { sendAndRecordMeetingInvites } from "../services/invites.js";
 import { sendMomToStakeholdersOnApproval } from "../services/mom-share.js";
+import { asyncHandler, sendAuthError } from "../lib/http.js";
+import { getMultipartFile, requireRouteParam } from "../lib/route-params.js";
+import { audioUpload, completeMeetingUpload } from "../lib/upload.js";
 
 const meetingInclude = {
   participants: true,
@@ -45,11 +49,11 @@ const meetingInclude = {
   mom: true,
 } as const;
 
-function mapTag(tag: string): MeetingTag {
-  return tag.toUpperCase() as MeetingTag;
+function mapTag(tag: string): MeetingTagType {
+  return tag.toUpperCase() as MeetingTagType;
 }
 
-function mapStatus(status: string): MeetingStatus {
+function mapStatus(status: string): MeetingStatusType {
   switch (status) {
     case "ongoing":
       return MeetingStatus.ONGOING;
@@ -60,47 +64,43 @@ function mapStatus(status: string): MeetingStatus {
   }
 }
 
-function sendAuthError(reply: FastifyReply, err: unknown) {
-  if (err instanceof HttpAuthError) {
-    return reply.status(err.statusCode).send({ error: err.code, message: err.message });
-  }
-  throw err;
-}
-
-export async function meetingRoutes(app: FastifyInstance) {
-  app.get("/meetings", async (request) => {
-    const user = requireAuthUser(request);
+export function createMeetingsRouter(): Router {
+  const router = Router();
+  router.get("/meetings", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     const meetings = await prisma.meeting.findMany({
       where: meetingsListWhere(user),
       include: meetingInclude,
       orderBy: { scheduledAt: "desc" },
     });
-    return meetings.map(mapMeeting);
-  });
+    res.json(meetings.map(mapMeeting));
+  }));
 
-  app.get<{ Params: { id: string } }>("/meetings/:id", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.get("/meetings/:id", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     const meeting = await prisma.meeting.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       include: meetingInclude,
     });
     if (!meeting) {
-      return reply.status(404).send({ error: "Meeting not found" });
+      res.status(404).json({ error: "Meeting not found" });
+        return;
     }
-    return mapMeeting(meeting);
-  });
+    res.json(mapMeeting(meeting));
+  }));
 
-  app.post("/meetings", async (request, reply) => {
-    const user = requireAuthUser(request);
-    const parsed = createMeetingSchema.safeParse(request.body);
+  router.post("/meetings", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
+    const parsed = createMeetingSchema.safeParse(req.body);
     if (!parsed.success) {
-      return reply.status(400).send({ error: parsed.error.flatten() });
+      res.status(400).json({ error: parsed.error.flatten() });
+        return;
     }
 
     const data = parsed.data;
@@ -114,6 +114,7 @@ export async function meetingRoutes(app: FastifyInstance) {
         durationMinutes: data.duration,
         tag: mapTag(data.tag),
         notes: data.notes,
+        organizationId: user.organizationId ?? undefined,
         organizerId: user.id,
         joinSlug: generateJoinSlug(),
         participants: {
@@ -134,7 +135,7 @@ export async function meetingRoutes(app: FastifyInstance) {
       include: meetingInclude,
     });
 
-    return {
+    res.json({
       meeting: mapMeeting(refreshed ?? meeting),
       invites: inviteResults.map((r) => ({
         email: r.email,
@@ -142,26 +143,28 @@ export async function meetingRoutes(app: FastifyInstance) {
         status: r.status,
         error: r.error,
       })),
-    };
-  });
+    });
+  }));
 
-  app.post<{ Params: { id: string } }>("/meetings/:id/invites/resend", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.post("/meetings/:id/invites/resend", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     const meeting = await prisma.meeting.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       include: { participants: true },
     });
     if (!meeting) {
-      return reply.status(404).send({ error: "Meeting not found" });
+      res.status(404).json({ error: "Meeting not found" });
+        return;
     }
     if (meeting.participants.length === 0) {
-      return reply.status(400).send({ error: "No stakeholders to invite" });
+      res.status(400).json({ error: "No stakeholders to invite" });
+        return;
     }
 
     const inviteResults = await sendAndRecordMeetingInvites(meeting.id);
@@ -170,30 +173,32 @@ export async function meetingRoutes(app: FastifyInstance) {
       include: meetingInclude,
     });
 
-    return {
+    res.json({
       meeting: mapMeeting(refreshed!),
       invites: inviteResults,
-    };
-  });
+    });
+  }));
 
-  app.patch<{ Params: { id: string } }>("/meetings/:id", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.patch("/meetings/:id", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
-    const parsed = updateMeetingSchema.safeParse(request.body);
+    const parsed = updateMeetingSchema.safeParse(req.body);
     if (!parsed.success) {
-      return reply.status(400).send({ error: parsed.error.flatten() });
+      res.status(400).json({ error: parsed.error.flatten() });
+        return;
     }
 
     const existing = await prisma.meeting.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
     });
     if (!existing) {
-      return reply.status(404).send({ error: "Meeting not found" });
+      res.status(404).json({ error: "Meeting not found" });
+        return;
     }
 
     const updates = parsed.data;
@@ -206,7 +211,7 @@ export async function meetingRoutes(app: FastifyInstance) {
     }
 
     const meeting = await prisma.meeting.update({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       data: {
         title: updates.title,
         description: updates.description,
@@ -219,38 +224,38 @@ export async function meetingRoutes(app: FastifyInstance) {
       include: meetingInclude,
     });
 
-    return mapMeeting(meeting);
-  });
+    res.json(mapMeeting(meeting));
+  }));
 
-  app.post<{ Params: { id: string } }>("/meetings/:id/audio", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.post("/meetings/:id/audio", audioUpload, asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     const meeting = await prisma.meeting.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
     });
     if (!meeting) {
-      return reply.status(404).send({ error: "Meeting not found" });
+      res.status(404).json({ error: "Meeting not found" });
+        return;
     }
 
-    const file = await request.file();
+    const file = req.file;
     if (!file) {
-      return reply.status(400).send({ error: "No audio file uploaded" });
+      res.status(400).json({ error: "No audio file uploaded" });
+      return;
     }
-
-    const buffer = await file.toBuffer();
     const saved = await saveMeetingRecording(
       meeting.id,
-      buffer,
-      file.filename || "recording.webm",
+      file.buffer,
+      file.originalname || "recording.webm",
       file.mimetype || "audio/webm",
     );
 
-    const autoProcess = (request.query as { process?: string }).process !== "false";
+    const autoProcess = req.query.process !== "false";
 
     try {
       if (autoProcess) {
@@ -265,100 +270,109 @@ export async function meetingRoutes(app: FastifyInstance) {
             where: { id: meeting.id },
             include: meetingInclude,
           });
-          return {
+          res.json({
             ok: true,
             message: "Recording transcribed and MOM generated",
             meeting: mapMeeting(refreshed!),
-          };
+          });
+          return;
         } catch (err) {
-          request.log.error(err, "Pipeline failed");
+          console.error("Pipeline failed", err);
           await prisma.meeting.update({
             where: { id: meeting.id },
             data: { status: MeetingStatus.FAILED },
           });
-          return reply.status(500).send({
+          res.status(500).json({
             error: err instanceof Error ? err.message : "Processing failed",
           });
+        return;
         }
       }
 
-      return { ok: true, message: "Recording saved. Call /process to generate MOM." };
+      res.json({ ok: true, message: "Recording saved. Call /process to generate MOM." });
     } finally {
       await saved.cleanup?.();
     }
-  });
+  }));
 
-  app.get<{ Params: { id: string } }>("/meetings/:id/recording/download", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.get("/meetings/:id/recording/download", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     const latestAudio = await prisma.audioFile.findFirst({
-      where: { meetingId: request.params.id },
+      where: { meetingId: requireRouteParam(req.params.id, 'id') },
       orderBy: { createdAt: "desc" },
     });
 
     if (!latestAudio) {
-      return reply.status(404).send({ error: "No recording for this meeting" });
+      res.status(404).json({ error: "No recording for this meeting" });
+        return;
     }
 
     const presigned = await getSecureRecordingDownloadUrl(latestAudio);
     if (presigned) {
-      return {
+      res.json({
         mode: "presigned",
         url: presigned.url,
         expiresInSeconds: presigned.expiresInSeconds,
-      };
+      });
+      return;
     }
 
     const filePath = localFilePath(latestAudio.storageKey);
     try {
-      return reply
-        .header("Content-Type", latestAudio.mimeType)
-        .header("Content-Disposition", `attachment; filename="meeting-${request.params.id}.webm"`)
-        .send(createReadStream(filePath));
+      res.setHeader("Content-Type", latestAudio.mimeType);
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="meeting-${requireRouteParam(req.params.id, 'id')}.webm"`,
+      );
+      createReadStream(filePath).pipe(res);
+      return;
     } catch {
-      return reply.status(404).send({ error: "Recording file not found on server" });
+      res.status(404).json({ error: "Recording file not found on server" });
+        return;
     }
-  });
+  }));
 
-  app.post<{ Params: { id: string } }>("/meetings/:id/complete", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.post("/meetings/:id/complete", completeMeetingUpload, asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     const meeting = await prisma.meeting.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       include: { participants: true, transcript: true },
     });
     if (!meeting) {
-      return reply.status(404).send({ error: "Meeting not found" });
+      res.status(404).json({ error: "Meeting not found" });
+        return;
     }
 
     let notes = meeting.notes;
     let savedAudio: Awaited<ReturnType<typeof saveMeetingRecording>> | null = null;
     let mimeType = "audio/webm";
 
-    const parts = request.parts();
-    for await (const part of parts) {
-      if (part.type === "file" && part.fieldname === "recording") {
-        const buffer = await part.toBuffer();
-        savedAudio = await saveMeetingRecording(
-          meeting.id,
-          buffer,
-          part.filename || "meeting-recording.webm",
-          part.mimetype || "audio/webm",
-        );
-        mimeType = part.mimetype || "audio/webm";
-      } else if (part.type === "field" && part.fieldname === "notes") {
-        notes = String(part.value);
-      }
+    const recordingFile = getMultipartFile(req.files, "recording");
+    const notesField = typeof req.body?.notes === "string" ? req.body.notes : undefined;
+
+    if (recordingFile && "buffer" in recordingFile) {
+      savedAudio = await saveMeetingRecording(
+        meeting.id,
+        recordingFile.buffer,
+        recordingFile.originalname || "meeting-recording.webm",
+        recordingFile.mimetype || "audio/webm",
+      );
+      mimeType = recordingFile.mimetype || "audio/webm";
+    }
+    if (notesField !== undefined) {
+      notes = notesField;
     }
 
     await prisma.meeting.update({
@@ -376,9 +390,9 @@ export async function meetingRoutes(app: FastifyInstance) {
             s3Bucket: savedAudio.s3Bucket,
           });
         } catch (pipelineErr) {
-          request.log.warn(
-            pipelineErr,
+          console.warn(
             "Audio pipeline failed — falling back to notes transcript",
+            pipelineErr,
           );
           await createTranscriptFromNotes(meeting.id);
           await runNluFromExistingTranscript(meeting.id);
@@ -402,37 +416,39 @@ export async function meetingRoutes(app: FastifyInstance) {
         data: { status: MeetingStatus.COMPLETED },
       });
 
-      return {
+      res.json({
         ok: true,
         meeting: mapMeeting(refreshed!),
         transcriptSource: refreshed?.transcript?.source ?? "notes",
-      };
+      });
     } catch (err) {
-      request.log.error(err, "Complete meeting pipeline failed");
+      console.error("Complete meeting pipeline failed", err);
       await prisma.meeting.update({
         where: { id: meeting.id },
         data: { status: MeetingStatus.FAILED },
       });
-      return reply.status(500).send({
+      res.status(500).json({
         error: err instanceof Error ? err.message : "Processing failed",
       });
+        return;
     }
-  });
+  }));
 
-  app.post<{ Params: { id: string } }>("/meetings/:id/process", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.post("/meetings/:id/process", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     const meeting = await prisma.meeting.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       include: { transcript: true },
     });
     if (!meeting) {
-      return reply.status(404).send({ error: "Meeting not found" });
+      res.status(404).json({ error: "Meeting not found" });
+        return;
     }
 
     const latestAudio = await prisma.audioFile.findFirst({
@@ -456,7 +472,8 @@ export async function meetingRoutes(app: FastifyInstance) {
         } finally {
           await materialized.cleanup?.();
         }
-        return { ok: true, message: "MOM generated from audio" };
+        res.json({ ok: true, message: "MOM generated from audio" });
+        return;
       }
 
       if (!meeting.transcript) {
@@ -464,9 +481,10 @@ export async function meetingRoutes(app: FastifyInstance) {
       }
 
       await runNluFromExistingTranscript(meeting.id);
-      return { ok: true, message: "MOM generated from meeting notes" };
+      res.json({ ok: true, message: "MOM generated from meeting notes" });
+      return;
     } catch (err) {
-      request.log.error(err, "Pipeline failed");
+      console.error("Pipeline failed", err);
       await prisma.meeting.update({
         where: { id: meeting.id },
         data: { status: MeetingStatus.FAILED },
@@ -474,26 +492,28 @@ export async function meetingRoutes(app: FastifyInstance) {
       await logAudit(meeting.id, PipelineStep.ERROR, {
         message: err instanceof Error ? err.message : "Unknown error",
       });
-      return reply.status(500).send({
+      res.status(500).json({
         error: err instanceof Error ? err.message : "Processing failed",
       });
+        return;
     }
-  });
+  }));
 
-  app.post<{ Params: { id: string } }>("/meetings/:id/mom/generate", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.post("/meetings/:id/mom/generate", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     const meeting = await prisma.meeting.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       include: { participants: true, transcript: true },
     });
     if (!meeting) {
-      return reply.status(404).send({ error: "Meeting not found" });
+      res.status(404).json({ error: "Meeting not found" });
+        return;
     }
 
     const transcriptText =
@@ -530,31 +550,33 @@ export async function meetingRoutes(app: FastifyInstance) {
     });
 
     await logAudit(meeting.id, PipelineStep.MOM_GENERATED);
-    return mapMom(mom);
-  });
+    res.json(mapMom(mom));
+  }));
 
-  app.patch<{ Params: { id: string } }>("/meetings/:id/mom", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.patch("/meetings/:id/mom", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
-    const parsed = editMomSchema.safeParse(request.body);
+    const parsed = editMomSchema.safeParse(req.body);
     if (!parsed.success) {
-      return reply.status(400).send({ error: parsed.error.flatten() });
+      res.status(400).json({ error: parsed.error.flatten() });
+        return;
     }
 
     const mom = await prisma.mom.findUnique({
-      where: { meetingId: request.params.id },
+      where: { meetingId: requireRouteParam(req.params.id, 'id') },
     });
     if (!mom) {
-      return reply.status(404).send({ error: "MOM not found" });
+      res.status(404).json({ error: "MOM not found" });
+        return;
     }
 
     const updated = await prisma.mom.update({
-      where: { meetingId: request.params.id },
+      where: { meetingId: requireRouteParam(req.params.id, 'id') },
       data: {
         keyPoints: parsed.data.keyPoints as unknown as Prisma.InputJsonValue,
         actionItems: parsed.data.actionItems as unknown as Prisma.InputJsonValue,
@@ -566,30 +588,32 @@ export async function meetingRoutes(app: FastifyInstance) {
       },
     });
 
-    await logAudit(request.params.id, PipelineStep.USER_EDIT, { action: "edit_mom" });
-    return mapMom(updated);
-  });
+    await logAudit(requireRouteParam(req.params.id, 'id'), PipelineStep.USER_EDIT, { action: "edit_mom" });
+    res.json(mapMom(updated));
+  }));
 
-  app.post<{ Params: { id: string } }>("/meetings/:id/mom/approve", async (request, reply) => {
-    const user = requireAuthUser(request);
+  router.post("/meetings/:id/mom/approve", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     try {
-      await assertMeetingAccess(user, request.params.id);
+      await assertMeetingAccess(user, requireRouteParam(req.params.id, "id"));
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     const meeting = await prisma.meeting.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       include: { mom: true, participants: true },
     });
     if (!meeting?.mom) {
-      return reply.status(404).send({ error: "MOM not found" });
+      res.status(404).json({ error: "MOM not found" });
+        return;
     }
 
     if (meeting.status !== MeetingStatus.COMPLETED) {
-      return reply.status(400).send({
+      res.status(400).json({
         error: "Meeting must be finished before MOM can be approved and shared",
       });
+        return;
     }
 
     const approvedBy = user.name;
@@ -600,17 +624,19 @@ export async function meetingRoutes(app: FastifyInstance) {
         shareResults = await sendMomToStakeholdersOnApproval(meeting.id, approvedBy);
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to send MOM";
-        return reply.status(500).send({ error: message });
+        res.status(500).json({ error: message });
+        return;
       }
 
       const delivered = shareResults.filter(
         (r) => r.status === "sent" || r.status === "logged",
       );
       if (delivered.length === 0) {
-        return reply.status(502).send({
+        res.status(502).json({
           error: "Could not deliver MOM to any stakeholder",
           shareResults,
         });
+        return;
       }
     }
 
@@ -641,14 +667,14 @@ export async function meetingRoutes(app: FastifyInstance) {
 
     await logAudit(meeting.id, PipelineStep.TASKS_CREATED, { count: actionItems.length });
 
-    return {
+    res.json({
       ...mapMom(mom),
       shareResults: shareResults.length > 0 ? shareResults : undefined,
-    };
-  });
+    });
+  }));
 
-  app.get("/tasks", async (request) => {
-    const user = requireAuthUser(request);
+  router.get("/tasks", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     const meetingFilter = meetingsListWhere(user);
     const items = await prisma.actionItem.findMany({
       where: {
@@ -660,33 +686,36 @@ export async function meetingRoutes(app: FastifyInstance) {
 
     const today = new Date().toISOString().split("T")[0]!;
 
-    return items.map((item) => {
-      const task = mapActionItemToTask(item, item.meeting.title);
-      if (item.status !== "COMPLETED" && item.dueDate) {
-        const due = item.dueDate.toISOString().split("T")[0]!;
-        if (due < today) {
-          task.status = "overdue";
+    res.json(
+      items.map((item) => {
+        const task = mapActionItemToTask(item, item.meeting.title);
+        if (item.status !== "COMPLETED" && item.dueDate) {
+          const due = item.dueDate.toISOString().split("T")[0]!;
+          if (due < today) {
+            task.status = "overdue";
+          }
         }
-      }
-      return task;
-    });
-  });
+        return task;
+      }),
+    );
+  }));
 
-  app.patch<{ Params: { id: string } }>("/tasks/:id", async (request, reply) => {
-    const user = requireAuthUser(request);
-    const body = request.body as { status?: string };
+  router.patch("/tasks/:id", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
+    const body = req.body as { status?: string };
     const existing = await prisma.actionItem.findUnique({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       include: { meeting: true },
     });
     if (!existing) {
-      return reply.status(404).send({ error: "Task not found" });
+      res.status(404).json({ error: "Task not found" });
+        return;
     }
 
     try {
       await assertMeetingAccess(user, existing.meetingId);
     } catch (err) {
-      return sendAuthError(reply, err);
+      sendAuthError(res, err); return;
     }
 
     let status = existing.status;
@@ -696,16 +725,16 @@ export async function meetingRoutes(app: FastifyInstance) {
     if (body.status === "overdue") status = TaskStatus.OVERDUE;
 
     const updated = await prisma.actionItem.update({
-      where: { id: request.params.id },
+      where: { id: requireRouteParam(req.params.id, 'id') },
       data: { status },
       include: { meeting: true },
     });
 
-    return mapActionItemToTask(updated, updated.meeting.title);
-  });
+    res.json(mapActionItemToTask(updated, updated.meeting.title));
+  }));
 
-  app.get("/insights", async (request) => {
-    const user = requireAuthUser(request);
+  router.get("/insights", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
     const meetingFilter = meetingsListWhere(user);
     const [meetingCount, taskCount, completedTasks, overdueTasks, recentMeetings] =
       await Promise.all([
@@ -728,7 +757,7 @@ export async function meetingRoutes(app: FastifyInstance) {
     const completionRate =
       taskCount > 0 ? Math.round((completedTasks / taskCount) * 100) : 0;
 
-    return {
+    res.json({
       meetingCount,
       taskCount,
       completedTasks,
@@ -740,6 +769,8 @@ export async function meetingRoutes(app: FastifyInstance) {
         hasMom: Boolean(m.mom),
         openTasks: m.actionItems.filter((t) => t.status !== "COMPLETED").length,
       })),
-    };
-  });
+    });
+  }));
+
+  return router;
 }

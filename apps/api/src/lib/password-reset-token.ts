@@ -1,5 +1,5 @@
-import type { FastifyInstance } from "fastify";
 import { hashSecret, verifySecret } from "./password.js";
+import { signJwt, verifyToken } from "./jwt.js";
 
 export const PASSWORD_RESET_PURPOSE = "password_reset";
 export const PASSWORD_RESET_TTL_SEC = 10 * 60;
@@ -10,30 +10,25 @@ export interface PasswordResetPayload {
   otpHash: string;
 }
 
-export async function createPasswordResetToken(
-  app: FastifyInstance,
-  email: string,
-  otp: string,
-): Promise<string> {
+export async function createPasswordResetToken(email: string, otp: string): Promise<string> {
   const otpHash = await hashSecret(otp);
-  return app.jwt.sign(
+  return signJwt(
     {
       purpose: PASSWORD_RESET_PURPOSE,
       email,
       otpHash,
     } satisfies PasswordResetPayload,
-    { expiresIn: PASSWORD_RESET_TTL_SEC },
+    PASSWORD_RESET_TTL_SEC,
   );
 }
 
 export async function verifyPasswordResetOtp(
-  app: FastifyInstance,
   resetToken: string,
   code: string,
 ): Promise<{ email: string }> {
   let payload: PasswordResetPayload;
   try {
-    payload = await app.jwt.verify<PasswordResetPayload>(resetToken);
+    payload = await verifyToken<PasswordResetPayload>(resetToken);
   } catch {
     throw new PasswordResetError("Reset link expired or invalid. Request a new code.");
   }

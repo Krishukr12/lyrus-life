@@ -1,5 +1,6 @@
 import { access } from "node:fs/promises";
 import { AudioStorageBackend, PipelineStep, type AudioFile, prisma } from "@lyrus/db";
+import type { AudioStorageBackendType } from "../../types/enums.js";
 import { logAudit } from "../audit.js";
 import { resolveStorageBackend } from "./config.js";
 import { saveToLocal, localFilePath } from "./local.js";
@@ -24,7 +25,7 @@ export async function saveMeetingRecording(
 
   let storageKey: string;
   let filePath: string;
-  let storageBackend: AudioStorageBackend;
+  let storageBackend: AudioStorageBackendType;
   let s3Key: string | undefined;
   let s3BucketName: string | undefined;
   let cleanup: (() => Promise<void>) | undefined;
