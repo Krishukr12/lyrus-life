@@ -276,6 +276,25 @@ export function createAdminOrganizationDetailRouter(): Router {
     }),
   );
 
+  router.post(
+    "/admin/organizations/:organizationId/impersonate",
+    authorize([UserRole.SUPER_ADMIN]),
+    asyncHandler(async (req, res) => {
+      const actor = requireAuthUser(req);
+      const organizationId = requireRouteParam(req.params.organizationId, "organizationId");
+      try {
+        const result = await organizationAdminService.impersonateOrgAdmin(
+          actor.id,
+          organizationId,
+        );
+        res.json(result);
+      } catch (err) {
+        if (handleOrgAdminError(err, res)) return;
+        throw err;
+      }
+    }),
+  );
+
   router.get(
     "/admin/organizations/:organizationId",
     authorize([UserRole.SUPER_ADMIN]),

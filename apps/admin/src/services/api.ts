@@ -1,7 +1,16 @@
 import { getAccessToken } from "@/lib/token-store";
-import type { CustomerBillingDetail, CustomerBillingRow, PlatformPricing } from "@/lib/billing-types";
+import type {
+  BillingDashboard,
+  CustomerBillingDetail,
+  CustomerBillingRow,
+  InvoiceRecord,
+  PaymentRecord,
+  PlatformPricing,
+  PricingChangeLogEntry,
+} from "@/lib/billing-types";
 import type { DashboardPayload } from "@/lib/dashboard-types";
 import type { OrgAuditItem, OrgEmployee, OrgMeeting, OrganizationDetail } from "@/lib/org-types";
+import type { MomTemplateApiRecord, MomTemplatePreset } from "@/lib/mom-template-types";
 import type { OrganizationSummary, PlatformStats } from "@/lib/types";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "/api";
@@ -82,6 +91,14 @@ export const adminApi = {
     }),
 
   getOrganization: (id: string) => request<OrganizationDetail>(`/admin/organizations/${id}`),
+
+  impersonateOrganization: (organizationId: string) =>
+    request<{
+      token: string;
+      loginUrl: string;
+      admin: { id: string; name: string; email: string };
+      expiresInSeconds: number;
+    }>(`/admin/organizations/${organizationId}/impersonate`, { method: "POST" }),
 
   listOrganizationEmployees: (
     organizationId: string,
@@ -183,4 +200,150 @@ export const adminApi = {
       method: "PATCH",
       body: JSON.stringify(body),
     }),
+
+  listPricingHistory: () =>
+    request<{ items: PricingChangeLogEntry[] }>("/admin/billing/pricing/history"),
+
+  getBillingDashboard: (organizationId: string) =>
+    request<{ dashboard: BillingDashboard }>(
+      `/admin/billing/customers/${organizationId}/dashboard`,
+    ),
+
+  listInvoices: (organizationId: string) =>
+    request<{ invoices: InvoiceRecord[] }>(
+      `/admin/billing/customers/${organizationId}/invoices`,
+    ),
+
+  generateInvoice: (organizationId: string) =>
+    request<{ invoice: InvoiceRecord }>(
+      `/admin/billing/customers/${organizationId}/invoices/generate`,
+      { method: "POST" },
+    ),
+
+  sendLatestInvoice: (organizationId: string) =>
+    request<{ invoice: InvoiceRecord }>(
+      `/admin/billing/customers/${organizationId}/invoices/send-latest`,
+      { method: "POST" },
+    ),
+
+  sendInvoice: (organizationId: string, invoiceId: string) =>
+    request<{ invoice: InvoiceRecord }>(
+      `/admin/billing/customers/${organizationId}/invoices/${invoiceId}/send`,
+      { method: "POST" },
+    ),
+
+  recordPayment: (organizationId: string, body: Record<string, unknown>) =>
+    request<{ payment: PaymentRecord }>(
+      `/admin/billing/customers/${organizationId}/payments`,
+      { method: "POST", body: JSON.stringify(body) },
+    ),
+
+  downloadInvoicePdf: async (organizationId: string, invoiceId: string, filename: string) => {
+    const token = getAccessToken();
+    const response = await fetch(
+      `${API_BASE}/admin/billing/customers/${organizationId}/invoices/${invoiceId}/pdf`,
+      {
+        credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+    );
+    if (!response.ok) {
+      let message = response.statusText;
+      try {
+        const body = (await response.json()) as { message?: string };
+        if (body.message) message = body.message;
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${filename}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  getMomTemplatePresets: () =>
+    request<{ presets: MomTemplatePreset[] }>("/admin/mom-templates/presets"),
+
+  listMomTemplates: (organizationId: string, includeArchived = false) =>
+    request<{ items: MomTemplateApiRecord[] }>(
+      `/admin/organizations/${organizationId}/mom-templates${includeArchived ? "?includeArchived=true" : ""}`,
+    ),
+
+  createMomTemplate: (organizationId: string, body: Record<string, unknown>) =>
+    request<{ template: MomTemplateApiRecord }>(
+      `/admin/organizations/${organizationId}/mom-templates`,
+      { method: "POST", body: JSON.stringify(body) },
+    ),
+
+  updateMomTemplate: (
+    organizationId: string,
+    templateId: string,
+    body: Record<string, unknown>,
+  ) =>
+    request<{ template: MomTemplateApiRecord }>(
+      `/admin/organizations/${organizationId}/mom-templates/${templateId}`,
+      { method: "PATCH", body: JSON.stringify(body) },
+    ),
+
+  duplicateMomTemplate: (organizationId: string, templateId: string) =>
+    request<{ template: MomTemplateApiRecord }>(
+      `/admin/organizations/${organizationId}/mom-templates/${templateId}/duplicate`,
+      { method: "POST" },
+    ),
+
+  setDefaultMomTemplate: (organizationId: string, templateId: string) =>
+    request<{ template: MomTemplateApiRecord }>(
+      `/admin/organizations/${organizationId}/mom-templates/${templateId}/set-default`,
+      { method: "POST" },
+    ),
+
+  archiveMomTemplate: (organizationId: string, templateId: string) =>
+    request<{ template: MomTemplateApiRecord }>(
+      `/admin/organizations/${organizationId}/mom-templates/${templateId}/archive`,
+      { method: "POST" },
+    ),
+
+  deleteMomTemplate: (organizationId: string, templateId: string) =>
+    request<{ ok: boolean }>(
+      `/admin/organizations/${organizationId}/mom-templates/${templateId}`,
+      { method: "DELETE" },
+    ),
+
+  uploadMomTemplateFile: async (
+    organizationId: string,
+    templateId: string,
+    file: File,
+  ) => {
+    const token = getAccessToken();
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(
+      `${API_BASE}/admin/organizations/${organizationId}/mom-templates/${templateId}/upload`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      let message = response.statusText;
+      try {
+        const body = (await response.json()) as { message?: string };
+        if (body.message) message = body.message;
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+
+    return response.json() as Promise<{ template: MomTemplateApiRecord }>;
+  },
 };

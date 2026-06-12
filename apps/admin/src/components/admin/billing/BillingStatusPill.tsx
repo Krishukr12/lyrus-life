@@ -5,6 +5,7 @@ const styles: Record<string, string> = {
   PENDING: "bg-amber-50 text-amber-800 ring-amber-600/20",
   OVERDUE: "bg-red-50 text-red-700 ring-red-600/20",
   TRIAL: "bg-blue-50 text-blue-700 ring-blue-600/20",
+  CANCELLED: "bg-slate-100 text-slate-600 ring-slate-500/20",
 };
 
 export function BillingStatusPill({ status }: { status: string }) {

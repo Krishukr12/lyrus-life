@@ -8,4 +8,5 @@ export {
 } from "./mom-email.js";
 export { sendLoginOtpEmail, sendPasswordResetOtpEmail } from "./auth-email.js";
 export { sendEmployeeInviteEmail, sendOrgAdminWelcomeEmail } from "./employee-invite-email.js";
+export { sendInvoiceEmail, type InvoiceEmailResult, type SendInvoiceEmailInput } from "./invoice-email.js";
 export { createSmtpTransport, getOrganizerEmail, getSmtpConfig } from "./smtp-config.js";

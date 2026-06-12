@@ -14,6 +14,7 @@ import {
 } from "../lib/mappers.js";
 import type { Prisma } from "@lyrus/db";
 import { logAudit } from "./audit.js";
+import { momTemplateService } from "./mom-template.service.js";
 
 function parseDueDate(value: string, fallback: Date): Date | null {
   if (!value || value === "TBD") return null;
@@ -49,30 +50,60 @@ async function persistExtraction(meetingId: string, meetingDate: Date) {
   const participantNames = meeting.participants.map((p) => p.name);
   const { date, time } = formatDateTime(meeting.scheduledAt);
 
+  const template = await momTemplateService.resolveForMeeting(
+    meeting.organizationId,
+    meeting.momTemplateId,
+  );
+
+  if (template && !meeting.momTemplateId) {
+    await prisma.meeting.update({
+      where: { id: meetingId },
+      data: { momTemplateId: template.id },
+    });
+  }
+
   const extraction = await extractMeetingInsights({
     transcript: meeting.transcript.fullText,
     participants: participantNames,
     meetingDateIso: date,
+    templateSections: template?.sections.map((s) => ({
+      title: s.title,
+      aiInstructions: s.aiInstructions,
+      isRequired: s.isRequired,
+    })),
   });
 
   const momPayload = extractionToMomPayload(meeting, extraction);
   const actionItemsJson = momPayload.actionItems as unknown as Prisma.InputJsonValue;
   const keyPointsJson = momPayload.keyPoints as unknown as Prisma.InputJsonValue;
   const participantsJson = participantNames as unknown as Prisma.InputJsonValue;
+  const sectionsJson =
+    extraction.sections && extraction.sections.length > 0
+      ? (extraction.sections as unknown as Prisma.InputJsonValue)
+      : template
+        ? (template.sections.map((s) => ({
+            title: s.title,
+            content: [] as string[],
+          })) as unknown as Prisma.InputJsonValue)
+        : undefined;
 
   await prisma.mom.upsert({
     where: { meetingId },
     create: {
       meetingId,
+      templateId: template?.id,
       title: meeting.title,
       dateTime: `${date} ${time}`,
       participants: participantsJson,
       keyPoints: keyPointsJson,
       actionItems: actionItemsJson,
+      sections: sectionsJson,
     },
     update: {
+      templateId: template?.id,
       keyPoints: keyPointsJson,
       actionItems: actionItemsJson,
+      sections: sectionsJson,
       approved: false,
       shared: false,
       approvedBy: null,

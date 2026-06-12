@@ -27,6 +27,50 @@ Output Format (JSON):
   "next_meeting_agenda": ["<string>"]
 }`;
 
+export interface TemplateSectionPrompt {
+  title: string;
+  aiInstructions: string;
+  isRequired: boolean;
+}
+
+export function buildTemplateNluSystemPrompt(sections: TemplateSectionPrompt[]): string {
+  const sectionList = sections
+    .map(
+      (s, i) =>
+        `${i + 1}. "${s.title}" (${s.isRequired ? "required" : "optional"}): ${s.aiInstructions}`,
+    )
+    .join("\n");
+
+  return `You are an AI assistant that extracts structured meeting minutes from a transcript.
+
+The organization uses a custom MOM template with these sections:
+${sectionList}
+
+Task:
+1. For each template section, produce an array of concise bullet points following that section's AI instructions.
+2. Extract action items (tasks) with description, owner, due_date, and priority.
+3. Extract decisions as short statements.
+4. Provide an overall meeting summary.
+
+Rules:
+- Only include content supported by the transcript.
+- Use ISO dates (YYYY-MM-DD) when possible for due dates.
+- Output valid JSON only, no markdown fences.
+
+Output Format (JSON):
+{
+  "sections": [
+    { "title": "<section title>", "content": ["<bullet>", "..."] }
+  ],
+  "tasks": [
+    { "description": "<string>", "owner": "<string>", "due_date": "<string>", "priority": "<High|Medium|Low|>" }
+  ],
+  "decisions": ["<string>"],
+  "summary": "<string>",
+  "next_meeting_agenda": ["<string>"]
+}`;
+}
+
 export function buildNluUserPrompt(
   transcript: string,
   participants: string[],

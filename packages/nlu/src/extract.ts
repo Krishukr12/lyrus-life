@@ -1,11 +1,17 @@
 import OpenAI from "openai";
 import { nluExtractionSchema, type NluExtraction } from "@lyrus/shared";
-import { buildNluUserPrompt, NLU_SYSTEM_PROMPT } from "./prompts.js";
+import {
+  buildNluUserPrompt,
+  buildTemplateNluSystemPrompt,
+  NLU_SYSTEM_PROMPT,
+  type TemplateSectionPrompt,
+} from "./prompts.js";
 
 export interface ExtractMeetingInsightsInput {
   transcript: string;
   participants: string[];
   meetingDateIso: string;
+  templateSections?: TemplateSectionPrompt[];
 }
 
 function heuristicExtraction(
@@ -59,12 +65,17 @@ export async function extractMeetingInsights(
   }
 
   const client = new OpenAI({ apiKey });
+  const systemPrompt =
+    input.templateSections && input.templateSections.length > 0
+      ? buildTemplateNluSystemPrompt(input.templateSections)
+      : NLU_SYSTEM_PROMPT;
+
   const response = await client.chat.completions.create({
     model: process.env.OPENAI_NLU_MODEL ?? "gpt-4o-mini",
     temperature: 0.2,
     response_format: { type: "json_object" },
     messages: [
-      { role: "system", content: NLU_SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       {
         role: "user",
         content: buildNluUserPrompt(

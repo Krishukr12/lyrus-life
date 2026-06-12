@@ -5,7 +5,8 @@ export const ONBOARDING_STEPS = [
   { id: 1, title: "Company Information", short: "Company" },
   { id: 2, title: "Business Details", short: "Business" },
   { id: 3, title: "Subscription Plan", short: "Plan" },
-  { id: 4, title: "Admin Account", short: "Admin" },
+  { id: 4, title: "Meeting Notes Configuration", short: "Notes" },
+  { id: 5, title: "Admin Account", short: "Admin" },
 ] as const;
 
 export function OnboardingStepper({
@@ -44,7 +45,7 @@ export function OnboardingStepper({
           />
         </div>
 
-        <ol className="grid gap-3 sm:grid-cols-4">
+        <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {ONBOARDING_STEPS.map((step) => {
             const done = step.id < activeStep;
             const current = step.id === activeStep;

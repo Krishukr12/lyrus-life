@@ -14,7 +14,10 @@ export function DashboardHero({ userName }: { userName?: string }) {
 
   return (
     <section className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_40px_rgba(15,23,42,0.08)]">
-      <div className="pointer-events-none absolute inset-0 admin-hero-mesh" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 admin-hero-mesh"
+        aria-hidden
+      />
       <div
         className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-indigo-400/10 blur-3xl"
         aria-hidden
@@ -37,9 +40,9 @@ export function DashboardHero({ userName }: { userName?: string }) {
               </span>
             </h1>
             <p className="mt-3 max-w-2xl text-[15px] sm:text-base leading-relaxed text-slate-600">
-              Manage organizations, subscriptions, revenue, users and platform operations from one
-              place.
+              All your admin controls—organizations, users, billing and more—in one place.
             </p>
+       
           </div>
         </div>
 

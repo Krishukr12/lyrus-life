@@ -1,9 +1,20 @@
-import { MeetingStatus, UserRole, UserStatus, prisma, type UserStatus as UserStatusType } from "@lyrus/db";
+import {
+  MeetingStatus,
+  OrganizationStatus,
+  UserRole,
+  UserStatus,
+  prisma,
+  type UserStatus as UserStatusType,
+} from "@lyrus/db";
 import { billingService } from "./billing.service.js";
 import { organizationRepository } from "../repositories/organization.repository.js";
-import { countActiveOrganizationSeats, PLAN_MAX_USERS } from "../lib/plan-limits.js";
+import { getIncludedSeats, getMeetingLimit } from "../lib/plan-limits.js";
+import { signAccessToken } from "../lib/jwt.js";
 import { serializeMeetingListItem, serializeOrganization, serializeUser } from "../lib/serializers.js";
+import { logTenantAudit } from "./tenant-audit.service.js";
 import { formatDistanceToNow } from "date-fns";
+
+const IMPERSONATION_TOKEN_TTL_SEC = 15 * 60;
 
 export class OrganizationAdminError extends Error {
   constructor(
@@ -35,7 +46,9 @@ export const organizationAdminService = {
     ]);
 
     const admin = org.users[0] ?? null;
-    const maxUsers = PLAN_MAX_USERS[org.subscriptionPlan];
+    const plan = org.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
+    const includedUsers = getIncludedSeats(plan);
+    const meetingLimit = getMeetingLimit(plan);
 
     return {
       organization: serializeOrganization(org),
@@ -60,10 +73,15 @@ export const organizationAdminService = {
             billingStatus: billingDetail.billingStatus,
             billingCycle: billingDetail.billingCycle,
             nextBillingDate: billingDetail.nextBillingDate,
+            trialEndsAt: billingDetail.trialEndsAt,
             monthlyAmountInr: billingDetail.monthlyAmountInr,
+            annualCostInr: billingDetail.annualCostInr,
             totalAmountInr: billingDetail.totalAmountInr,
             activeUsers: billingDetail.activeUsers,
-            userLimit: maxUsers,
+            includedUsers: billingDetail.includedUsers,
+            additionalUsers: billingDetail.additionalUsers,
+            meetingLimit,
+            totalMeetings: org._count.meetings,
           }
         : null,
     };
@@ -172,6 +190,71 @@ export const organizationAdminService = {
     return {
       items: items.map(serializeUser),
       total,
+    };
+  },
+
+  async impersonateOrgAdmin(actorId: string, organizationId: string) {
+    const org = await organizationRepository.findById(organizationId);
+    if (!org) {
+      throw new OrganizationAdminError("not_found", "Organization not found", 404);
+    }
+    if (org.status === OrganizationStatus.SUSPENDED) {
+      throw new OrganizationAdminError(
+        "org_suspended",
+        "Cannot impersonate admin of a suspended organization",
+        400,
+      );
+    }
+
+    const admin = await prisma.user.findFirst({
+      where: {
+        organizationId,
+        role: UserRole.ORG_ADMIN,
+        status: UserStatus.ACTIVE,
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    if (!admin) {
+      throw new OrganizationAdminError(
+        "no_admin",
+        "No active organization admin found for this tenant",
+        404,
+      );
+    }
+
+    const token = await signAccessToken(
+      {
+        sub: admin.id,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role,
+        organizationId: admin.organizationId,
+      },
+      IMPERSONATION_TOKEN_TTL_SEC,
+    );
+
+    await logTenantAudit({
+      organizationId,
+      userId: actorId,
+      action: "admin.impersonation_started",
+      metadata: {
+        targetUserId: admin.id,
+        targetEmail: admin.email,
+      },
+    });
+
+    const webAppUrl = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
+
+    return {
+      token,
+      loginUrl: `${webAppUrl}/auth/impersonate?token=${encodeURIComponent(token)}`,
+      admin: {
+        id: admin.id,
+        name: admin.name,
+        email: admin.email,
+      },
+      expiresInSeconds: IMPERSONATION_TOKEN_TTL_SEC,
     };
   },
 };

@@ -13,7 +13,16 @@ export const DEFAULT_PLATFORM_PRICING = {
 
 /** Users/locations included in base plan before per-unit charges apply. */
 export const PLAN_INCLUDED_ALLOWANCES = {
-  STARTER: { users: 5, locations: 1 },
-  PROFESSIONAL: { users: 20, locations: 5 },
-  ENTERPRISE: { users: 50, locations: 20 },
+  STARTER: { users: 5, locations: 1, meetings: 100 },
+  PROFESSIONAL: { users: 20, locations: 5, meetings: 500 },
+  ENTERPRISE: { users: 50, locations: 20, meetings: null as number | null },
+} as const;
+
+export const PLATFORM_BILLING = {
+  companyName: process.env.BILLING_COMPANY_NAME ?? "Quincore Business Solutions Pvt Ltd",
+  companyAddress:
+    process.env.BILLING_COMPANY_ADDRESS ??
+    "Bengaluru, Karnataka, India",
+  companyGstin: process.env.BILLING_COMPANY_GSTIN ?? "",
+  invoiceDueDays: Number(process.env.BILLING_INVOICE_DUE_DAYS ?? 15),
 } as const;

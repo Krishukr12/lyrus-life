@@ -12,7 +12,14 @@ import {
   OrganizationSettingsError,
   organizationSettingsService,
 } from "../../services/organization-settings.service.js";
-import { countActiveOrganizationSeats, PLAN_MAX_USERS } from "../../lib/plan-limits.js";
+import {
+  assertOrganizationCanAddUser,
+  countActiveOrganizationSeats,
+  getIncludedSeats,
+  getMeetingLimit,
+  countOrganizationMeetings,
+} from "../../lib/plan-limits.js";
+import { billingService } from "../../services/billing.service.js";
 import { organizationRepository } from "../../repositories/organization.repository.js";
 
 export function createOrganizationSettingsRouter(): Router {
@@ -75,14 +82,33 @@ export function createOrganizationSettingsRouter(): Router {
         return;
       }
 
-      const activeUsers = await countActiveOrganizationSeats(tenant.organizationId);
-      const maxUsers = PLAN_MAX_USERS[org.subscriptionPlan];
+      const [activeUsers, totalMeetings, billingDetail] = await Promise.all([
+        countActiveOrganizationSeats(tenant.organizationId),
+        countOrganizationMeetings(tenant.organizationId),
+        billingService.getCustomerBillingDetail(tenant.organizationId),
+      ]);
+      const plan = org.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
+      const includedUsers = getIncludedSeats(plan);
+      const meetingLimit = getMeetingLimit(plan);
+      let canAddUser = true;
+      try {
+        await assertOrganizationCanAddUser(tenant.organizationId);
+      } catch {
+        canAddUser = false;
+      }
 
       res.json({
         subscriptionPlan: org.subscriptionPlan,
         activeUsers,
-        maxUsers,
-        canAddUser: maxUsers === null || activeUsers < maxUsers,
+        includedUsers,
+        additionalUsers: Math.max(0, activeUsers - includedUsers),
+        maxUsers: null,
+        meetingLimit,
+        totalMeetings,
+        canAddUser,
+        billingStatus: billingDetail?.billingStatus ?? "PENDING",
+        monthlyAmountInr: billingDetail?.monthlyAmountInr ?? 0,
+        totalAmountInr: billingDetail?.totalAmountInr ?? 0,
       });
     }),
   );

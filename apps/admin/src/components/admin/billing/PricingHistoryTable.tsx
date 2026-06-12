@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { History } from "lucide-react";
-import type { PricingHistoryEntry } from "@/lib/pricing-history";
-import { PlanBadge } from "@/components/admin/billing/PlanBadge";
+import type { PricingChangeLogEntry } from "@/lib/billing-types";
+import { formatInr } from "@/lib/format-inr";
 import {
   Table,
   TableBody,
@@ -11,7 +11,42 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function PricingHistoryTable({ entries }: { entries: PricingHistoryEntry[] }) {
+const FIELD_LABELS: Record<string, string> = {
+  starterMonthlyInr: "Starter monthly",
+  starterYearlyInr: "Starter yearly",
+  growthMonthlyInr: "Growth monthly",
+  growthYearlyInr: "Growth yearly",
+  enterpriseBaseMonthlyInr: "Enterprise base",
+  extraUserMonthlyInr: "Extra user",
+  extraLocationMonthlyInr: "Extra location",
+  gstPercent: "GST %",
+  freeTrialDays: "Trial days",
+};
+
+function formatFieldValue(key: string, value: unknown): string {
+  if (value == null) return "—";
+  if (key === "gstPercent") return `${value}%`;
+  if (key === "freeTrialDays") return `${value} days`;
+  if (typeof value === "number") return formatInr(value);
+  return String(value);
+}
+
+function summarizeChanges(entry: PricingChangeLogEntry): string[] {
+  const lines: string[] = [];
+  const prev = entry.previous;
+  const next = entry.next;
+  for (const key of Object.keys(FIELD_LABELS)) {
+    const k = key as keyof typeof prev;
+    if (prev[k] !== next[k]) {
+      lines.push(
+        `${FIELD_LABELS[key]}: ${formatFieldValue(key, prev[k])} → ${formatFieldValue(key, next[k])}`,
+      );
+    }
+  }
+  return lines.length > 0 ? lines : ["Pricing updated"];
+}
+
+export function PricingHistoryTable({ entries }: { entries: PricingChangeLogEntry[] }) {
   return (
     <section className="admin-card-accent overflow-hidden mb-6">
       <div className="admin-panel-header">
@@ -20,7 +55,7 @@ export function PricingHistoryTable({ entries }: { entries: PricingHistoryEntry[
           <div>
             <h2 className="admin-panel-title">Pricing change history</h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Local audit log of pricing updates from this admin session
+              Platform-wide pricing updates stored in the database
             </p>
           </div>
         </div>
@@ -35,29 +70,25 @@ export function PricingHistoryTable({ entries }: { entries: PricingHistoryEntry[
             <TableHeader>
               <TableRow className="hover:bg-transparent border-[#e5e7eb]">
                 <TableHead className="text-xs font-semibold text-slate-500">Changed by</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500">Plan</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500">Field</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500">Old value</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500">New value</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500">Changes</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500">Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {entries.map((entry) => (
                 <TableRow key={entry.id} className="border-[#e5e7eb]">
-                  <TableCell className="text-sm text-slate-700">{entry.changedBy}</TableCell>
-                  <TableCell>
-                    <PlanBadge plan={entry.plan} />
+                  <TableCell className="text-sm text-slate-700 align-top">
+                    {entry.actorName ?? "System"}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">{entry.field}</TableCell>
-                  <TableCell className="text-sm tabular-nums text-slate-500">
-                    {entry.oldValue}
+                  <TableCell className="text-sm text-slate-600 align-top">
+                    <ul className="space-y-0.5">
+                      {summarizeChanges(entry).map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
                   </TableCell>
-                  <TableCell className="text-sm tabular-nums font-medium text-slate-900">
-                    {entry.newValue}
-                  </TableCell>
-                  <TableCell className="text-xs text-slate-500 whitespace-nowrap">
-                    {format(new Date(entry.date), "MMM d, yyyy · h:mm a")}
+                  <TableCell className="text-xs text-slate-500 whitespace-nowrap align-top">
+                    {format(new Date(entry.createdAt), "MMM d, yyyy · h:mm a")}
                   </TableCell>
                 </TableRow>
               ))}

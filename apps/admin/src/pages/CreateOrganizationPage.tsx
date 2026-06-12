@@ -9,6 +9,7 @@ import {
   CreditCard,
   Globe,
   MapPin,
+  FileText,
   Shield,
   Sparkles,
   User,
@@ -18,6 +19,7 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { PageContainer } from "@/components/admin/PageContainer";
 import { OnboardingStepper } from "@/components/admin/OnboardingStepper";
 import { FormSection } from "@/components/admin/FormSection";
+import { MeetingNotesConfigStep } from "@/components/admin/organization/meeting-notes/MeetingNotesConfigStep";
 import { OnboardingPlanCards } from "@/components/admin/organization/OnboardingPlanCards";
 import { OnboardingPreviewPanel } from "@/components/admin/organization/OnboardingPreviewPanel";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -32,6 +34,8 @@ import {
   onboardingFormSchema,
   type OnboardingFormValues,
 } from "@/lib/schemas";
+import type { OnboardingMomTemplateDraft } from "@/lib/mom-template-types";
+import { validateTemplateDraft } from "@/lib/mom-template-utils";
 import { toCreateOrganizationPayload } from "@/lib/onboarding";
 
 const COMPANY_SIZE_OPTIONS = [
@@ -67,7 +71,13 @@ const STATUS_OPTIONS = [
   { value: "PENDING_SETUP", label: "Pending setup" },
 ];
 
-const SECTION_IDS = ["step-company", "step-business", "step-subscription", "step-admin"] as const;
+const SECTION_IDS = [
+  "step-company",
+  "step-business",
+  "step-subscription",
+  "step-meeting-notes",
+  "step-admin",
+] as const;
 
 function computeCompletion(values: OnboardingFormValues): number {
   const checks = [
@@ -95,6 +105,7 @@ export default function CreateOrganizationPage() {
   const { collapsed } = useSidebar();
   const slugTouched = useRef(false);
   const [activeStep, setActiveStep] = useState(1);
+  const [momTemplates, setMomTemplates] = useState<OnboardingMomTemplateDraft[]>([]);
 
   const form = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingFormSchema),
@@ -143,7 +154,24 @@ export default function CreateOrganizationPage() {
   }, []);
 
   const create = useMutation({
-    mutationFn: adminApi.createOrganization,
+    mutationFn: async (payload: Record<string, unknown>) => {
+      const result = await adminApi.createOrganization(payload);
+      const uploads = momTemplates.filter((t) => t.pendingUpload);
+      if (uploads.length > 0) {
+        const { items } = await adminApi.listMomTemplates(result.organization.id);
+        for (const draft of uploads) {
+          const match = items.find((item) => item.name === draft.name);
+          if (match && draft.pendingUpload) {
+            await adminApi.uploadMomTemplateFile(
+              result.organization.id,
+              match.id,
+              draft.pendingUpload,
+            );
+          }
+        }
+      }
+      return result;
+    },
     onSuccess: (result) => {
       toast.success("Organization onboarded", {
         description: `Temporary password: ${result.temporaryPassword}`,
@@ -155,7 +183,25 @@ export default function CreateOrganizationPage() {
   });
 
   function onSubmit(values: OnboardingFormValues) {
-    create.mutate(toCreateOrganizationPayload(values));
+    if (momTemplates.length === 0) {
+      toast.error("Configure at least one meeting notes template");
+      return;
+    }
+
+    for (const template of momTemplates) {
+      const error = validateTemplateDraft(template);
+      if (error) {
+        toast.error(error);
+        return;
+      }
+    }
+
+    if (!momTemplates.some((t) => t.isDefault)) {
+      toast.error("Select a default meeting notes template");
+      return;
+    }
+
+    create.mutate(toCreateOrganizationPayload(values, momTemplates));
   }
 
   return (
@@ -390,10 +436,22 @@ export default function CreateOrganizationPage() {
                 </FormSection>
               </div>
 
-              {/* Step 4 — Admin */}
-              <div id="step-admin">
+              {/* Step 4 — Meeting Notes */}
+              <div id="step-meeting-notes">
                 <FormSection
                   step={4}
+                  title="Meeting Notes Configuration"
+                  description="Define how meeting minutes and MOM documents are generated for this organization."
+                  icon={FileText}
+                >
+                  <MeetingNotesConfigStep templates={momTemplates} onChange={setMomTemplates} />
+                </FormSection>
+              </div>
+
+              {/* Step 5 — Admin */}
+              <div id="step-admin">
+                <FormSection
+                  step={5}
                   title="Admin Account"
                   description="Initial tenant administrator credentials."
                   icon={Shield}

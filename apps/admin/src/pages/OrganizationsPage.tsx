@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -13,12 +13,10 @@ import {
   Plus,
   Search,
 } from "lucide-react";
-import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { PageContainer } from "@/components/admin/PageContainer";
 import { ExecutiveMetricCard } from "@/components/admin/ExecutiveMetricCard";
-import { OrganizationTenantCard } from "@/components/admin/organization/OrganizationTenantCard";
-import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { OrganizationsTable } from "@/components/admin/organization/OrganizationsTable";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,12 +48,6 @@ export default function OrganizationsPage() {
   const { setQuery: setGlobalSearch } = useGlobalSearch();
   const [page, setPage] = useState(1);
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [confirm, setConfirm] = useState<{
-    id: string;
-    name: string;
-    action: "suspend" | "activate";
-  } | null>(null);
-
   const urlSearch = searchParams.get("search") ?? "";
   const urlStatus = searchParams.get("status");
   const initialStatus =
@@ -93,8 +85,6 @@ export default function OrganizationsPage() {
     }
   }, [debouncedSearch, searchParams, setGlobalSearch]);
 
-  const queryClient = useQueryClient();
-
   useEffect(() => {
     setPage(1);
   }, [statusFilter]);
@@ -126,28 +116,6 @@ export default function OrganizationsPage() {
   }, [dashboard]);
 
   const rows = data?.items ?? [];
-
-  const activate = useMutation({
-    mutationFn: (id: string) => adminApi.activateOrganization(id),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["admin"] });
-      toast.success("Organization activated");
-      setConfirm(null);
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const suspend = useMutation({
-    mutationFn: (id: string) => adminApi.suspendOrganization(id),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["admin"] });
-      toast.success("Organization suspended");
-      setConfirm(null);
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const pending = activate.isPending || suspend.isPending;
 
   return (
     <PageContainer>
@@ -195,7 +163,8 @@ export default function OrganizationsPage() {
           label="Monthly Revenue"
           value={dashboard ? formatInr(dashboard.billing.mrrInr) : "—"}
           icon={IndianRupee}
-          accent="amber"
+          accent="blue"
+          featured
           loading={!dashboard}
         />
       </section>
@@ -249,12 +218,13 @@ export default function OrganizationsPage() {
         </div>
       </Form>
 
-      {/* Tenant cards grid */}
       {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-64 w-full rounded-[22px]" />
-          ))}
+        <div className="overflow-hidden rounded-[22px] border border-slate-200/80 bg-white p-4 shadow-sm">
+          <div className="space-y-3">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 w-full rounded-lg" />
+            ))}
+          </div>
         </div>
       ) : rows.length === 0 ? (
         <EmptyState
@@ -269,23 +239,9 @@ export default function OrganizationsPage() {
         />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-            {rows.map((org) => (
-              <OrganizationTenantCard
-                key={org.id}
-                org={org}
-                monthlyRevenueInr={revenueByOrg.get(org.id)}
-                onSuspend={() =>
-                  setConfirm({ id: org.id, name: org.name, action: "suspend" })
-                }
-                onActivate={() =>
-                  setConfirm({ id: org.id, name: org.name, action: "activate" })
-                }
-              />
-            ))}
-          </div>
+          <OrganizationsTable rows={rows} revenueByOrg={revenueByOrg} />
 
-          <div className="mt-6 flex flex-col gap-3 rounded-[18px] border border-slate-200/80 bg-white px-5 py-3.5 text-sm text-slate-500 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-col gap-3 rounded-[18px] border border-slate-200/80 bg-white px-5 py-3.5 text-sm text-slate-500 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <span>
               {data?.total ?? 0} total · Page {data?.page ?? 1}
               {isFetching ? " · Updating…" : ""}
@@ -314,24 +270,6 @@ export default function OrganizationsPage() {
         </>
       )}
 
-      <ConfirmDialog
-        open={Boolean(confirm)}
-        onOpenChange={(open) => !open && setConfirm(null)}
-        title={confirm?.action === "suspend" ? "Suspend organization?" : "Activate organization?"}
-        description={
-          confirm
-            ? `${confirm.action === "suspend" ? "Suspend" : "Activate"} "${confirm.name}". Users in this tenant will ${confirm.action === "suspend" ? "lose access" : "regain access"}.`
-            : ""
-        }
-        confirmLabel={confirm?.action === "suspend" ? "Suspend" : "Activate"}
-        variant={confirm?.action === "suspend" ? "danger" : "default"}
-        loading={pending}
-        onConfirm={() => {
-          if (!confirm) return;
-          if (confirm.action === "suspend") suspend.mutate(confirm.id);
-          else activate.mutate(confirm.id);
-        }}
-      />
     </PageContainer>
   );
 }

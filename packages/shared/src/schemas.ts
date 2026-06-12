@@ -7,11 +7,17 @@ export const extractedTaskSchema = z.object({
   priority: z.enum(["High", "Medium", "Low", ""]).or(z.string()).optional(),
 });
 
+export const nluSectionContentSchema = z.object({
+  title: z.string(),
+  content: z.array(z.string()),
+});
+
 export const nluExtractionSchema = z.object({
   tasks: z.array(extractedTaskSchema),
   decisions: z.array(z.string()),
   summary: z.string(),
   next_meeting_agenda: z.array(z.string()).optional(),
+  sections: z.array(nluSectionContentSchema).optional(),
 });
 
 export type NluExtraction = z.infer<typeof nluExtractionSchema>;

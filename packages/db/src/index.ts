@@ -25,6 +25,12 @@ export const OrganizationStatus = generatedExports.OrganizationStatus;
 export const SubscriptionPlan = generatedExports.SubscriptionPlan;
 export const BillingStatus = generatedExports.BillingStatus;
 export const AudioStorageBackend = generatedExports.AudioStorageBackend;
+export const TemplateFileStorageBackend = generatedExports.TemplateFileStorageBackend;
+export const MomTemplateCategory = generatedExports.MomTemplateCategory;
+export const MomTemplateSource = generatedExports.MomTemplateSource;
+export const InvoiceStatus = generatedExports.InvoiceStatus;
+export const PaymentStatus = generatedExports.PaymentStatus;
+export const InvoiceDeliveryStatus = generatedExports.InvoiceDeliveryStatus;
 
 export type PrismaClient = InstanceType<typeof PrismaClient>;
 
@@ -68,4 +74,13 @@ export type {
   Decision,
   Summary,
   AuditLog,
+  MomTemplate,
+  MomTemplateSection,
+  MomTemplateUpload,
+  Invoice,
+  InvoiceLineItem,
+  Payment,
+  InvoiceDelivery,
+  BillingEvent,
+  PricingChangeLog,
 } from "../generated/client/index.js";

@@ -9,6 +9,7 @@ import {
   prisma,
 } from "@lyrus/db";
 import { assertMeetingAccess, meetingsListWhere } from "../lib/meeting-access.js";
+import { assertOrganizationCanCreateMeeting, PlanLimitError } from "../lib/plan-limits.js";
 import { generateJoinSlug } from "../lib/join-slug.js";
 import { requireAuthUser } from "../middleware/authenticate.js";
 import { extractMeetingInsights } from "@lyrus/nlu";
@@ -105,6 +106,18 @@ export function createMeetingsRouter(): Router {
 
     const data = parsed.data;
     const scheduledAt = parseScheduledAt(data.date, data.time);
+
+    if (user.organizationId) {
+      try {
+        await assertOrganizationCanCreateMeeting(user.organizationId);
+      } catch (err) {
+        if (err instanceof PlanLimitError) {
+          res.status(err.statusCode).json({ error: err.code, message: err.message });
+          return;
+        }
+        throw err;
+      }
+    }
 
     const meeting = await prisma.meeting.create({
       data: {

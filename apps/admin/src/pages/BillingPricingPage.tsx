@@ -3,7 +3,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
-import { Eye, FileText, PauseCircle, Pencil, RotateCcw, Save } from "lucide-react";
+import {
+  ArrowUpRight,
+  BarChart3,
+  Eye,
+  FileText,
+  IndianRupee,
+  Mail,
+  Pencil,
+  RotateCcw,
+  Save,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/admin/PageContainer";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -22,7 +33,9 @@ import {
 import { EditBillingDialog } from "@/components/admin/billing/EditBillingDialog";
 import { PlanBadge } from "@/components/admin/billing/PlanBadge";
 import { PlatformBillingSettingsCard } from "@/components/admin/billing/PlatformBillingSettingsCard";
+import { CustomerBillingDashboardDialog } from "@/components/admin/billing/CustomerBillingDashboardDialog";
 import { PricingHistoryTable } from "@/components/admin/billing/PricingHistoryTable";
+import { RecordPaymentDialog } from "@/components/admin/billing/RecordPaymentDialog";
 import { PricingPlanCard } from "@/components/admin/billing/PricingPlanCard";
 import { RevenueSummaryCards } from "@/components/admin/billing/RevenueSummaryCards";
 import { Button } from "@/components/ui/button";
@@ -44,9 +57,7 @@ import {
 import type { CustomerBillingDetail, CustomerBillingRow, PlatformPricing } from "@/lib/billing-types";
 import { formatInr } from "@/lib/format-inr";
 import { PLAN_INCLUDED_ALLOWANCES } from "@/lib/plan-allowances";
-import { appendPricingHistory, loadPricingHistory } from "@/lib/pricing-history";
 import { adminApi } from "@/services/api";
-import { useAuth } from "@/contexts/AuthContext";
 
 const DEFAULT_FILTERS: BillingTableFilters = {
   search: "",
@@ -58,14 +69,16 @@ const DEFAULT_FILTERS: BillingTableFilters = {
 };
 
 export default function BillingPricingPage() {
-  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [detailRow, setDetailRow] = useState<CustomerBillingDetail | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [editRow, setEditRow] = useState<CustomerBillingRow | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [dashboardRow, setDashboardRow] = useState<CustomerBillingRow | null>(null);
+  const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [paymentRow, setPaymentRow] = useState<CustomerBillingRow | null>(null);
+  const [paymentOpen, setPaymentOpen] = useState(false);
   const [editPricingTarget, setEditPricingTarget] = useState<PricingEditTarget | null>(null);
-  const [pricingHistory, setPricingHistory] = useState(() => loadPricingHistory());
   const [filters, setFilters] = useState<BillingTableFilters>(DEFAULT_FILTERS);
 
   const pricingQuery = useQuery({
@@ -76,6 +89,29 @@ export default function BillingPricingPage() {
   const customersQuery = useQuery({
     queryKey: ["admin", "billing", "customers"],
     queryFn: () => adminApi.listCustomerBilling(),
+  });
+
+  const pricingHistoryQuery = useQuery({
+    queryKey: ["admin", "billing", "pricing-history"],
+    queryFn: () => adminApi.listPricingHistory(),
+  });
+
+  const generateInvoice = useMutation({
+    mutationFn: (organizationId: string) => adminApi.generateInvoice(organizationId),
+    onSuccess: () => {
+      toast.success("Invoice generated");
+      void queryClient.invalidateQueries({ queryKey: ["admin", "billing"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const sendInvoice = useMutation({
+    mutationFn: (organizationId: string) => adminApi.sendLatestInvoice(organizationId),
+    onSuccess: () => {
+      toast.success("Invoice generated and sent");
+      void queryClient.invalidateQueries({ queryKey: ["admin", "billing"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const form = useForm<PricingConfigFormValues>({
@@ -95,13 +131,7 @@ export default function BillingPricingPage() {
   const savePricing = useMutation({
     mutationFn: (values: PricingConfigFormValues) =>
       adminApi.updateBillingPricing(values as PlatformPricing),
-    onSuccess: (_data, variables) => {
-      const previous = pricingQuery.data?.pricing;
-      if (previous) {
-        setPricingHistory(
-          appendPricingHistory(previous, variables as PlatformPricing, user?.name ?? "Super Admin"),
-        );
-      }
+    onSuccess: () => {
       toast.success("Pricing saved");
       void queryClient.invalidateQueries({ queryKey: ["admin", "billing"] });
     },
@@ -111,11 +141,7 @@ export default function BillingPricingPage() {
   const resetPricing = useMutation({
     mutationFn: () => adminApi.resetBillingPricing(),
     onSuccess: (data) => {
-      const previous = form.getValues() as PlatformPricing;
       form.reset(data.pricing);
-      setPricingHistory(
-        appendPricingHistory(previous, data.pricing, user?.name ?? "Super Admin"),
-      );
       toast.success("Pricing reset to defaults");
       void queryClient.invalidateQueries({ queryKey: ["admin", "billing"] });
     },
@@ -195,7 +221,7 @@ export default function BillingPricingPage() {
       {pricingQuery.isLoading ? (
         <div className="grid gap-4 md:grid-cols-3 mb-6">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-72 rounded-[14px]" />
+            <Skeleton key={i} className="h-72 rounded-[28px]" />
           ))}
         </div>
       ) : (
@@ -234,7 +260,7 @@ export default function BillingPricingPage() {
         </div>
       )}
 
-      <PricingHistoryTable entries={pricingHistory} />
+      <PricingHistoryTable entries={pricingHistoryQuery.data?.items ?? []} />
 
       <Form {...form}>
         <div className="mb-6 space-y-4">
@@ -253,14 +279,29 @@ export default function BillingPricingPage() {
         </div>
       </Form>
 
-      <section className="admin-card-accent overflow-hidden">
-        <div className="admin-panel-header">
-          <div>
-            <h2 className="admin-panel-title">Customer billing</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {filteredItems.length} of {allItems.length} organizations · amounts include GST
-            </p>
+      <section className="overflow-hidden rounded-[28px] border border-slate-100/80 bg-white shadow-[0_4px_24px_rgba(15,23,42,0.06)]">
+        <div className="flex items-center justify-between gap-3 px-6 py-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <Users className="h-5 w-5" strokeWidth={1.75} />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold tracking-tight text-slate-900">
+                Customer billing
+              </h2>
+              <p className="mt-0.5 text-xs text-slate-400">
+                {filteredItems.length} of {allItems.length} organizations · amounts include GST
+              </p>
+            </div>
           </div>
+          <button
+            type="button"
+            aria-hidden
+            tabIndex={-1}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          >
+            <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
+          </button>
         </div>
 
         <CustomerBillingFilters
@@ -358,28 +399,30 @@ export default function BillingPricingPage() {
                             },
                           },
                           {
-                            label: "Generate invoice",
-                            icon: <FileText className="h-3.5 w-3.5" />,
-                            onClick: () =>
-                              toast.info(
-                                "Invoice generation will be available in a future release.",
-                              ),
+                            label: "Billing dashboard",
+                            icon: <BarChart3 className="h-3.5 w-3.5" />,
+                            onClick: () => {
+                              setDashboardRow(row);
+                              setDashboardOpen(true);
+                            },
                           },
                           {
-                            label: "Suspend billing",
-                            icon: <PauseCircle className="h-3.5 w-3.5" />,
-                            variant: "danger",
-                            onClick: () =>
-                              toast.info(
-                                "Use Edit plan to set billing status to suspended or overdue.",
-                              ),
+                            label: "Generate invoice",
+                            icon: <FileText className="h-3.5 w-3.5" />,
+                            onClick: () => generateInvoice.mutate(row.organizationId),
+                          },
+                          {
+                            label: "Send invoice",
+                            icon: <Mail className="h-3.5 w-3.5" />,
+                            onClick: () => sendInvoice.mutate(row.organizationId),
                           },
                           {
                             label: "Mark as paid",
-                            onClick: () =>
-                              toast.info(
-                                "Payment recording will be available in a future release.",
-                              ),
+                            icon: <IndianRupee className="h-3.5 w-3.5" />,
+                            onClick: () => {
+                              setPaymentRow(row);
+                              setPaymentOpen(true);
+                            },
                           },
                         ]}
                       />
@@ -407,6 +450,21 @@ export default function BillingPricingPage() {
         open={editOpen}
         onOpenChange={setEditOpen}
         row={editRow}
+        onSaved={() => void queryClient.invalidateQueries({ queryKey: ["admin", "billing"] })}
+      />
+
+      <CustomerBillingDashboardDialog
+        open={dashboardOpen}
+        onOpenChange={setDashboardOpen}
+        row={dashboardRow}
+      />
+
+      <RecordPaymentDialog
+        open={paymentOpen}
+        onOpenChange={setPaymentOpen}
+        organizationId={paymentRow?.organizationId ?? ""}
+        organizationName={paymentRow?.organizationName ?? ""}
+        suggestedAmountInr={paymentRow?.totalAmountInr}
         onSaved={() => void queryClient.invalidateQueries({ queryKey: ["admin", "billing"] })}
       />
     </PageContainer>

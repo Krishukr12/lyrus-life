@@ -8,6 +8,9 @@ import { logTenantAudit } from "./tenant-audit.service.js";
 import { generateTemporaryPassword } from "../utils/slug.js";
 import { fullName } from "../utils/user-name.js";
 import { hashPassword } from "../utils/password.js";
+import { momTemplateService } from "./mom-template.service.js";
+import { billingService } from "./billing.service.js";
+import { billingRepository } from "../repositories/billing.repository.js";
 
 export class OrganizationServiceError extends Error {
   constructor(
@@ -96,7 +99,8 @@ export const organizationService = {
         data: {
           organizationId: organization.id,
           billingStatus,
-          billingCycle: "monthly",
+          billingCycle: input.billingCycle ?? "monthly",
+          billingEmail: adminEmail,
         },
       });
 
@@ -133,6 +137,32 @@ export const organizationService = {
     });
 
     const webAppUrl = process.env.WEB_APP_URL ?? "http://localhost:8080";
+    if (input.momTemplates?.templates?.length) {
+      await momTemplateService.provisionOnboardingTemplates(
+        actorId,
+        result.organization.id,
+        input.momTemplates.templates,
+        input.momTemplates.defaultTemplateIndex ?? 0,
+      );
+    }
+
+    const pricing = await billingRepository.getPricingConfig();
+    if (orgStatus === OrganizationStatus.ACTIVE && pricing.freeTrialDays > 0) {
+      await billingService.startTrial(
+        result.organization.id,
+        pricing.freeTrialDays,
+        actorId,
+      );
+    } else if (orgStatus === OrganizationStatus.ACTIVE) {
+      await billingRepository.upsertOrganizationBilling(result.organization.id, {
+        billingStatus: BillingStatus.ACTIVE,
+      });
+      await billingService.initializeBillingPeriod(
+        result.organization.id,
+        input.billingCycle ?? "monthly",
+      );
+    }
+
     try {
       await sendOrgAdminWelcomeEmail({
         to: result.admin.email,
@@ -145,8 +175,10 @@ export const organizationService = {
       console.warn("Failed to send org admin welcome email", err);
     }
 
+    const organization = await organizationRepository.findById(result.organization.id);
+
     return {
-      organization: result.organization,
+      organization: organization ?? result.organization,
       admin: result.admin,
       temporaryPassword,
     };

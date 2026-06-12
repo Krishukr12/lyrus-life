@@ -18,6 +18,7 @@ import CalendarView from "@/pages/CalendarView";
 import Tasks from "@/pages/Tasks";
 import PlatformInsights from "@/pages/PlatformInsights";
 import Login from "@/pages/Login";
+import ImpersonatePage from "@/pages/ImpersonatePage";
 import AccountSuspendedPage from "@/pages/AccountSuspendedPage";
 import JoinMeeting from "@/pages/JoinMeeting";
 import MeetingRoom from "@/pages/MeetingRoom";
@@ -33,6 +34,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/auth/impersonate" element={<ImpersonatePage />} />
             <Route path="/account-suspended" element={<AccountSuspendedPage />} />
             <Route
               path="/org/*"

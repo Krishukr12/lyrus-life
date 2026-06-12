@@ -141,7 +141,96 @@ exports.Prisma.OrganizationBillingScalarFieldEnum = {
   billingStatus: 'billingStatus',
   billingCycle: 'billingCycle',
   nextBillingDate: 'nextBillingDate',
+  trialStartedAt: 'trialStartedAt',
+  trialEndsAt: 'trialEndsAt',
+  cancelledAt: 'cancelledAt',
+  currentPeriodStart: 'currentPeriodStart',
+  currentPeriodEnd: 'currentPeriodEnd',
+  discountPercent: 'discountPercent',
+  billingEmail: 'billingEmail',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.InvoiceScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  invoiceNumber: 'invoiceNumber',
+  status: 'status',
+  planName: 'planName',
+  billingCycle: 'billingCycle',
+  periodStart: 'periodStart',
+  periodEnd: 'periodEnd',
+  includedSeats: 'includedSeats',
+  activeSeats: 'activeSeats',
+  additionalSeats: 'additionalSeats',
+  includedLocations: 'includedLocations',
+  activeLocations: 'activeLocations',
+  subtotalInr: 'subtotalInr',
+  discountInr: 'discountInr',
+  gstInr: 'gstInr',
+  totalInr: 'totalInr',
+  billingAddress: 'billingAddress',
+  storageKey: 'storageKey',
+  storageBackend: 'storageBackend',
+  issuedAt: 'issuedAt',
+  dueAt: 'dueAt',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.InvoiceLineItemScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  description: 'description',
+  quantity: 'quantity',
+  unitPriceInr: 'unitPriceInr',
+  amountInr: 'amountInr',
+  sortOrder: 'sortOrder'
+};
+
+exports.Prisma.PaymentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  invoiceId: 'invoiceId',
+  amountInr: 'amountInr',
+  status: 'status',
+  method: 'method',
+  reference: 'reference',
+  notes: 'notes',
+  recordedById: 'recordedById',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.InvoiceDeliveryScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  organizationId: 'organizationId',
+  recipientEmail: 'recipientEmail',
+  status: 'status',
+  error: 'error',
+  sentAt: 'sentAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.BillingEventScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  type: 'type',
+  metadata: 'metadata',
+  actorId: 'actorId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PricingChangeLogScalarFieldEnum = {
+  id: 'id',
+  actorId: 'actorId',
+  actorName: 'actorName',
+  previous: 'previous',
+  next: 'next',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.OrganizationScalarFieldEnum = {
@@ -166,7 +255,8 @@ exports.Prisma.OrganizationScalarFieldEnum = {
   status: 'status',
   subscriptionPlan: 'subscriptionPlan',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  defaultMomTemplateId: 'defaultMomTemplateId'
 };
 
 exports.Prisma.UserScalarFieldEnum = {
@@ -234,7 +324,47 @@ exports.Prisma.MeetingScalarFieldEnum = {
   liveBroadcastAt: 'liveBroadcastAt',
   liveEndedAt: 'liveEndedAt',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  momTemplateId: 'momTemplateId'
+};
+
+exports.Prisma.MomTemplateScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  description: 'description',
+  category: 'category',
+  source: 'source',
+  isDefault: 'isDefault',
+  isArchived: 'isArchived',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MomTemplateSectionScalarFieldEnum = {
+  id: 'id',
+  templateId: 'templateId',
+  title: 'title',
+  description: 'description',
+  aiInstructions: 'aiInstructions',
+  isRequired: 'isRequired',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MomTemplateUploadScalarFieldEnum = {
+  id: 'id',
+  templateId: 'templateId',
+  organizationId: 'organizationId',
+  fileName: 'fileName',
+  mimeType: 'mimeType',
+  storageKey: 'storageKey',
+  storageBackend: 'storageBackend',
+  sizeBytes: 'sizeBytes',
+  extractedHeadings: 'extractedHeadings',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.MeetingInviteScalarFieldEnum = {
@@ -288,11 +418,13 @@ exports.Prisma.TranscriptSegmentScalarFieldEnum = {
 exports.Prisma.MomScalarFieldEnum = {
   id: 'id',
   meetingId: 'meetingId',
+  templateId: 'templateId',
   title: 'title',
   dateTime: 'dateTime',
   participants: 'participants',
   keyPoints: 'keyPoints',
   actionItems: 'actionItems',
+  sections: 'sections',
   approved: 'approved',
   approvedBy: 'approvedBy',
   approvedAt: 'approvedAt',
@@ -378,7 +510,35 @@ exports.BillingStatus = exports.$Enums.BillingStatus = {
   ACTIVE: 'ACTIVE',
   PENDING: 'PENDING',
   OVERDUE: 'OVERDUE',
-  TRIAL: 'TRIAL'
+  TRIAL: 'TRIAL',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.InvoiceStatus = exports.$Enums.InvoiceStatus = {
+  DRAFT: 'DRAFT',
+  ISSUED: 'ISSUED',
+  SENT: 'SENT',
+  PAID: 'PAID',
+  OVERDUE: 'OVERDUE',
+  VOID: 'VOID'
+};
+
+exports.TemplateFileStorageBackend = exports.$Enums.TemplateFileStorageBackend = {
+  LOCAL: 'LOCAL',
+  S3: 'S3'
+};
+
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
+  PENDING: 'PENDING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED'
+};
+
+exports.InvoiceDeliveryStatus = exports.$Enums.InvoiceDeliveryStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
 };
 
 exports.OrganizationStatus = exports.$Enums.OrganizationStatus = {
@@ -418,6 +578,23 @@ exports.MeetingTag = exports.$Enums.MeetingTag = {
   INTERNAL: 'INTERNAL',
   CLIENT: 'CLIENT',
   VENDOR: 'VENDOR'
+};
+
+exports.MomTemplateCategory = exports.$Enums.MomTemplateCategory = {
+  GENERAL_BUSINESS: 'GENERAL_BUSINESS',
+  ENGINEERING_STANDUP: 'ENGINEERING_STANDUP',
+  PROJECT_MANAGEMENT: 'PROJECT_MANAGEMENT',
+  SALES: 'SALES',
+  HR_INTERVIEW: 'HR_INTERVIEW',
+  LEADERSHIP_REVIEW: 'LEADERSHIP_REVIEW',
+  CONSULTING_REVIEW: 'CONSULTING_REVIEW',
+  CUSTOM: 'CUSTOM'
+};
+
+exports.MomTemplateSource = exports.$Enums.MomTemplateSource = {
+  PRESET: 'PRESET',
+  CUSTOM: 'CUSTOM',
+  UPLOADED: 'UPLOADED'
 };
 
 exports.InviteStatus = exports.$Enums.InviteStatus = {
@@ -463,12 +640,21 @@ exports.PipelineStep = exports.$Enums.PipelineStep = {
 exports.Prisma.ModelName = {
   PlatformPricingConfig: 'PlatformPricingConfig',
   OrganizationBilling: 'OrganizationBilling',
+  Invoice: 'Invoice',
+  InvoiceLineItem: 'InvoiceLineItem',
+  Payment: 'Payment',
+  InvoiceDelivery: 'InvoiceDelivery',
+  BillingEvent: 'BillingEvent',
+  PricingChangeLog: 'PricingChangeLog',
   Organization: 'Organization',
   User: 'User',
   EmployeeProfile: 'EmployeeProfile',
   TenantAuditLog: 'TenantAuditLog',
   AuthOtp: 'AuthOtp',
   Meeting: 'Meeting',
+  MomTemplate: 'MomTemplate',
+  MomTemplateSection: 'MomTemplateSection',
+  MomTemplateUpload: 'MomTemplateUpload',
   MeetingInvite: 'MeetingInvite',
   MeetingParticipant: 'MeetingParticipant',
   AudioFile: 'AudioFile',

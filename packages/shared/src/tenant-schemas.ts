@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { onboardingMomTemplatesSchema } from "./mom-template-schemas.js";
 import { indianPhoneSchema, optionalIndianPhoneSchema } from "./phone.js";
 
 export const tenantUserRoleSchema = z.enum([
@@ -54,11 +55,13 @@ export const createOrganizationSchema = z.object({
   address: z.string().max(500).optional(),
   timezone: z.string().max(80).default("Asia/Kolkata"),
   subscriptionPlan: subscriptionPlanSchema.default("STARTER"),
+  billingCycle: z.enum(["monthly", "yearly"]).default("monthly"),
   status: organizationStatusSchema.default("ACTIVE"),
   adminFirstName: z.string().min(1).max(80),
   adminLastName: z.string().min(1).max(80),
   adminEmail: z.string().email(),
   adminPhone: optionalIndianPhoneSchema,
+  momTemplates: onboardingMomTemplatesSchema.optional(),
 });
 
 export const updateOrganizationSettingsSchema = z.object({

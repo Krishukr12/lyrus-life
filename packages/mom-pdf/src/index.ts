@@ -6,10 +6,23 @@ export interface MomPdfActionItem {
   deadline: string;
 }
 
+export interface MomPdfSection {
+  title: string;
+  content: string[];
+}
+
+export interface MomPdfBranding {
+  brandName?: string;
+  tagline?: string;
+  accentRgb?: [number, number, number];
+}
+
 export interface MomPdfInput {
   meetingTitle: string;
   meetingDate: string;
   durationMinutes: number;
+  branding?: MomPdfBranding;
+  sections?: MomPdfSection[];
   mom: {
     createdAt: string;
     participants: string[];
@@ -59,9 +72,22 @@ function getTemplateFields(input: MomPdfInput) {
   };
 }
 
-/** Lyrus Life branded MOM PDF (same layout as the web review template). */
+function ensurePageSpace(pdf: jsPDF, y: number, needed: number, pageHeight: number): number {
+  if (y + needed > pageHeight - 48) {
+    pdf.addPage();
+    return 52;
+  }
+  return y;
+}
+
+/** Organization-configurable MOM PDF with optional template sections. */
 export function generateMomPdfBytes(input: MomPdfInput): Uint8Array {
   const fields = getTemplateFields(input);
+  const branding = input.branding ?? {};
+  const brandName = branding.brandName ?? "LYRUS";
+  const tagline = branding.tagline ?? "Think • Design • Deliver";
+  const accent = branding.accentRgb ?? [28, 141, 149];
+
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
   const left = 48;
   let y = 52;
@@ -72,14 +98,14 @@ export function generateMomPdfBytes(input: MomPdfInput): Uint8Array {
   pdf.setLineWidth(0.6);
   pdf.rect(24, 24, pageWidth - 48, pageHeight - 48);
 
-  pdf.setTextColor(28, 141, 149);
+  pdf.setTextColor(accent[0], accent[1], accent[2]);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(18);
-  pdf.text("LYRUS", 297, y, { align: "center" });
+  pdf.text(brandName.toUpperCase(), 297, y, { align: "center" });
   y += 14;
   pdf.setFont("helvetica", "italic");
   pdf.setFontSize(9);
-  pdf.text("Think • Design • Deliver", 297, y, { align: "center" });
+  pdf.text(tagline, 297, y, { align: "center" });
   y += 22;
 
   pdf.setTextColor(0, 0, 0);
@@ -106,66 +132,47 @@ export function generateMomPdfBytes(input: MomPdfInput): Uint8Array {
   y += 16;
   pdf.setFont("helvetica", "normal");
   fields.attendees.forEach((attendee, index) => {
+    y = ensurePageSpace(pdf, y, 14, pageHeight);
     pdf.text(`${index + 1}. ${attendee}`, left + 14, y);
     y += 14;
   });
 
-  y += 8;
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Key Discussion Points", left, y);
-  y += 16;
-  pdf.setFont("helvetica", "normal");
-  fields.keyPoints.forEach((point) => {
-    const wrapped = pdf.splitTextToSize(`[${point}]`, 500);
-    pdf.text(wrapped, left + 14, y);
-    y += 14 * wrapped.length;
-  });
+  const templateSections =
+    input.sections && input.sections.length > 0
+      ? input.sections
+      : [
+          { title: "Key Discussion Points", content: fields.keyPoints },
+          {
+            title: "Action Items",
+            content: fields.actionItems.map(
+              (item) =>
+                `${item.slNo}. ${item.actionItem} — ${item.responsibility} (${item.timeline})`,
+            ),
+          },
+          { title: "Next Steps", content: fields.nextSteps },
+        ];
 
-  y += 10;
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Action Items", left, y);
-  y += 18;
-
-  const headers = ["Sl No", "Action Item", "Responsibility", "Status", "Timeline"];
-  const widths = [44, 204, 100, 70, 80];
-  let x = left;
-  pdf.setFontSize(10);
-  pdf.setFont("helvetica", "bold");
-  headers.forEach((header, i) => {
-    pdf.rect(x, y, widths[i], 20);
-    pdf.text(header, x + 4, y + 14);
-    x += widths[i];
-  });
-  y += 20;
-
-  pdf.setFont("helvetica", "normal");
-  fields.actionItems.forEach((item) => {
-    const row = [String(item.slNo), item.actionItem, item.responsibility, item.status, item.timeline];
-    x = left;
-    row.forEach((cell, i) => {
-      pdf.rect(x, y, widths[i], 22);
-      const text = pdf.splitTextToSize(cell, widths[i] - 8)[0] ?? "";
-      pdf.text(text, x + 4, y + 14);
-      x += widths[i];
-    });
-    y += 22;
-  });
-
-  y += 14;
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Next Steps", left, y);
-  y += 16;
-  pdf.setFont("helvetica", "normal");
-  fields.nextSteps.forEach((step) => {
-    pdf.text(`[${step}]`, left + 14, y);
-    y += 14;
-  });
+  for (const section of templateSections) {
+    y += 10;
+    y = ensurePageSpace(pdf, y, 30, pageHeight);
+    pdf.setFont("helvetica", "bold");
+    pdf.text(section.title, left, y);
+    y += 16;
+    pdf.setFont("helvetica", "normal");
+    const bullets = section.content.length > 0 ? section.content : ["—"];
+    for (const point of bullets) {
+      const wrapped = pdf.splitTextToSize(`• ${point}`, 500);
+      y = ensurePageSpace(pdf, y, 14 * wrapped.length, pageHeight);
+      pdf.text(wrapped, left + 14, y);
+      y += 14 * wrapped.length;
+    }
+  }
 
   y += 18;
+  y = ensurePageSpace(pdf, y, 20, pageHeight);
   pdf.setFont("helvetica", "italic");
   pdf.setFontSize(9);
   pdf.text(`Generated On: ${fields.generatedOn}`, left, y);
-  pdf.text("Page 1 of 1", pageWidth - 60, pageHeight - 32, { align: "right" });
 
   return new Uint8Array(pdf.output("arraybuffer"));
 }

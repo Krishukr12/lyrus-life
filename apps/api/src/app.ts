@@ -12,6 +12,8 @@ import { createAdminOrganizationsRouter } from "./routes/admin/organizations.js"
 import { createAdminOrganizationDetailRouter } from "./routes/admin/organization-detail.js";
 import { createAdminBillingRouter } from "./routes/admin/billing.js";
 import { createAdminDashboardRouter } from "./routes/admin/dashboard.js";
+import { createAdminMomTemplatesRouter } from "./routes/admin/mom-templates.js";
+import { MomTemplateServiceError } from "./services/mom-template.service.js";
 import { createOrganizationUsersRouter } from "./routes/organization/users.js";
 import { createOrganizationSettingsRouter } from "./routes/organization/settings.js";
 import { PlanLimitError } from "./lib/plan-limits.js";
@@ -46,6 +48,7 @@ export function createApp(corsOrigins: string[]): Express {
   protectedApi.use(createAdminOrganizationDetailRouter());
   protectedApi.use(createAdminDashboardRouter());
   protectedApi.use(createAdminBillingRouter());
+  protectedApi.use(createAdminMomTemplatesRouter());
   protectedApi.use(createOrganizationUsersRouter());
   protectedApi.use(createOrganizationSettingsRouter());
   protectedApi.use(createMeetingsRouter());
@@ -69,6 +72,10 @@ export function createApp(corsOrigins: string[]): Express {
       return;
     }
     if (err instanceof PlanLimitError) {
+      res.status(err.statusCode).json({ error: err.code, message: err.message });
+      return;
+    }
+    if (err instanceof MomTemplateServiceError) {
       res.status(err.statusCode).json({ error: err.code, message: err.message });
       return;
     }

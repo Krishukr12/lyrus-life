@@ -1,3 +1,4 @@
+import { Building2, CalendarClock, FlaskConical, IndianRupee } from "lucide-react";
 import { ExecutiveMetricCard } from "@/components/admin/ExecutiveMetricCard";
 import type { CustomerBillingRow } from "@/lib/billing-types";
 import { formatInr } from "@/lib/format-inr";
@@ -15,20 +16,23 @@ export function RevenueSummaryCards({
   const stats = computeRevenueSummary(items);
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-6">
+    <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <ExecutiveMetricCard
         label="Total MRR (INR)"
         value={loading ? "—" : formatInr(stats.mrr)}
         trendLabel="Active subscriptions"
         loading={loading}
-        accent="emerald"
+        accent="blue"
+        featured
+        icon={IndianRupee}
       />
       <ExecutiveMetricCard
         label="Active customers"
         value={loading ? "—" : stats.activeCustomers}
         trendLabel="Paying tenants"
         loading={loading}
-        accent="blue"
+        accent="emerald"
+        icon={Building2}
       />
       <ExecutiveMetricCard
         label="Trial customers"
@@ -36,6 +40,7 @@ export function RevenueSummaryCards({
         trendLabel="On free trial"
         loading={loading}
         accent="violet"
+        icon={FlaskConical}
       />
       <ExecutiveMetricCard
         label="Expected next billing (INR)"
@@ -43,6 +48,7 @@ export function RevenueSummaryCards({
         trendLabel="Next 30 days"
         loading={loading}
         accent="amber"
+        icon={CalendarClock}
       />
     </div>
   );

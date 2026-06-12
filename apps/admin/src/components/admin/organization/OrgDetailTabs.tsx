@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
   Activity,
+  ArrowUpRight,
   BarChart3,
   Building2,
   CreditCard,
@@ -16,7 +18,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/admin/EmptyState";
+import { BillingStatusPill } from "@/components/admin/billing/BillingStatusPill";
+import { CustomerBillingDashboardDialog } from "@/components/admin/billing/CustomerBillingDashboardDialog";
 import { PlanBadge } from "@/components/admin/billing/PlanBadge";
+import { RecordPaymentDialog } from "@/components/admin/billing/RecordPaymentDialog";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +48,9 @@ const TAB_ITEMS = [
   { value: "settings", label: "Settings", icon: Settings },
 ] as const;
 
+const overviewCardShell =
+  "overflow-hidden rounded-[28px] border border-slate-100/80 bg-white shadow-[0_4px_24px_rgba(15,23,42,0.06)]";
+
 function OverviewCard({
   title,
   icon: Icon,
@@ -55,20 +63,26 @@ function OverviewCard({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-[22px] border border-slate-200/80 bg-white",
-        "shadow-[0_1px_2px_rgba(15,23,42,0.04),0_6px_20px_rgba(15,23,42,0.05)]",
-        className,
-      )}
-    >
-      <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/50 px-5 py-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm ring-1 ring-slate-200/80">
-          <Icon className="h-4 w-4" />
+    <div className={cn(overviewCardShell, className)}>
+      <div className="flex items-center justify-between gap-3 px-6 py-5">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+            <Icon className="h-5 w-5" strokeWidth={1.75} />
+          </div>
+          <h3 className="truncate text-base font-semibold tracking-tight text-slate-900">
+            {title}
+          </h3>
         </div>
-        <h3 className="text-sm font-bold tracking-tight text-slate-900">{title}</h3>
+        <button
+          type="button"
+          aria-hidden
+          tabIndex={-1}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+        >
+          <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
+        </button>
       </div>
-      <div className="p-5">{children}</div>
+      <div className="px-6 pb-6">{children}</div>
     </div>
   );
 }
@@ -135,16 +149,28 @@ export function OrgOverviewTab({ detail }: { detail: OrganizationDetail }) {
           <UsageStat label="Meetings" value={usage.totalMeetings} />
         </div>
         <InfoItem
-          label="User limit"
-          value={subscription?.userLimit != null ? String(subscription.userLimit) : "Unlimited"}
+          label="Included users"
+          value={subscription ? String(subscription.includedUsers) : null}
+        />
+        <InfoItem
+          label="Additional users"
+          value={subscription ? String(subscription.additionalUsers) : null}
         />
         <InfoItem label="Current users" value={String(subscription?.activeUsers ?? usage.totalEmployees)} />
+        <InfoItem
+          label="Meeting usage"
+          value={
+            subscription
+              ? `${subscription.totalMeetings}${subscription.meetingLimit != null ? ` / ${subscription.meetingLimit}` : ""}`
+              : String(usage.totalMeetings)
+          }
+        />
         <InfoItem label="Created" value={format(new Date(org.createdAt), "MMM d, yyyy")} />
       </OverviewCard>
 
       <OverviewCard title="Admin Information" icon={Shield}>
-        <div className="mb-4 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/60 p-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-sm font-bold text-white">
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-slate-100/80 bg-white p-3 shadow-[0_2px_12px_rgba(15,23,42,0.04)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#3B82F6] text-sm font-bold text-white">
             {(admin?.name ?? org.primaryContactName ?? "A").charAt(0)}
           </div>
           <div>
@@ -187,8 +213,8 @@ export function OrgOverviewTab({ detail }: { detail: OrganizationDetail }) {
 
 function UsageStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/30 px-3 py-3 text-center">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+    <div className="rounded-2xl border border-slate-100/80 bg-white px-3 py-3 text-center shadow-[0_2px_12px_rgba(15,23,42,0.04)]">
+      <p className="text-[10px] font-medium text-slate-400">{label}</p>
       <p className="mt-1 text-xl font-bold tabular-nums text-slate-900">{value}</p>
     </div>
   );
@@ -263,8 +289,8 @@ export function OrgEmployeesTab({ organizationId }: { organizationId: string }) 
   }
 
   return (
-    <div className="overflow-hidden rounded-[22px] border border-slate-200/80 bg-white shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4">
+    <div className={overviewCardShell}>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-5">
         <Input
           placeholder="Search employees…"
           value={search}
@@ -418,8 +444,8 @@ export function OrgMeetingsTab({ organizationId }: { organizationId: string }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-[22px] border border-slate-200/80 bg-white shadow-sm">
-      <div className="border-b border-slate-100 p-4">
+    <div className={overviewCardShell}>
+      <div className="border-b border-slate-100 px-6 py-5">
         <Input
           placeholder="Search meetings…"
           value={search}
@@ -467,7 +493,21 @@ export function OrgMeetingsTab({ organizationId }: { organizationId: string }) {
 }
 
 export function OrgSubscriptionTab({ detail }: { detail: OrganizationDetail }) {
+  const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const org = detail.organization;
   const sub = detail.subscription;
+
+  const sendInvoice = useMutation({
+    mutationFn: () => adminApi.sendLatestInvoice(org.id),
+    onSuccess: () => {
+      toast.success("Invoice generated and sent");
+      void queryClient.invalidateQueries({ queryKey: ["admin", "organization", org.id] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (!sub) {
     return (
       <EmptyState
@@ -477,24 +517,108 @@ export function OrgSubscriptionTab({ detail }: { detail: OrganizationDetail }) {
       />
     );
   }
+
+  const billingRow = {
+    organizationId: org.id,
+    organizationName: org.name,
+    slug: org.slug,
+    currentPlan: sub.plan,
+    currentPlanLabel: sub.planLabel,
+    activeUsers: sub.activeUsers,
+    activeLocations: 0,
+    billingCycle: sub.billingCycle,
+    monthlyAmountInr: sub.monthlyAmountInr,
+    gstInr: sub.totalAmountInr - sub.monthlyAmountInr,
+    totalAmountInr: sub.totalAmountInr,
+    billingStatus: sub.billingStatus,
+    nextBillingDate: sub.nextBillingDate,
+    breakdown: {
+      basePlanInr: 0,
+      extraUsers: sub.additionalUsers,
+      extraUsersCostInr: 0,
+      extraLocations: 0,
+      extraLocationsCostInr: 0,
+      monthlySubtotalInr: sub.monthlyAmountInr,
+      gstInr: sub.totalAmountInr - sub.monthlyAmountInr,
+      totalInr: sub.totalAmountInr,
+    },
+  };
+
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      <OverviewCard title="Billing Overview" icon={CreditCard}>
-        <InfoItem label="Current plan" value={sub.planLabel} />
-        <InfoItem label="Status" value={sub.billingStatus} />
-        <InfoItem label="Billing cycle" value={sub.billingCycle} />
-        <InfoItem
-          label="Renewal date"
-          value={sub.nextBillingDate ? format(new Date(sub.nextBillingDate), "MMM d, yyyy") : null}
-        />
-      </OverviewCard>
-      <OverviewCard title="Revenue & Limits" icon={BarChart3}>
-        <InfoItem label="Monthly amount (INR)" value={formatInr(sub.monthlyAmountInr)} />
-        <InfoItem label="Total with GST (INR)" value={formatInr(sub.totalAmountInr)} />
-        <InfoItem label="User limit" value={sub.userLimit != null ? String(sub.userLimit) : "Unlimited"} />
-        <InfoItem label="Current users" value={String(sub.activeUsers)} />
-      </OverviewCard>
-    </div>
+    <>
+      <div className="mb-4 flex flex-wrap gap-2">
+        <Button
+          type="button"
+          className="bg-blue-600 hover:bg-blue-700"
+          disabled={sendInvoice.isPending}
+          onClick={() => sendInvoice.mutate()}
+        >
+          <Mail className="h-4 w-4 mr-2" />
+          {sendInvoice.isPending ? "Sending…" : "Send invoice"}
+        </Button>
+        <Button type="button" variant="outline" onClick={() => setDashboardOpen(true)}>
+          <BarChart3 className="h-4 w-4 mr-2" />
+          Billing dashboard
+        </Button>
+        <Button type="button" variant="outline" onClick={() => setPaymentOpen(true)}>
+          Record payment
+        </Button>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <OverviewCard title="Billing Overview" icon={CreditCard}>
+          <div className="mb-4 flex flex-wrap gap-2">
+            <PlanBadge plan={sub.plan} />
+            <BillingStatusPill status={sub.billingStatus} />
+          </div>
+          <InfoItem label="Current plan" value={sub.planLabel} />
+          <InfoItem label="Billing cycle" value={sub.billingCycle} />
+          <InfoItem
+            label="Renewal date"
+            value={sub.nextBillingDate ? format(new Date(sub.nextBillingDate), "MMM d, yyyy") : null}
+          />
+          {sub.trialEndsAt ? (
+            <InfoItem
+              label="Trial ends"
+              value={format(new Date(sub.trialEndsAt), "MMM d, yyyy")}
+            />
+          ) : null}
+        </OverviewCard>
+        <OverviewCard title="Revenue & Seats" icon={BarChart3}>
+          <InfoItem label="Monthly amount (INR)" value={formatInr(sub.monthlyAmountInr)} />
+          <InfoItem label="Annual cost (INR)" value={formatInr(sub.annualCostInr)} />
+          <InfoItem label="Total with GST (INR)" value={formatInr(sub.totalAmountInr)} />
+          <InfoItem label="Included users" value={String(sub.includedUsers)} />
+          <InfoItem label="Active users" value={String(sub.activeUsers)} />
+          <InfoItem label="Additional users" value={String(sub.additionalUsers)} />
+          <InfoItem
+            label="Meetings"
+            value={
+              sub.meetingLimit != null
+                ? `${sub.totalMeetings} / ${sub.meetingLimit}`
+                : String(sub.totalMeetings)
+            }
+          />
+        </OverviewCard>
+      </div>
+
+      <CustomerBillingDashboardDialog
+        open={dashboardOpen}
+        onOpenChange={setDashboardOpen}
+        row={billingRow}
+      />
+
+      <RecordPaymentDialog
+        open={paymentOpen}
+        onOpenChange={setPaymentOpen}
+        organizationId={org.id}
+        organizationName={org.name}
+        suggestedAmountInr={sub.totalAmountInr}
+        onSaved={() =>
+          void queryClient.invalidateQueries({ queryKey: ["admin", "organization", org.id] })
+        }
+      />
+    </>
   );
 }
 
@@ -515,7 +639,7 @@ export function OrgActivityTab({ organizationId }: { organizationId: string }) {
   }
 
   return (
-    <div className="divide-y divide-slate-100 overflow-hidden rounded-[22px] border border-slate-200/80 bg-white shadow-sm">
+    <div className={cn("divide-y divide-slate-100", overviewCardShell)}>
       {isLoading ? (
         <p className="p-6 text-sm text-slate-500">Loading activity…</p>
       ) : (
@@ -579,7 +703,7 @@ export function OrgSettingsTab({
   );
 
   return (
-    <div className="max-w-2xl space-y-4 rounded-[22px] border border-slate-200/80 bg-white p-6 shadow-sm">
+    <div className={cn("max-w-2xl space-y-4 p-6", overviewCardShell)}>
       <div className="grid gap-4 sm:grid-cols-2">
         {field("name", "Organization name")}
         {field("industry", "Industry")}
@@ -600,6 +724,8 @@ export function OrgSettingsTab({
   );
 }
 
+const TAB_VALUES = new Set(TAB_ITEMS.map((t) => t.value));
+
 export function OrgDetailTabs({
   detail,
   organizationId,
@@ -609,8 +735,19 @@ export function OrgDetailTabs({
   organizationId: string;
   defaultTab?: string;
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const activeTab =
+    tabParam && TAB_VALUES.has(tabParam as (typeof TAB_ITEMS)[number]["value"])
+      ? tabParam
+      : defaultTab;
+
   return (
-    <Tabs defaultValue={defaultTab} className="space-y-6">
+    <Tabs
+      value={activeTab}
+      onValueChange={(value) => setSearchParams({ tab: value }, { replace: true })}
+      className="space-y-6"
+    >
       <TabsList className="flex h-auto w-full flex-wrap gap-1 rounded-[18px] border border-slate-200/80 bg-slate-100/60 p-1.5 shadow-inner">
         {TAB_ITEMS.map(({ value, label, icon: Icon }) => (
           <TabsTrigger

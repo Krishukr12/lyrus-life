@@ -33,6 +33,7 @@ const STATUS_OPTIONS = [
   { value: "PENDING", label: "Pending" },
   { value: "OVERDUE", label: "Overdue" },
   { value: "TRIAL", label: "Trial" },
+  { value: "CANCELLED", label: "Cancelled" },
 ];
 
 export function EditBillingDialog({
@@ -53,6 +54,8 @@ export function EditBillingDialog({
       billingCycle: "monthly",
       billingStatus: "PENDING",
       activeLocations: 0,
+      discountPercent: 0,
+      billingEmail: "",
       nextBillingDate: "",
     },
   });
@@ -64,6 +67,8 @@ export function EditBillingDialog({
       billingCycle: row.billingCycle as EditBillingFormValues["billingCycle"],
       billingStatus: row.billingStatus as EditBillingFormValues["billingStatus"],
       activeLocations: row.activeLocations,
+      discountPercent: 0,
+      billingEmail: "",
       nextBillingDate: row.nextBillingDate
         ? row.nextBillingDate.slice(0, 10)
         : "",
@@ -77,6 +82,8 @@ export function EditBillingDialog({
         billingCycle: values.billingCycle,
         billingStatus: values.billingStatus,
         activeLocations: values.activeLocations,
+        discountPercent: values.discountPercent,
+        billingEmail: values.billingEmail || null,
         nextBillingDate: values.nextBillingDate || null,
       }),
     onSuccess: () => {
@@ -122,6 +129,18 @@ export function EditBillingDialog({
               name="activeLocations"
               label="Active parking locations"
               type="number"
+            />
+            <FormInput
+              control={form.control}
+              name="discountPercent"
+              label="Discount (%)"
+              type="number"
+            />
+            <FormInput
+              control={form.control}
+              name="billingEmail"
+              label="Billing email"
+              type="email"
             />
             <FormInput
               control={form.control}

@@ -64,9 +64,14 @@ export type OrganizationDetail = {
     billingStatus: string;
     billingCycle: string;
     nextBillingDate: string | null;
+    trialEndsAt: string | null;
     monthlyAmountInr: number;
+    annualCostInr: number;
     totalAmountInr: number;
     activeUsers: number;
-    userLimit: number | null;
+    includedUsers: number;
+    additionalUsers: number;
+    meetingLimit: number | null;
+    totalMeetings: number;
   } | null;
 };

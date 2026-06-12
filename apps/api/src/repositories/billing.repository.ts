@@ -1,7 +1,7 @@
 import { prisma, type Prisma } from "@lyrus/db";
 import { DEFAULT_PLATFORM_PRICING } from "../lib/billing-defaults.js";
 
-export type BillingStatusValue = "ACTIVE" | "PENDING" | "OVERDUE" | "TRIAL";
+export type BillingStatusValue = "ACTIVE" | "PENDING" | "OVERDUE" | "TRIAL" | "CANCELLED";
 
 export type PricingConfigUpdate = {
   starterMonthlyInr: number;
@@ -94,6 +94,13 @@ export const billingRepository = {
       billingStatus?: BillingStatusValue;
       billingCycle?: string;
       nextBillingDate?: Date | null;
+      trialStartedAt?: Date | null;
+      trialEndsAt?: Date | null;
+      cancelledAt?: Date | null;
+      currentPeriodStart?: Date | null;
+      currentPeriodEnd?: Date | null;
+      discountPercent?: number;
+      billingEmail?: string | null;
     },
   ) {
     return prisma.organizationBilling.upsert({
@@ -104,12 +111,28 @@ export const billingRepository = {
         billingStatus: data.billingStatus ?? "PENDING",
         billingCycle: data.billingCycle ?? "monthly",
         nextBillingDate: data.nextBillingDate ?? null,
+        trialStartedAt: data.trialStartedAt ?? null,
+        trialEndsAt: data.trialEndsAt ?? null,
+        cancelledAt: data.cancelledAt ?? null,
+        currentPeriodStart: data.currentPeriodStart ?? null,
+        currentPeriodEnd: data.currentPeriodEnd ?? null,
+        discountPercent: data.discountPercent ?? 0,
+        billingEmail: data.billingEmail ?? null,
       },
       update: {
         ...(data.activeLocations !== undefined ? { activeLocations: data.activeLocations } : {}),
         ...(data.billingStatus !== undefined ? { billingStatus: data.billingStatus } : {}),
         ...(data.billingCycle !== undefined ? { billingCycle: data.billingCycle } : {}),
         ...(data.nextBillingDate !== undefined ? { nextBillingDate: data.nextBillingDate } : {}),
+        ...(data.trialStartedAt !== undefined ? { trialStartedAt: data.trialStartedAt } : {}),
+        ...(data.trialEndsAt !== undefined ? { trialEndsAt: data.trialEndsAt } : {}),
+        ...(data.cancelledAt !== undefined ? { cancelledAt: data.cancelledAt } : {}),
+        ...(data.currentPeriodStart !== undefined
+          ? { currentPeriodStart: data.currentPeriodStart }
+          : {}),
+        ...(data.currentPeriodEnd !== undefined ? { currentPeriodEnd: data.currentPeriodEnd } : {}),
+        ...(data.discountPercent !== undefined ? { discountPercent: data.discountPercent } : {}),
+        ...(data.billingEmail !== undefined ? { billingEmail: data.billingEmail } : {}),
       },
     });
   },

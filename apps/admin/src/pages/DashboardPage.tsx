@@ -91,7 +91,8 @@ export default function DashboardPage() {
           trendLabel={`${data?.billing.activeSubscriptions ?? 0} paying customers`}
           description={`${data?.billing.trialAccounts ?? "—"} on trial`}
           loading={dashboardQuery.isLoading}
-          accent="amber"
+          accent="blue"
+          featured
           icon={IndianRupee}
         />
       </section>

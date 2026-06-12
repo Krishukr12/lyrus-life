@@ -15,7 +15,12 @@ export async function sendMomToStakeholdersOnApproval(
 ): Promise<InviteResult[]> {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
-    include: { participants: true, organizer: true, mom: true },
+    include: {
+      participants: true,
+      organizer: true,
+      mom: true,
+      organization: { select: { name: true } },
+    },
   });
 
   if (!meeting?.mom) {
@@ -38,6 +43,9 @@ export async function sendMomToStakeholdersOnApproval(
   const actionItems = Array.isArray(meeting.mom.actionItems)
     ? (meeting.mom.actionItems as unknown as MomPdfActionItem[])
     : [];
+  const sections = Array.isArray(meeting.mom.sections)
+    ? (meeting.mom.sections as Array<{ title: string; content: string[] }>)
+    : undefined;
 
   const { date } = formatDateTime(meeting.scheduledAt);
   const organizerEmail = meeting.organizer?.email ?? getOrganizerEmail();
@@ -51,6 +59,10 @@ export async function sendMomToStakeholdersOnApproval(
       meetingTitle: meeting.title,
       meetingDate: date,
       durationMinutes: meeting.durationMinutes,
+      branding: meeting.organization?.name
+        ? { brandName: meeting.organization.name, tagline: "Minutes of Meeting" }
+        : undefined,
+      sections,
       mom: {
         createdAt: meeting.mom.createdAt.toISOString(),
         participants: Array.isArray(meeting.mom.participants)

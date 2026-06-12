@@ -17,8 +17,10 @@ export type PricingConfigFormValues = z.infer<typeof pricingConfigFormSchema>;
 export const editBillingSchema = z.object({
   subscriptionPlan: z.enum(["STARTER", "PROFESSIONAL", "ENTERPRISE"]),
   billingCycle: z.enum(["monthly", "yearly"]),
-  billingStatus: z.enum(["ACTIVE", "PENDING", "OVERDUE", "TRIAL"]),
+  billingStatus: z.enum(["ACTIVE", "PENDING", "OVERDUE", "TRIAL", "CANCELLED"]),
   activeLocations: z.coerce.number().int().min(0).max(10_000),
+  discountPercent: z.coerce.number().min(0).max(100).optional(),
+  billingEmail: z.union([z.string().email(), z.literal("")]).optional(),
   nextBillingDate: z.string().optional(),
 });
 

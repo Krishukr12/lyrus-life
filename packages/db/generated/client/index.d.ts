@@ -24,6 +24,36 @@ export type PlatformPricingConfig = $Result.DefaultSelection<Prisma.$PlatformPri
  */
 export type OrganizationBilling = $Result.DefaultSelection<Prisma.$OrganizationBillingPayload>
 /**
+ * Model Invoice
+ * 
+ */
+export type Invoice = $Result.DefaultSelection<Prisma.$InvoicePayload>
+/**
+ * Model InvoiceLineItem
+ * 
+ */
+export type InvoiceLineItem = $Result.DefaultSelection<Prisma.$InvoiceLineItemPayload>
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = $Result.DefaultSelection<Prisma.$PaymentPayload>
+/**
+ * Model InvoiceDelivery
+ * 
+ */
+export type InvoiceDelivery = $Result.DefaultSelection<Prisma.$InvoiceDeliveryPayload>
+/**
+ * Model BillingEvent
+ * 
+ */
+export type BillingEvent = $Result.DefaultSelection<Prisma.$BillingEventPayload>
+/**
+ * Model PricingChangeLog
+ * 
+ */
+export type PricingChangeLog = $Result.DefaultSelection<Prisma.$PricingChangeLogPayload>
+/**
  * Model Organization
  * 
  */
@@ -53,6 +83,21 @@ export type AuthOtp = $Result.DefaultSelection<Prisma.$AuthOtpPayload>
  * 
  */
 export type Meeting = $Result.DefaultSelection<Prisma.$MeetingPayload>
+/**
+ * Model MomTemplate
+ * 
+ */
+export type MomTemplate = $Result.DefaultSelection<Prisma.$MomTemplatePayload>
+/**
+ * Model MomTemplateSection
+ * 
+ */
+export type MomTemplateSection = $Result.DefaultSelection<Prisma.$MomTemplateSectionPayload>
+/**
+ * Model MomTemplateUpload
+ * 
+ */
+export type MomTemplateUpload = $Result.DefaultSelection<Prisma.$MomTemplateUploadPayload>
 /**
  * Model MeetingInvite
  * 
@@ -224,10 +269,73 @@ export const BillingStatus: {
   ACTIVE: 'ACTIVE',
   PENDING: 'PENDING',
   OVERDUE: 'OVERDUE',
-  TRIAL: 'TRIAL'
+  TRIAL: 'TRIAL',
+  CANCELLED: 'CANCELLED'
 };
 
 export type BillingStatus = (typeof BillingStatus)[keyof typeof BillingStatus]
+
+
+export const InvoiceStatus: {
+  DRAFT: 'DRAFT',
+  ISSUED: 'ISSUED',
+  SENT: 'SENT',
+  PAID: 'PAID',
+  OVERDUE: 'OVERDUE',
+  VOID: 'VOID'
+};
+
+export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus]
+
+
+export const PaymentStatus: {
+  PENDING: 'PENDING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED'
+};
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const InvoiceDeliveryStatus: {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+};
+
+export type InvoiceDeliveryStatus = (typeof InvoiceDeliveryStatus)[keyof typeof InvoiceDeliveryStatus]
+
+
+export const MomTemplateCategory: {
+  GENERAL_BUSINESS: 'GENERAL_BUSINESS',
+  ENGINEERING_STANDUP: 'ENGINEERING_STANDUP',
+  PROJECT_MANAGEMENT: 'PROJECT_MANAGEMENT',
+  SALES: 'SALES',
+  HR_INTERVIEW: 'HR_INTERVIEW',
+  LEADERSHIP_REVIEW: 'LEADERSHIP_REVIEW',
+  CONSULTING_REVIEW: 'CONSULTING_REVIEW',
+  CUSTOM: 'CUSTOM'
+};
+
+export type MomTemplateCategory = (typeof MomTemplateCategory)[keyof typeof MomTemplateCategory]
+
+
+export const MomTemplateSource: {
+  PRESET: 'PRESET',
+  CUSTOM: 'CUSTOM',
+  UPLOADED: 'UPLOADED'
+};
+
+export type MomTemplateSource = (typeof MomTemplateSource)[keyof typeof MomTemplateSource]
+
+
+export const TemplateFileStorageBackend: {
+  LOCAL: 'LOCAL',
+  S3: 'S3'
+};
+
+export type TemplateFileStorageBackend = (typeof TemplateFileStorageBackend)[keyof typeof TemplateFileStorageBackend]
 
 }
 
@@ -278,6 +386,30 @@ export const SubscriptionPlan: typeof $Enums.SubscriptionPlan
 export type BillingStatus = $Enums.BillingStatus
 
 export const BillingStatus: typeof $Enums.BillingStatus
+
+export type InvoiceStatus = $Enums.InvoiceStatus
+
+export const InvoiceStatus: typeof $Enums.InvoiceStatus
+
+export type PaymentStatus = $Enums.PaymentStatus
+
+export const PaymentStatus: typeof $Enums.PaymentStatus
+
+export type InvoiceDeliveryStatus = $Enums.InvoiceDeliveryStatus
+
+export const InvoiceDeliveryStatus: typeof $Enums.InvoiceDeliveryStatus
+
+export type MomTemplateCategory = $Enums.MomTemplateCategory
+
+export const MomTemplateCategory: typeof $Enums.MomTemplateCategory
+
+export type MomTemplateSource = $Enums.MomTemplateSource
+
+export const MomTemplateSource: typeof $Enums.MomTemplateSource
+
+export type TemplateFileStorageBackend = $Enums.TemplateFileStorageBackend
+
+export const TemplateFileStorageBackend: typeof $Enums.TemplateFileStorageBackend
 
 /**
  * ##  Prisma Client ʲˢ
@@ -421,6 +553,66 @@ export class PrismaClient<
   get organizationBilling(): Prisma.OrganizationBillingDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.invoice`: Exposes CRUD operations for the **Invoice** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Invoices
+    * const invoices = await prisma.invoice.findMany()
+    * ```
+    */
+  get invoice(): Prisma.InvoiceDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.invoiceLineItem`: Exposes CRUD operations for the **InvoiceLineItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more InvoiceLineItems
+    * const invoiceLineItems = await prisma.invoiceLineItem.findMany()
+    * ```
+    */
+  get invoiceLineItem(): Prisma.InvoiceLineItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.payment`: Exposes CRUD operations for the **Payment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Payments
+    * const payments = await prisma.payment.findMany()
+    * ```
+    */
+  get payment(): Prisma.PaymentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.invoiceDelivery`: Exposes CRUD operations for the **InvoiceDelivery** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more InvoiceDeliveries
+    * const invoiceDeliveries = await prisma.invoiceDelivery.findMany()
+    * ```
+    */
+  get invoiceDelivery(): Prisma.InvoiceDeliveryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.billingEvent`: Exposes CRUD operations for the **BillingEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BillingEvents
+    * const billingEvents = await prisma.billingEvent.findMany()
+    * ```
+    */
+  get billingEvent(): Prisma.BillingEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.pricingChangeLog`: Exposes CRUD operations for the **PricingChangeLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PricingChangeLogs
+    * const pricingChangeLogs = await prisma.pricingChangeLog.findMany()
+    * ```
+    */
+  get pricingChangeLog(): Prisma.PricingChangeLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.organization`: Exposes CRUD operations for the **Organization** model.
     * Example usage:
     * ```ts
@@ -479,6 +671,36 @@ export class PrismaClient<
     * ```
     */
   get meeting(): Prisma.MeetingDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.momTemplate`: Exposes CRUD operations for the **MomTemplate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MomTemplates
+    * const momTemplates = await prisma.momTemplate.findMany()
+    * ```
+    */
+  get momTemplate(): Prisma.MomTemplateDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.momTemplateSection`: Exposes CRUD operations for the **MomTemplateSection** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MomTemplateSections
+    * const momTemplateSections = await prisma.momTemplateSection.findMany()
+    * ```
+    */
+  get momTemplateSection(): Prisma.MomTemplateSectionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.momTemplateUpload`: Exposes CRUD operations for the **MomTemplateUpload** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MomTemplateUploads
+    * const momTemplateUploads = await prisma.momTemplateUpload.findMany()
+    * ```
+    */
+  get momTemplateUpload(): Prisma.MomTemplateUploadDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.meetingInvite`: Exposes CRUD operations for the **MeetingInvite** model.
@@ -1015,12 +1237,21 @@ export namespace Prisma {
   export const ModelName: {
     PlatformPricingConfig: 'PlatformPricingConfig',
     OrganizationBilling: 'OrganizationBilling',
+    Invoice: 'Invoice',
+    InvoiceLineItem: 'InvoiceLineItem',
+    Payment: 'Payment',
+    InvoiceDelivery: 'InvoiceDelivery',
+    BillingEvent: 'BillingEvent',
+    PricingChangeLog: 'PricingChangeLog',
     Organization: 'Organization',
     User: 'User',
     EmployeeProfile: 'EmployeeProfile',
     TenantAuditLog: 'TenantAuditLog',
     AuthOtp: 'AuthOtp',
     Meeting: 'Meeting',
+    MomTemplate: 'MomTemplate',
+    MomTemplateSection: 'MomTemplateSection',
+    MomTemplateUpload: 'MomTemplateUpload',
     MeetingInvite: 'MeetingInvite',
     MeetingParticipant: 'MeetingParticipant',
     AudioFile: 'AudioFile',
@@ -1046,7 +1277,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "platformPricingConfig" | "organizationBilling" | "organization" | "user" | "employeeProfile" | "tenantAuditLog" | "authOtp" | "meeting" | "meetingInvite" | "meetingParticipant" | "audioFile" | "transcript" | "transcriptSegment" | "mom" | "actionItem" | "decision" | "summary" | "auditLog"
+      modelProps: "platformPricingConfig" | "organizationBilling" | "invoice" | "invoiceLineItem" | "payment" | "invoiceDelivery" | "billingEvent" | "pricingChangeLog" | "organization" | "user" | "employeeProfile" | "tenantAuditLog" | "authOtp" | "meeting" | "momTemplate" | "momTemplateSection" | "momTemplateUpload" | "meetingInvite" | "meetingParticipant" | "audioFile" | "transcript" | "transcriptSegment" | "mom" | "actionItem" | "decision" | "summary" | "auditLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1195,6 +1426,450 @@ export namespace Prisma {
           count: {
             args: Prisma.OrganizationBillingCountArgs<ExtArgs>
             result: $Utils.Optional<OrganizationBillingCountAggregateOutputType> | number
+          }
+        }
+      }
+      Invoice: {
+        payload: Prisma.$InvoicePayload<ExtArgs>
+        fields: Prisma.InvoiceFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InvoiceFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InvoiceFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          findFirst: {
+            args: Prisma.InvoiceFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InvoiceFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          findMany: {
+            args: Prisma.InvoiceFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>[]
+          }
+          create: {
+            args: Prisma.InvoiceCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          createMany: {
+            args: Prisma.InvoiceCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.InvoiceCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>[]
+          }
+          delete: {
+            args: Prisma.InvoiceDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          update: {
+            args: Prisma.InvoiceUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          deleteMany: {
+            args: Prisma.InvoiceDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InvoiceUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.InvoiceUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>[]
+          }
+          upsert: {
+            args: Prisma.InvoiceUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoicePayload>
+          }
+          aggregate: {
+            args: Prisma.InvoiceAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInvoice>
+          }
+          groupBy: {
+            args: Prisma.InvoiceGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InvoiceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InvoiceCountArgs<ExtArgs>
+            result: $Utils.Optional<InvoiceCountAggregateOutputType> | number
+          }
+        }
+      }
+      InvoiceLineItem: {
+        payload: Prisma.$InvoiceLineItemPayload<ExtArgs>
+        fields: Prisma.InvoiceLineItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InvoiceLineItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InvoiceLineItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>
+          }
+          findFirst: {
+            args: Prisma.InvoiceLineItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InvoiceLineItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>
+          }
+          findMany: {
+            args: Prisma.InvoiceLineItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>[]
+          }
+          create: {
+            args: Prisma.InvoiceLineItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>
+          }
+          createMany: {
+            args: Prisma.InvoiceLineItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.InvoiceLineItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>[]
+          }
+          delete: {
+            args: Prisma.InvoiceLineItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>
+          }
+          update: {
+            args: Prisma.InvoiceLineItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.InvoiceLineItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InvoiceLineItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.InvoiceLineItemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>[]
+          }
+          upsert: {
+            args: Prisma.InvoiceLineItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceLineItemPayload>
+          }
+          aggregate: {
+            args: Prisma.InvoiceLineItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInvoiceLineItem>
+          }
+          groupBy: {
+            args: Prisma.InvoiceLineItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InvoiceLineItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InvoiceLineItemCountArgs<ExtArgs>
+            result: $Utils.Optional<InvoiceLineItemCountAggregateOutputType> | number
+          }
+        }
+      }
+      Payment: {
+        payload: Prisma.$PaymentPayload<ExtArgs>
+        fields: Prisma.PaymentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PaymentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PaymentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>
+          }
+          findFirst: {
+            args: Prisma.PaymentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PaymentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>
+          }
+          findMany: {
+            args: Prisma.PaymentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>[]
+          }
+          create: {
+            args: Prisma.PaymentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>
+          }
+          createMany: {
+            args: Prisma.PaymentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PaymentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>[]
+          }
+          delete: {
+            args: Prisma.PaymentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>
+          }
+          update: {
+            args: Prisma.PaymentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>
+          }
+          deleteMany: {
+            args: Prisma.PaymentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PaymentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PaymentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>[]
+          }
+          upsert: {
+            args: Prisma.PaymentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PaymentPayload>
+          }
+          aggregate: {
+            args: Prisma.PaymentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePayment>
+          }
+          groupBy: {
+            args: Prisma.PaymentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PaymentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PaymentCountArgs<ExtArgs>
+            result: $Utils.Optional<PaymentCountAggregateOutputType> | number
+          }
+        }
+      }
+      InvoiceDelivery: {
+        payload: Prisma.$InvoiceDeliveryPayload<ExtArgs>
+        fields: Prisma.InvoiceDeliveryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InvoiceDeliveryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InvoiceDeliveryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>
+          }
+          findFirst: {
+            args: Prisma.InvoiceDeliveryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InvoiceDeliveryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>
+          }
+          findMany: {
+            args: Prisma.InvoiceDeliveryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>[]
+          }
+          create: {
+            args: Prisma.InvoiceDeliveryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>
+          }
+          createMany: {
+            args: Prisma.InvoiceDeliveryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.InvoiceDeliveryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>[]
+          }
+          delete: {
+            args: Prisma.InvoiceDeliveryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>
+          }
+          update: {
+            args: Prisma.InvoiceDeliveryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>
+          }
+          deleteMany: {
+            args: Prisma.InvoiceDeliveryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InvoiceDeliveryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.InvoiceDeliveryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>[]
+          }
+          upsert: {
+            args: Prisma.InvoiceDeliveryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InvoiceDeliveryPayload>
+          }
+          aggregate: {
+            args: Prisma.InvoiceDeliveryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInvoiceDelivery>
+          }
+          groupBy: {
+            args: Prisma.InvoiceDeliveryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InvoiceDeliveryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InvoiceDeliveryCountArgs<ExtArgs>
+            result: $Utils.Optional<InvoiceDeliveryCountAggregateOutputType> | number
+          }
+        }
+      }
+      BillingEvent: {
+        payload: Prisma.$BillingEventPayload<ExtArgs>
+        fields: Prisma.BillingEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BillingEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BillingEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>
+          }
+          findFirst: {
+            args: Prisma.BillingEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BillingEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>
+          }
+          findMany: {
+            args: Prisma.BillingEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>[]
+          }
+          create: {
+            args: Prisma.BillingEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>
+          }
+          createMany: {
+            args: Prisma.BillingEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BillingEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>[]
+          }
+          delete: {
+            args: Prisma.BillingEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>
+          }
+          update: {
+            args: Prisma.BillingEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.BillingEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BillingEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BillingEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.BillingEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingEventPayload>
+          }
+          aggregate: {
+            args: Prisma.BillingEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBillingEvent>
+          }
+          groupBy: {
+            args: Prisma.BillingEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BillingEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BillingEventCountArgs<ExtArgs>
+            result: $Utils.Optional<BillingEventCountAggregateOutputType> | number
+          }
+        }
+      }
+      PricingChangeLog: {
+        payload: Prisma.$PricingChangeLogPayload<ExtArgs>
+        fields: Prisma.PricingChangeLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PricingChangeLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PricingChangeLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>
+          }
+          findFirst: {
+            args: Prisma.PricingChangeLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PricingChangeLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>
+          }
+          findMany: {
+            args: Prisma.PricingChangeLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>[]
+          }
+          create: {
+            args: Prisma.PricingChangeLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>
+          }
+          createMany: {
+            args: Prisma.PricingChangeLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PricingChangeLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>[]
+          }
+          delete: {
+            args: Prisma.PricingChangeLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>
+          }
+          update: {
+            args: Prisma.PricingChangeLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.PricingChangeLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PricingChangeLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PricingChangeLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.PricingChangeLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PricingChangeLogPayload>
+          }
+          aggregate: {
+            args: Prisma.PricingChangeLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePricingChangeLog>
+          }
+          groupBy: {
+            args: Prisma.PricingChangeLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PricingChangeLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PricingChangeLogCountArgs<ExtArgs>
+            result: $Utils.Optional<PricingChangeLogCountAggregateOutputType> | number
           }
         }
       }
@@ -1639,6 +2314,228 @@ export namespace Prisma {
           count: {
             args: Prisma.MeetingCountArgs<ExtArgs>
             result: $Utils.Optional<MeetingCountAggregateOutputType> | number
+          }
+        }
+      }
+      MomTemplate: {
+        payload: Prisma.$MomTemplatePayload<ExtArgs>
+        fields: Prisma.MomTemplateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MomTemplateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MomTemplateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>
+          }
+          findFirst: {
+            args: Prisma.MomTemplateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MomTemplateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>
+          }
+          findMany: {
+            args: Prisma.MomTemplateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>[]
+          }
+          create: {
+            args: Prisma.MomTemplateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>
+          }
+          createMany: {
+            args: Prisma.MomTemplateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MomTemplateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>[]
+          }
+          delete: {
+            args: Prisma.MomTemplateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>
+          }
+          update: {
+            args: Prisma.MomTemplateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>
+          }
+          deleteMany: {
+            args: Prisma.MomTemplateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MomTemplateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MomTemplateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>[]
+          }
+          upsert: {
+            args: Prisma.MomTemplateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplatePayload>
+          }
+          aggregate: {
+            args: Prisma.MomTemplateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMomTemplate>
+          }
+          groupBy: {
+            args: Prisma.MomTemplateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MomTemplateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MomTemplateCountArgs<ExtArgs>
+            result: $Utils.Optional<MomTemplateCountAggregateOutputType> | number
+          }
+        }
+      }
+      MomTemplateSection: {
+        payload: Prisma.$MomTemplateSectionPayload<ExtArgs>
+        fields: Prisma.MomTemplateSectionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MomTemplateSectionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MomTemplateSectionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>
+          }
+          findFirst: {
+            args: Prisma.MomTemplateSectionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MomTemplateSectionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>
+          }
+          findMany: {
+            args: Prisma.MomTemplateSectionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>[]
+          }
+          create: {
+            args: Prisma.MomTemplateSectionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>
+          }
+          createMany: {
+            args: Prisma.MomTemplateSectionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MomTemplateSectionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>[]
+          }
+          delete: {
+            args: Prisma.MomTemplateSectionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>
+          }
+          update: {
+            args: Prisma.MomTemplateSectionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>
+          }
+          deleteMany: {
+            args: Prisma.MomTemplateSectionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MomTemplateSectionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MomTemplateSectionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>[]
+          }
+          upsert: {
+            args: Prisma.MomTemplateSectionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateSectionPayload>
+          }
+          aggregate: {
+            args: Prisma.MomTemplateSectionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMomTemplateSection>
+          }
+          groupBy: {
+            args: Prisma.MomTemplateSectionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MomTemplateSectionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MomTemplateSectionCountArgs<ExtArgs>
+            result: $Utils.Optional<MomTemplateSectionCountAggregateOutputType> | number
+          }
+        }
+      }
+      MomTemplateUpload: {
+        payload: Prisma.$MomTemplateUploadPayload<ExtArgs>
+        fields: Prisma.MomTemplateUploadFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MomTemplateUploadFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MomTemplateUploadFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>
+          }
+          findFirst: {
+            args: Prisma.MomTemplateUploadFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MomTemplateUploadFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>
+          }
+          findMany: {
+            args: Prisma.MomTemplateUploadFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>[]
+          }
+          create: {
+            args: Prisma.MomTemplateUploadCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>
+          }
+          createMany: {
+            args: Prisma.MomTemplateUploadCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MomTemplateUploadCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>[]
+          }
+          delete: {
+            args: Prisma.MomTemplateUploadDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>
+          }
+          update: {
+            args: Prisma.MomTemplateUploadUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>
+          }
+          deleteMany: {
+            args: Prisma.MomTemplateUploadDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MomTemplateUploadUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MomTemplateUploadUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>[]
+          }
+          upsert: {
+            args: Prisma.MomTemplateUploadUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MomTemplateUploadPayload>
+          }
+          aggregate: {
+            args: Prisma.MomTemplateUploadAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMomTemplateUpload>
+          }
+          groupBy: {
+            args: Prisma.MomTemplateUploadGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MomTemplateUploadGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MomTemplateUploadCountArgs<ExtArgs>
+            result: $Utils.Optional<MomTemplateUploadCountAggregateOutputType> | number
           }
         }
       }
@@ -2492,12 +3389,21 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     platformPricingConfig?: PlatformPricingConfigOmit
     organizationBilling?: OrganizationBillingOmit
+    invoice?: InvoiceOmit
+    invoiceLineItem?: InvoiceLineItemOmit
+    payment?: PaymentOmit
+    invoiceDelivery?: InvoiceDeliveryOmit
+    billingEvent?: BillingEventOmit
+    pricingChangeLog?: PricingChangeLogOmit
     organization?: OrganizationOmit
     user?: UserOmit
     employeeProfile?: EmployeeProfileOmit
     tenantAuditLog?: TenantAuditLogOmit
     authOtp?: AuthOtpOmit
     meeting?: MeetingOmit
+    momTemplate?: MomTemplateOmit
+    momTemplateSection?: MomTemplateSectionOmit
+    momTemplateUpload?: MomTemplateUploadOmit
     meetingInvite?: MeetingInviteOmit
     meetingParticipant?: MeetingParticipantOmit
     audioFile?: AudioFileOmit
@@ -2584,6 +3490,55 @@ export namespace Prisma {
 
 
   /**
+   * Count Type InvoiceCountOutputType
+   */
+
+  export type InvoiceCountOutputType = {
+    lineItems: number
+    payments: number
+    deliveries: number
+  }
+
+  export type InvoiceCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    lineItems?: boolean | InvoiceCountOutputTypeCountLineItemsArgs
+    payments?: boolean | InvoiceCountOutputTypeCountPaymentsArgs
+    deliveries?: boolean | InvoiceCountOutputTypeCountDeliveriesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * InvoiceCountOutputType without action
+   */
+  export type InvoiceCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceCountOutputType
+     */
+    select?: InvoiceCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * InvoiceCountOutputType without action
+   */
+  export type InvoiceCountOutputTypeCountLineItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceLineItemWhereInput
+  }
+
+  /**
+   * InvoiceCountOutputType without action
+   */
+  export type InvoiceCountOutputTypeCountPaymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PaymentWhereInput
+  }
+
+  /**
+   * InvoiceCountOutputType without action
+   */
+  export type InvoiceCountOutputTypeCountDeliveriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceDeliveryWhereInput
+  }
+
+
+  /**
    * Count Type OrganizationCountOutputType
    */
 
@@ -2591,12 +3546,20 @@ export namespace Prisma {
     users: number
     meetings: number
     auditEvents: number
+    momTemplates: number
+    invoices: number
+    payments: number
+    billingEvents: number
   }
 
   export type OrganizationCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | OrganizationCountOutputTypeCountUsersArgs
     meetings?: boolean | OrganizationCountOutputTypeCountMeetingsArgs
     auditEvents?: boolean | OrganizationCountOutputTypeCountAuditEventsArgs
+    momTemplates?: boolean | OrganizationCountOutputTypeCountMomTemplatesArgs
+    invoices?: boolean | OrganizationCountOutputTypeCountInvoicesArgs
+    payments?: boolean | OrganizationCountOutputTypeCountPaymentsArgs
+    billingEvents?: boolean | OrganizationCountOutputTypeCountBillingEventsArgs
   }
 
   // Custom InputTypes
@@ -2629,6 +3592,34 @@ export namespace Prisma {
    */
   export type OrganizationCountOutputTypeCountAuditEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TenantAuditLogWhereInput
+  }
+
+  /**
+   * OrganizationCountOutputType without action
+   */
+  export type OrganizationCountOutputTypeCountMomTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MomTemplateWhereInput
+  }
+
+  /**
+   * OrganizationCountOutputType without action
+   */
+  export type OrganizationCountOutputTypeCountInvoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceWhereInput
+  }
+
+  /**
+   * OrganizationCountOutputType without action
+   */
+  export type OrganizationCountOutputTypeCountPaymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PaymentWhereInput
+  }
+
+  /**
+   * OrganizationCountOutputType without action
+   */
+  export type OrganizationCountOutputTypeCountBillingEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BillingEventWhereInput
   }
 
 
@@ -2772,6 +3763,55 @@ export namespace Prisma {
    */
   export type MeetingCountOutputTypeCountInvitesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MeetingInviteWhereInput
+  }
+
+
+  /**
+   * Count Type MomTemplateCountOutputType
+   */
+
+  export type MomTemplateCountOutputType = {
+    defaultForOrganization: number
+    sections: number
+    meetings: number
+  }
+
+  export type MomTemplateCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    defaultForOrganization?: boolean | MomTemplateCountOutputTypeCountDefaultForOrganizationArgs
+    sections?: boolean | MomTemplateCountOutputTypeCountSectionsArgs
+    meetings?: boolean | MomTemplateCountOutputTypeCountMeetingsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * MomTemplateCountOutputType without action
+   */
+  export type MomTemplateCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateCountOutputType
+     */
+    select?: MomTemplateCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * MomTemplateCountOutputType without action
+   */
+  export type MomTemplateCountOutputTypeCountDefaultForOrganizationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrganizationWhereInput
+  }
+
+  /**
+   * MomTemplateCountOutputType without action
+   */
+  export type MomTemplateCountOutputTypeCountSectionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MomTemplateSectionWhereInput
+  }
+
+  /**
+   * MomTemplateCountOutputType without action
+   */
+  export type MomTemplateCountOutputTypeCountMeetingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MeetingWhereInput
   }
 
 
@@ -3981,10 +5021,12 @@ export namespace Prisma {
 
   export type OrganizationBillingAvgAggregateOutputType = {
     activeLocations: number | null
+    discountPercent: Decimal | null
   }
 
   export type OrganizationBillingSumAggregateOutputType = {
     activeLocations: number | null
+    discountPercent: Decimal | null
   }
 
   export type OrganizationBillingMinAggregateOutputType = {
@@ -3993,6 +5035,14 @@ export namespace Prisma {
     billingStatus: $Enums.BillingStatus | null
     billingCycle: string | null
     nextBillingDate: Date | null
+    trialStartedAt: Date | null
+    trialEndsAt: Date | null
+    cancelledAt: Date | null
+    currentPeriodStart: Date | null
+    currentPeriodEnd: Date | null
+    discountPercent: Decimal | null
+    billingEmail: string | null
+    createdAt: Date | null
     updatedAt: Date | null
   }
 
@@ -4002,6 +5052,14 @@ export namespace Prisma {
     billingStatus: $Enums.BillingStatus | null
     billingCycle: string | null
     nextBillingDate: Date | null
+    trialStartedAt: Date | null
+    trialEndsAt: Date | null
+    cancelledAt: Date | null
+    currentPeriodStart: Date | null
+    currentPeriodEnd: Date | null
+    discountPercent: Decimal | null
+    billingEmail: string | null
+    createdAt: Date | null
     updatedAt: Date | null
   }
 
@@ -4011,6 +5069,14 @@ export namespace Prisma {
     billingStatus: number
     billingCycle: number
     nextBillingDate: number
+    trialStartedAt: number
+    trialEndsAt: number
+    cancelledAt: number
+    currentPeriodStart: number
+    currentPeriodEnd: number
+    discountPercent: number
+    billingEmail: number
+    createdAt: number
     updatedAt: number
     _all: number
   }
@@ -4018,10 +5084,12 @@ export namespace Prisma {
 
   export type OrganizationBillingAvgAggregateInputType = {
     activeLocations?: true
+    discountPercent?: true
   }
 
   export type OrganizationBillingSumAggregateInputType = {
     activeLocations?: true
+    discountPercent?: true
   }
 
   export type OrganizationBillingMinAggregateInputType = {
@@ -4030,6 +5098,14 @@ export namespace Prisma {
     billingStatus?: true
     billingCycle?: true
     nextBillingDate?: true
+    trialStartedAt?: true
+    trialEndsAt?: true
+    cancelledAt?: true
+    currentPeriodStart?: true
+    currentPeriodEnd?: true
+    discountPercent?: true
+    billingEmail?: true
+    createdAt?: true
     updatedAt?: true
   }
 
@@ -4039,6 +5115,14 @@ export namespace Prisma {
     billingStatus?: true
     billingCycle?: true
     nextBillingDate?: true
+    trialStartedAt?: true
+    trialEndsAt?: true
+    cancelledAt?: true
+    currentPeriodStart?: true
+    currentPeriodEnd?: true
+    discountPercent?: true
+    billingEmail?: true
+    createdAt?: true
     updatedAt?: true
   }
 
@@ -4048,6 +5132,14 @@ export namespace Prisma {
     billingStatus?: true
     billingCycle?: true
     nextBillingDate?: true
+    trialStartedAt?: true
+    trialEndsAt?: true
+    cancelledAt?: true
+    currentPeriodStart?: true
+    currentPeriodEnd?: true
+    discountPercent?: true
+    billingEmail?: true
+    createdAt?: true
     updatedAt?: true
     _all?: true
   }
@@ -4144,6 +5236,14 @@ export namespace Prisma {
     billingStatus: $Enums.BillingStatus
     billingCycle: string
     nextBillingDate: Date | null
+    trialStartedAt: Date | null
+    trialEndsAt: Date | null
+    cancelledAt: Date | null
+    currentPeriodStart: Date | null
+    currentPeriodEnd: Date | null
+    discountPercent: Decimal
+    billingEmail: string | null
+    createdAt: Date
     updatedAt: Date
     _count: OrganizationBillingCountAggregateOutputType | null
     _avg: OrganizationBillingAvgAggregateOutputType | null
@@ -4172,6 +5272,14 @@ export namespace Prisma {
     billingStatus?: boolean
     billingCycle?: boolean
     nextBillingDate?: boolean
+    trialStartedAt?: boolean
+    trialEndsAt?: boolean
+    cancelledAt?: boolean
+    currentPeriodStart?: boolean
+    currentPeriodEnd?: boolean
+    discountPercent?: boolean
+    billingEmail?: boolean
+    createdAt?: boolean
     updatedAt?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["organizationBilling"]>
@@ -4182,6 +5290,14 @@ export namespace Prisma {
     billingStatus?: boolean
     billingCycle?: boolean
     nextBillingDate?: boolean
+    trialStartedAt?: boolean
+    trialEndsAt?: boolean
+    cancelledAt?: boolean
+    currentPeriodStart?: boolean
+    currentPeriodEnd?: boolean
+    discountPercent?: boolean
+    billingEmail?: boolean
+    createdAt?: boolean
     updatedAt?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["organizationBilling"]>
@@ -4192,6 +5308,14 @@ export namespace Prisma {
     billingStatus?: boolean
     billingCycle?: boolean
     nextBillingDate?: boolean
+    trialStartedAt?: boolean
+    trialEndsAt?: boolean
+    cancelledAt?: boolean
+    currentPeriodStart?: boolean
+    currentPeriodEnd?: boolean
+    discountPercent?: boolean
+    billingEmail?: boolean
+    createdAt?: boolean
     updatedAt?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["organizationBilling"]>
@@ -4202,10 +5326,18 @@ export namespace Prisma {
     billingStatus?: boolean
     billingCycle?: boolean
     nextBillingDate?: boolean
+    trialStartedAt?: boolean
+    trialEndsAt?: boolean
+    cancelledAt?: boolean
+    currentPeriodStart?: boolean
+    currentPeriodEnd?: boolean
+    discountPercent?: boolean
+    billingEmail?: boolean
+    createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type OrganizationBillingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"organizationId" | "activeLocations" | "billingStatus" | "billingCycle" | "nextBillingDate" | "updatedAt", ExtArgs["result"]["organizationBilling"]>
+  export type OrganizationBillingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"organizationId" | "activeLocations" | "billingStatus" | "billingCycle" | "nextBillingDate" | "trialStartedAt" | "trialEndsAt" | "cancelledAt" | "currentPeriodStart" | "currentPeriodEnd" | "discountPercent" | "billingEmail" | "createdAt" | "updatedAt", ExtArgs["result"]["organizationBilling"]>
   export type OrganizationBillingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
   }
@@ -4227,6 +5359,14 @@ export namespace Prisma {
       billingStatus: $Enums.BillingStatus
       billingCycle: string
       nextBillingDate: Date | null
+      trialStartedAt: Date | null
+      trialEndsAt: Date | null
+      cancelledAt: Date | null
+      currentPeriodStart: Date | null
+      currentPeriodEnd: Date | null
+      discountPercent: Prisma.Decimal
+      billingEmail: string | null
+      createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["organizationBilling"]>
     composites: {}
@@ -4657,6 +5797,14 @@ export namespace Prisma {
     readonly billingStatus: FieldRef<"OrganizationBilling", 'BillingStatus'>
     readonly billingCycle: FieldRef<"OrganizationBilling", 'String'>
     readonly nextBillingDate: FieldRef<"OrganizationBilling", 'DateTime'>
+    readonly trialStartedAt: FieldRef<"OrganizationBilling", 'DateTime'>
+    readonly trialEndsAt: FieldRef<"OrganizationBilling", 'DateTime'>
+    readonly cancelledAt: FieldRef<"OrganizationBilling", 'DateTime'>
+    readonly currentPeriodStart: FieldRef<"OrganizationBilling", 'DateTime'>
+    readonly currentPeriodEnd: FieldRef<"OrganizationBilling", 'DateTime'>
+    readonly discountPercent: FieldRef<"OrganizationBilling", 'Decimal'>
+    readonly billingEmail: FieldRef<"OrganizationBilling", 'String'>
+    readonly createdAt: FieldRef<"OrganizationBilling", 'DateTime'>
     readonly updatedAt: FieldRef<"OrganizationBilling", 'DateTime'>
   }
     
@@ -5078,6 +6226,6997 @@ export namespace Prisma {
 
 
   /**
+   * Model Invoice
+   */
+
+  export type AggregateInvoice = {
+    _count: InvoiceCountAggregateOutputType | null
+    _avg: InvoiceAvgAggregateOutputType | null
+    _sum: InvoiceSumAggregateOutputType | null
+    _min: InvoiceMinAggregateOutputType | null
+    _max: InvoiceMaxAggregateOutputType | null
+  }
+
+  export type InvoiceAvgAggregateOutputType = {
+    includedSeats: number | null
+    activeSeats: number | null
+    additionalSeats: number | null
+    includedLocations: number | null
+    activeLocations: number | null
+    subtotalInr: number | null
+    discountInr: number | null
+    gstInr: number | null
+    totalInr: number | null
+  }
+
+  export type InvoiceSumAggregateOutputType = {
+    includedSeats: number | null
+    activeSeats: number | null
+    additionalSeats: number | null
+    includedLocations: number | null
+    activeLocations: number | null
+    subtotalInr: number | null
+    discountInr: number | null
+    gstInr: number | null
+    totalInr: number | null
+  }
+
+  export type InvoiceMinAggregateOutputType = {
+    id: string | null
+    organizationId: string | null
+    invoiceNumber: string | null
+    status: $Enums.InvoiceStatus | null
+    planName: string | null
+    billingCycle: string | null
+    periodStart: Date | null
+    periodEnd: Date | null
+    includedSeats: number | null
+    activeSeats: number | null
+    additionalSeats: number | null
+    includedLocations: number | null
+    activeLocations: number | null
+    subtotalInr: number | null
+    discountInr: number | null
+    gstInr: number | null
+    totalInr: number | null
+    billingAddress: string | null
+    storageKey: string | null
+    storageBackend: $Enums.TemplateFileStorageBackend | null
+    issuedAt: Date | null
+    dueAt: Date | null
+    paidAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type InvoiceMaxAggregateOutputType = {
+    id: string | null
+    organizationId: string | null
+    invoiceNumber: string | null
+    status: $Enums.InvoiceStatus | null
+    planName: string | null
+    billingCycle: string | null
+    periodStart: Date | null
+    periodEnd: Date | null
+    includedSeats: number | null
+    activeSeats: number | null
+    additionalSeats: number | null
+    includedLocations: number | null
+    activeLocations: number | null
+    subtotalInr: number | null
+    discountInr: number | null
+    gstInr: number | null
+    totalInr: number | null
+    billingAddress: string | null
+    storageKey: string | null
+    storageBackend: $Enums.TemplateFileStorageBackend | null
+    issuedAt: Date | null
+    dueAt: Date | null
+    paidAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type InvoiceCountAggregateOutputType = {
+    id: number
+    organizationId: number
+    invoiceNumber: number
+    status: number
+    planName: number
+    billingCycle: number
+    periodStart: number
+    periodEnd: number
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr: number
+    gstInr: number
+    totalInr: number
+    billingAddress: number
+    storageKey: number
+    storageBackend: number
+    issuedAt: number
+    dueAt: number
+    paidAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type InvoiceAvgAggregateInputType = {
+    includedSeats?: true
+    activeSeats?: true
+    additionalSeats?: true
+    includedLocations?: true
+    activeLocations?: true
+    subtotalInr?: true
+    discountInr?: true
+    gstInr?: true
+    totalInr?: true
+  }
+
+  export type InvoiceSumAggregateInputType = {
+    includedSeats?: true
+    activeSeats?: true
+    additionalSeats?: true
+    includedLocations?: true
+    activeLocations?: true
+    subtotalInr?: true
+    discountInr?: true
+    gstInr?: true
+    totalInr?: true
+  }
+
+  export type InvoiceMinAggregateInputType = {
+    id?: true
+    organizationId?: true
+    invoiceNumber?: true
+    status?: true
+    planName?: true
+    billingCycle?: true
+    periodStart?: true
+    periodEnd?: true
+    includedSeats?: true
+    activeSeats?: true
+    additionalSeats?: true
+    includedLocations?: true
+    activeLocations?: true
+    subtotalInr?: true
+    discountInr?: true
+    gstInr?: true
+    totalInr?: true
+    billingAddress?: true
+    storageKey?: true
+    storageBackend?: true
+    issuedAt?: true
+    dueAt?: true
+    paidAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type InvoiceMaxAggregateInputType = {
+    id?: true
+    organizationId?: true
+    invoiceNumber?: true
+    status?: true
+    planName?: true
+    billingCycle?: true
+    periodStart?: true
+    periodEnd?: true
+    includedSeats?: true
+    activeSeats?: true
+    additionalSeats?: true
+    includedLocations?: true
+    activeLocations?: true
+    subtotalInr?: true
+    discountInr?: true
+    gstInr?: true
+    totalInr?: true
+    billingAddress?: true
+    storageKey?: true
+    storageBackend?: true
+    issuedAt?: true
+    dueAt?: true
+    paidAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type InvoiceCountAggregateInputType = {
+    id?: true
+    organizationId?: true
+    invoiceNumber?: true
+    status?: true
+    planName?: true
+    billingCycle?: true
+    periodStart?: true
+    periodEnd?: true
+    includedSeats?: true
+    activeSeats?: true
+    additionalSeats?: true
+    includedLocations?: true
+    activeLocations?: true
+    subtotalInr?: true
+    discountInr?: true
+    gstInr?: true
+    totalInr?: true
+    billingAddress?: true
+    storageKey?: true
+    storageBackend?: true
+    issuedAt?: true
+    dueAt?: true
+    paidAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type InvoiceAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Invoice to aggregate.
+     */
+    where?: InvoiceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Invoices to fetch.
+     */
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InvoiceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Invoices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Invoices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Invoices
+    **/
+    _count?: true | InvoiceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: InvoiceAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: InvoiceSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InvoiceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InvoiceMaxAggregateInputType
+  }
+
+  export type GetInvoiceAggregateType<T extends InvoiceAggregateArgs> = {
+        [P in keyof T & keyof AggregateInvoice]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInvoice[P]>
+      : GetScalarType<T[P], AggregateInvoice[P]>
+  }
+
+
+
+
+  export type InvoiceGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceWhereInput
+    orderBy?: InvoiceOrderByWithAggregationInput | InvoiceOrderByWithAggregationInput[]
+    by: InvoiceScalarFieldEnum[] | InvoiceScalarFieldEnum
+    having?: InvoiceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InvoiceCountAggregateInputType | true
+    _avg?: InvoiceAvgAggregateInputType
+    _sum?: InvoiceSumAggregateInputType
+    _min?: InvoiceMinAggregateInputType
+    _max?: InvoiceMaxAggregateInputType
+  }
+
+  export type InvoiceGroupByOutputType = {
+    id: string
+    organizationId: string
+    invoiceNumber: string
+    status: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date
+    periodEnd: Date
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr: number
+    gstInr: number
+    totalInr: number
+    billingAddress: string | null
+    storageKey: string | null
+    storageBackend: $Enums.TemplateFileStorageBackend | null
+    issuedAt: Date | null
+    dueAt: Date | null
+    paidAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: InvoiceCountAggregateOutputType | null
+    _avg: InvoiceAvgAggregateOutputType | null
+    _sum: InvoiceSumAggregateOutputType | null
+    _min: InvoiceMinAggregateOutputType | null
+    _max: InvoiceMaxAggregateOutputType | null
+  }
+
+  type GetInvoiceGroupByPayload<T extends InvoiceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InvoiceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InvoiceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InvoiceGroupByOutputType[P]>
+            : GetScalarType<T[P], InvoiceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InvoiceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    invoiceNumber?: boolean
+    status?: boolean
+    planName?: boolean
+    billingCycle?: boolean
+    periodStart?: boolean
+    periodEnd?: boolean
+    includedSeats?: boolean
+    activeSeats?: boolean
+    additionalSeats?: boolean
+    includedLocations?: boolean
+    activeLocations?: boolean
+    subtotalInr?: boolean
+    discountInr?: boolean
+    gstInr?: boolean
+    totalInr?: boolean
+    billingAddress?: boolean
+    storageKey?: boolean
+    storageBackend?: boolean
+    issuedAt?: boolean
+    dueAt?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    lineItems?: boolean | Invoice$lineItemsArgs<ExtArgs>
+    payments?: boolean | Invoice$paymentsArgs<ExtArgs>
+    deliveries?: boolean | Invoice$deliveriesArgs<ExtArgs>
+    _count?: boolean | InvoiceCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoice"]>
+
+  export type InvoiceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    invoiceNumber?: boolean
+    status?: boolean
+    planName?: boolean
+    billingCycle?: boolean
+    periodStart?: boolean
+    periodEnd?: boolean
+    includedSeats?: boolean
+    activeSeats?: boolean
+    additionalSeats?: boolean
+    includedLocations?: boolean
+    activeLocations?: boolean
+    subtotalInr?: boolean
+    discountInr?: boolean
+    gstInr?: boolean
+    totalInr?: boolean
+    billingAddress?: boolean
+    storageKey?: boolean
+    storageBackend?: boolean
+    issuedAt?: boolean
+    dueAt?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoice"]>
+
+  export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    invoiceNumber?: boolean
+    status?: boolean
+    planName?: boolean
+    billingCycle?: boolean
+    periodStart?: boolean
+    periodEnd?: boolean
+    includedSeats?: boolean
+    activeSeats?: boolean
+    additionalSeats?: boolean
+    includedLocations?: boolean
+    activeLocations?: boolean
+    subtotalInr?: boolean
+    discountInr?: boolean
+    gstInr?: boolean
+    totalInr?: boolean
+    billingAddress?: boolean
+    storageKey?: boolean
+    storageBackend?: boolean
+    issuedAt?: boolean
+    dueAt?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoice"]>
+
+  export type InvoiceSelectScalar = {
+    id?: boolean
+    organizationId?: boolean
+    invoiceNumber?: boolean
+    status?: boolean
+    planName?: boolean
+    billingCycle?: boolean
+    periodStart?: boolean
+    periodEnd?: boolean
+    includedSeats?: boolean
+    activeSeats?: boolean
+    additionalSeats?: boolean
+    includedLocations?: boolean
+    activeLocations?: boolean
+    subtotalInr?: boolean
+    discountInr?: boolean
+    gstInr?: boolean
+    totalInr?: boolean
+    billingAddress?: boolean
+    storageKey?: boolean
+    storageBackend?: boolean
+    issuedAt?: boolean
+    dueAt?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type InvoiceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "invoiceNumber" | "status" | "planName" | "billingCycle" | "periodStart" | "periodEnd" | "includedSeats" | "activeSeats" | "additionalSeats" | "includedLocations" | "activeLocations" | "subtotalInr" | "discountInr" | "gstInr" | "totalInr" | "billingAddress" | "storageKey" | "storageBackend" | "issuedAt" | "dueAt" | "paidAt" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
+  export type InvoiceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    lineItems?: boolean | Invoice$lineItemsArgs<ExtArgs>
+    payments?: boolean | Invoice$paymentsArgs<ExtArgs>
+    deliveries?: boolean | Invoice$deliveriesArgs<ExtArgs>
+    _count?: boolean | InvoiceCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type InvoiceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }
+  export type InvoiceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }
+
+  export type $InvoicePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Invoice"
+    objects: {
+      organization: Prisma.$OrganizationPayload<ExtArgs>
+      lineItems: Prisma.$InvoiceLineItemPayload<ExtArgs>[]
+      payments: Prisma.$PaymentPayload<ExtArgs>[]
+      deliveries: Prisma.$InvoiceDeliveryPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      organizationId: string
+      invoiceNumber: string
+      status: $Enums.InvoiceStatus
+      planName: string
+      billingCycle: string
+      periodStart: Date
+      periodEnd: Date
+      includedSeats: number
+      activeSeats: number
+      additionalSeats: number
+      includedLocations: number
+      activeLocations: number
+      subtotalInr: number
+      discountInr: number
+      gstInr: number
+      totalInr: number
+      billingAddress: string | null
+      storageKey: string | null
+      storageBackend: $Enums.TemplateFileStorageBackend | null
+      issuedAt: Date | null
+      dueAt: Date | null
+      paidAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["invoice"]>
+    composites: {}
+  }
+
+  type InvoiceGetPayload<S extends boolean | null | undefined | InvoiceDefaultArgs> = $Result.GetResult<Prisma.$InvoicePayload, S>
+
+  type InvoiceCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InvoiceFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InvoiceCountAggregateInputType | true
+    }
+
+  export interface InvoiceDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Invoice'], meta: { name: 'Invoice' } }
+    /**
+     * Find zero or one Invoice that matches the filter.
+     * @param {InvoiceFindUniqueArgs} args - Arguments to find a Invoice
+     * @example
+     * // Get one Invoice
+     * const invoice = await prisma.invoice.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InvoiceFindUniqueArgs>(args: SelectSubset<T, InvoiceFindUniqueArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Invoice that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InvoiceFindUniqueOrThrowArgs} args - Arguments to find a Invoice
+     * @example
+     * // Get one Invoice
+     * const invoice = await prisma.invoice.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InvoiceFindUniqueOrThrowArgs>(args: SelectSubset<T, InvoiceFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Invoice that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceFindFirstArgs} args - Arguments to find a Invoice
+     * @example
+     * // Get one Invoice
+     * const invoice = await prisma.invoice.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InvoiceFindFirstArgs>(args?: SelectSubset<T, InvoiceFindFirstArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Invoice that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceFindFirstOrThrowArgs} args - Arguments to find a Invoice
+     * @example
+     * // Get one Invoice
+     * const invoice = await prisma.invoice.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InvoiceFindFirstOrThrowArgs>(args?: SelectSubset<T, InvoiceFindFirstOrThrowArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Invoices that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Invoices
+     * const invoices = await prisma.invoice.findMany()
+     * 
+     * // Get first 10 Invoices
+     * const invoices = await prisma.invoice.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const invoiceWithIdOnly = await prisma.invoice.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends InvoiceFindManyArgs>(args?: SelectSubset<T, InvoiceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Invoice.
+     * @param {InvoiceCreateArgs} args - Arguments to create a Invoice.
+     * @example
+     * // Create one Invoice
+     * const Invoice = await prisma.invoice.create({
+     *   data: {
+     *     // ... data to create a Invoice
+     *   }
+     * })
+     * 
+     */
+    create<T extends InvoiceCreateArgs>(args: SelectSubset<T, InvoiceCreateArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Invoices.
+     * @param {InvoiceCreateManyArgs} args - Arguments to create many Invoices.
+     * @example
+     * // Create many Invoices
+     * const invoice = await prisma.invoice.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InvoiceCreateManyArgs>(args?: SelectSubset<T, InvoiceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Invoices and returns the data saved in the database.
+     * @param {InvoiceCreateManyAndReturnArgs} args - Arguments to create many Invoices.
+     * @example
+     * // Create many Invoices
+     * const invoice = await prisma.invoice.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Invoices and only return the `id`
+     * const invoiceWithIdOnly = await prisma.invoice.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends InvoiceCreateManyAndReturnArgs>(args?: SelectSubset<T, InvoiceCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Invoice.
+     * @param {InvoiceDeleteArgs} args - Arguments to delete one Invoice.
+     * @example
+     * // Delete one Invoice
+     * const Invoice = await prisma.invoice.delete({
+     *   where: {
+     *     // ... filter to delete one Invoice
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InvoiceDeleteArgs>(args: SelectSubset<T, InvoiceDeleteArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Invoice.
+     * @param {InvoiceUpdateArgs} args - Arguments to update one Invoice.
+     * @example
+     * // Update one Invoice
+     * const invoice = await prisma.invoice.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InvoiceUpdateArgs>(args: SelectSubset<T, InvoiceUpdateArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Invoices.
+     * @param {InvoiceDeleteManyArgs} args - Arguments to filter Invoices to delete.
+     * @example
+     * // Delete a few Invoices
+     * const { count } = await prisma.invoice.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InvoiceDeleteManyArgs>(args?: SelectSubset<T, InvoiceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Invoices.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Invoices
+     * const invoice = await prisma.invoice.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InvoiceUpdateManyArgs>(args: SelectSubset<T, InvoiceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Invoices and returns the data updated in the database.
+     * @param {InvoiceUpdateManyAndReturnArgs} args - Arguments to update many Invoices.
+     * @example
+     * // Update many Invoices
+     * const invoice = await prisma.invoice.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Invoices and only return the `id`
+     * const invoiceWithIdOnly = await prisma.invoice.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends InvoiceUpdateManyAndReturnArgs>(args: SelectSubset<T, InvoiceUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Invoice.
+     * @param {InvoiceUpsertArgs} args - Arguments to update or create a Invoice.
+     * @example
+     * // Update or create a Invoice
+     * const invoice = await prisma.invoice.upsert({
+     *   create: {
+     *     // ... data to create a Invoice
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Invoice we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InvoiceUpsertArgs>(args: SelectSubset<T, InvoiceUpsertArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Invoices.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceCountArgs} args - Arguments to filter Invoices to count.
+     * @example
+     * // Count the number of Invoices
+     * const count = await prisma.invoice.count({
+     *   where: {
+     *     // ... the filter for the Invoices we want to count
+     *   }
+     * })
+    **/
+    count<T extends InvoiceCountArgs>(
+      args?: Subset<T, InvoiceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InvoiceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Invoice.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InvoiceAggregateArgs>(args: Subset<T, InvoiceAggregateArgs>): Prisma.PrismaPromise<GetInvoiceAggregateType<T>>
+
+    /**
+     * Group by Invoice.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InvoiceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InvoiceGroupByArgs['orderBy'] }
+        : { orderBy?: InvoiceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InvoiceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInvoiceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Invoice model
+   */
+  readonly fields: InvoiceFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Invoice.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InvoiceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    organization<T extends OrganizationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrganizationDefaultArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    lineItems<T extends Invoice$lineItemsArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$lineItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    payments<T extends Invoice$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    deliveries<T extends Invoice$deliveriesArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Invoice model
+   */
+  interface InvoiceFieldRefs {
+    readonly id: FieldRef<"Invoice", 'String'>
+    readonly organizationId: FieldRef<"Invoice", 'String'>
+    readonly invoiceNumber: FieldRef<"Invoice", 'String'>
+    readonly status: FieldRef<"Invoice", 'InvoiceStatus'>
+    readonly planName: FieldRef<"Invoice", 'String'>
+    readonly billingCycle: FieldRef<"Invoice", 'String'>
+    readonly periodStart: FieldRef<"Invoice", 'DateTime'>
+    readonly periodEnd: FieldRef<"Invoice", 'DateTime'>
+    readonly includedSeats: FieldRef<"Invoice", 'Int'>
+    readonly activeSeats: FieldRef<"Invoice", 'Int'>
+    readonly additionalSeats: FieldRef<"Invoice", 'Int'>
+    readonly includedLocations: FieldRef<"Invoice", 'Int'>
+    readonly activeLocations: FieldRef<"Invoice", 'Int'>
+    readonly subtotalInr: FieldRef<"Invoice", 'Int'>
+    readonly discountInr: FieldRef<"Invoice", 'Int'>
+    readonly gstInr: FieldRef<"Invoice", 'Int'>
+    readonly totalInr: FieldRef<"Invoice", 'Int'>
+    readonly billingAddress: FieldRef<"Invoice", 'String'>
+    readonly storageKey: FieldRef<"Invoice", 'String'>
+    readonly storageBackend: FieldRef<"Invoice", 'TemplateFileStorageBackend'>
+    readonly issuedAt: FieldRef<"Invoice", 'DateTime'>
+    readonly dueAt: FieldRef<"Invoice", 'DateTime'>
+    readonly paidAt: FieldRef<"Invoice", 'DateTime'>
+    readonly createdAt: FieldRef<"Invoice", 'DateTime'>
+    readonly updatedAt: FieldRef<"Invoice", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Invoice findUnique
+   */
+  export type InvoiceFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoice to fetch.
+     */
+    where: InvoiceWhereUniqueInput
+  }
+
+  /**
+   * Invoice findUniqueOrThrow
+   */
+  export type InvoiceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoice to fetch.
+     */
+    where: InvoiceWhereUniqueInput
+  }
+
+  /**
+   * Invoice findFirst
+   */
+  export type InvoiceFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoice to fetch.
+     */
+    where?: InvoiceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Invoices to fetch.
+     */
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Invoices.
+     */
+    cursor?: InvoiceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Invoices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Invoices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Invoices.
+     */
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice findFirstOrThrow
+   */
+  export type InvoiceFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoice to fetch.
+     */
+    where?: InvoiceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Invoices to fetch.
+     */
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Invoices.
+     */
+    cursor?: InvoiceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Invoices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Invoices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Invoices.
+     */
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice findMany
+   */
+  export type InvoiceFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter, which Invoices to fetch.
+     */
+    where?: InvoiceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Invoices to fetch.
+     */
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Invoices.
+     */
+    cursor?: InvoiceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Invoices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Invoices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Invoices.
+     */
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice create
+   */
+  export type InvoiceCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Invoice.
+     */
+    data: XOR<InvoiceCreateInput, InvoiceUncheckedCreateInput>
+  }
+
+  /**
+   * Invoice createMany
+   */
+  export type InvoiceCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Invoices.
+     */
+    data: InvoiceCreateManyInput | InvoiceCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Invoice createManyAndReturn
+   */
+  export type InvoiceCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * The data used to create many Invoices.
+     */
+    data: InvoiceCreateManyInput | InvoiceCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Invoice update
+   */
+  export type InvoiceUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Invoice.
+     */
+    data: XOR<InvoiceUpdateInput, InvoiceUncheckedUpdateInput>
+    /**
+     * Choose, which Invoice to update.
+     */
+    where: InvoiceWhereUniqueInput
+  }
+
+  /**
+   * Invoice updateMany
+   */
+  export type InvoiceUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Invoices.
+     */
+    data: XOR<InvoiceUpdateManyMutationInput, InvoiceUncheckedUpdateManyInput>
+    /**
+     * Filter which Invoices to update
+     */
+    where?: InvoiceWhereInput
+    /**
+     * Limit how many Invoices to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Invoice updateManyAndReturn
+   */
+  export type InvoiceUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * The data used to update Invoices.
+     */
+    data: XOR<InvoiceUpdateManyMutationInput, InvoiceUncheckedUpdateManyInput>
+    /**
+     * Filter which Invoices to update
+     */
+    where?: InvoiceWhereInput
+    /**
+     * Limit how many Invoices to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Invoice upsert
+   */
+  export type InvoiceUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Invoice to update in case it exists.
+     */
+    where: InvoiceWhereUniqueInput
+    /**
+     * In case the Invoice found by the `where` argument doesn't exist, create a new Invoice with this data.
+     */
+    create: XOR<InvoiceCreateInput, InvoiceUncheckedCreateInput>
+    /**
+     * In case the Invoice was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InvoiceUpdateInput, InvoiceUncheckedUpdateInput>
+  }
+
+  /**
+   * Invoice delete
+   */
+  export type InvoiceDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    /**
+     * Filter which Invoice to delete.
+     */
+    where: InvoiceWhereUniqueInput
+  }
+
+  /**
+   * Invoice deleteMany
+   */
+  export type InvoiceDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Invoices to delete
+     */
+    where?: InvoiceWhereInput
+    /**
+     * Limit how many Invoices to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Invoice.lineItems
+   */
+  export type Invoice$lineItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    where?: InvoiceLineItemWhereInput
+    orderBy?: InvoiceLineItemOrderByWithRelationInput | InvoiceLineItemOrderByWithRelationInput[]
+    cursor?: InvoiceLineItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InvoiceLineItemScalarFieldEnum | InvoiceLineItemScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice.payments
+   */
+  export type Invoice$paymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    where?: PaymentWhereInput
+    orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    cursor?: PaymentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice.deliveries
+   */
+  export type Invoice$deliveriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    where?: InvoiceDeliveryWhereInput
+    orderBy?: InvoiceDeliveryOrderByWithRelationInput | InvoiceDeliveryOrderByWithRelationInput[]
+    cursor?: InvoiceDeliveryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InvoiceDeliveryScalarFieldEnum | InvoiceDeliveryScalarFieldEnum[]
+  }
+
+  /**
+   * Invoice without action
+   */
+  export type InvoiceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model InvoiceLineItem
+   */
+
+  export type AggregateInvoiceLineItem = {
+    _count: InvoiceLineItemCountAggregateOutputType | null
+    _avg: InvoiceLineItemAvgAggregateOutputType | null
+    _sum: InvoiceLineItemSumAggregateOutputType | null
+    _min: InvoiceLineItemMinAggregateOutputType | null
+    _max: InvoiceLineItemMaxAggregateOutputType | null
+  }
+
+  export type InvoiceLineItemAvgAggregateOutputType = {
+    quantity: number | null
+    unitPriceInr: number | null
+    amountInr: number | null
+    sortOrder: number | null
+  }
+
+  export type InvoiceLineItemSumAggregateOutputType = {
+    quantity: number | null
+    unitPriceInr: number | null
+    amountInr: number | null
+    sortOrder: number | null
+  }
+
+  export type InvoiceLineItemMinAggregateOutputType = {
+    id: string | null
+    invoiceId: string | null
+    description: string | null
+    quantity: number | null
+    unitPriceInr: number | null
+    amountInr: number | null
+    sortOrder: number | null
+  }
+
+  export type InvoiceLineItemMaxAggregateOutputType = {
+    id: string | null
+    invoiceId: string | null
+    description: string | null
+    quantity: number | null
+    unitPriceInr: number | null
+    amountInr: number | null
+    sortOrder: number | null
+  }
+
+  export type InvoiceLineItemCountAggregateOutputType = {
+    id: number
+    invoiceId: number
+    description: number
+    quantity: number
+    unitPriceInr: number
+    amountInr: number
+    sortOrder: number
+    _all: number
+  }
+
+
+  export type InvoiceLineItemAvgAggregateInputType = {
+    quantity?: true
+    unitPriceInr?: true
+    amountInr?: true
+    sortOrder?: true
+  }
+
+  export type InvoiceLineItemSumAggregateInputType = {
+    quantity?: true
+    unitPriceInr?: true
+    amountInr?: true
+    sortOrder?: true
+  }
+
+  export type InvoiceLineItemMinAggregateInputType = {
+    id?: true
+    invoiceId?: true
+    description?: true
+    quantity?: true
+    unitPriceInr?: true
+    amountInr?: true
+    sortOrder?: true
+  }
+
+  export type InvoiceLineItemMaxAggregateInputType = {
+    id?: true
+    invoiceId?: true
+    description?: true
+    quantity?: true
+    unitPriceInr?: true
+    amountInr?: true
+    sortOrder?: true
+  }
+
+  export type InvoiceLineItemCountAggregateInputType = {
+    id?: true
+    invoiceId?: true
+    description?: true
+    quantity?: true
+    unitPriceInr?: true
+    amountInr?: true
+    sortOrder?: true
+    _all?: true
+  }
+
+  export type InvoiceLineItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InvoiceLineItem to aggregate.
+     */
+    where?: InvoiceLineItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InvoiceLineItems to fetch.
+     */
+    orderBy?: InvoiceLineItemOrderByWithRelationInput | InvoiceLineItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InvoiceLineItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InvoiceLineItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InvoiceLineItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned InvoiceLineItems
+    **/
+    _count?: true | InvoiceLineItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: InvoiceLineItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: InvoiceLineItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InvoiceLineItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InvoiceLineItemMaxAggregateInputType
+  }
+
+  export type GetInvoiceLineItemAggregateType<T extends InvoiceLineItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateInvoiceLineItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInvoiceLineItem[P]>
+      : GetScalarType<T[P], AggregateInvoiceLineItem[P]>
+  }
+
+
+
+
+  export type InvoiceLineItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceLineItemWhereInput
+    orderBy?: InvoiceLineItemOrderByWithAggregationInput | InvoiceLineItemOrderByWithAggregationInput[]
+    by: InvoiceLineItemScalarFieldEnum[] | InvoiceLineItemScalarFieldEnum
+    having?: InvoiceLineItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InvoiceLineItemCountAggregateInputType | true
+    _avg?: InvoiceLineItemAvgAggregateInputType
+    _sum?: InvoiceLineItemSumAggregateInputType
+    _min?: InvoiceLineItemMinAggregateInputType
+    _max?: InvoiceLineItemMaxAggregateInputType
+  }
+
+  export type InvoiceLineItemGroupByOutputType = {
+    id: string
+    invoiceId: string
+    description: string
+    quantity: number
+    unitPriceInr: number
+    amountInr: number
+    sortOrder: number
+    _count: InvoiceLineItemCountAggregateOutputType | null
+    _avg: InvoiceLineItemAvgAggregateOutputType | null
+    _sum: InvoiceLineItemSumAggregateOutputType | null
+    _min: InvoiceLineItemMinAggregateOutputType | null
+    _max: InvoiceLineItemMaxAggregateOutputType | null
+  }
+
+  type GetInvoiceLineItemGroupByPayload<T extends InvoiceLineItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InvoiceLineItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InvoiceLineItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InvoiceLineItemGroupByOutputType[P]>
+            : GetScalarType<T[P], InvoiceLineItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InvoiceLineItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    invoiceId?: boolean
+    description?: boolean
+    quantity?: boolean
+    unitPriceInr?: boolean
+    amountInr?: boolean
+    sortOrder?: boolean
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoiceLineItem"]>
+
+  export type InvoiceLineItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    invoiceId?: boolean
+    description?: boolean
+    quantity?: boolean
+    unitPriceInr?: boolean
+    amountInr?: boolean
+    sortOrder?: boolean
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoiceLineItem"]>
+
+  export type InvoiceLineItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    invoiceId?: boolean
+    description?: boolean
+    quantity?: boolean
+    unitPriceInr?: boolean
+    amountInr?: boolean
+    sortOrder?: boolean
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoiceLineItem"]>
+
+  export type InvoiceLineItemSelectScalar = {
+    id?: boolean
+    invoiceId?: boolean
+    description?: boolean
+    quantity?: boolean
+    unitPriceInr?: boolean
+    amountInr?: boolean
+    sortOrder?: boolean
+  }
+
+  export type InvoiceLineItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "invoiceId" | "description" | "quantity" | "unitPriceInr" | "amountInr" | "sortOrder", ExtArgs["result"]["invoiceLineItem"]>
+  export type InvoiceLineItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }
+  export type InvoiceLineItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }
+  export type InvoiceLineItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }
+
+  export type $InvoiceLineItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "InvoiceLineItem"
+    objects: {
+      invoice: Prisma.$InvoicePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      invoiceId: string
+      description: string
+      quantity: number
+      unitPriceInr: number
+      amountInr: number
+      sortOrder: number
+    }, ExtArgs["result"]["invoiceLineItem"]>
+    composites: {}
+  }
+
+  type InvoiceLineItemGetPayload<S extends boolean | null | undefined | InvoiceLineItemDefaultArgs> = $Result.GetResult<Prisma.$InvoiceLineItemPayload, S>
+
+  type InvoiceLineItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InvoiceLineItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InvoiceLineItemCountAggregateInputType | true
+    }
+
+  export interface InvoiceLineItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InvoiceLineItem'], meta: { name: 'InvoiceLineItem' } }
+    /**
+     * Find zero or one InvoiceLineItem that matches the filter.
+     * @param {InvoiceLineItemFindUniqueArgs} args - Arguments to find a InvoiceLineItem
+     * @example
+     * // Get one InvoiceLineItem
+     * const invoiceLineItem = await prisma.invoiceLineItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InvoiceLineItemFindUniqueArgs>(args: SelectSubset<T, InvoiceLineItemFindUniqueArgs<ExtArgs>>): Prisma__InvoiceLineItemClient<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one InvoiceLineItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InvoiceLineItemFindUniqueOrThrowArgs} args - Arguments to find a InvoiceLineItem
+     * @example
+     * // Get one InvoiceLineItem
+     * const invoiceLineItem = await prisma.invoiceLineItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InvoiceLineItemFindUniqueOrThrowArgs>(args: SelectSubset<T, InvoiceLineItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InvoiceLineItemClient<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InvoiceLineItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceLineItemFindFirstArgs} args - Arguments to find a InvoiceLineItem
+     * @example
+     * // Get one InvoiceLineItem
+     * const invoiceLineItem = await prisma.invoiceLineItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InvoiceLineItemFindFirstArgs>(args?: SelectSubset<T, InvoiceLineItemFindFirstArgs<ExtArgs>>): Prisma__InvoiceLineItemClient<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InvoiceLineItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceLineItemFindFirstOrThrowArgs} args - Arguments to find a InvoiceLineItem
+     * @example
+     * // Get one InvoiceLineItem
+     * const invoiceLineItem = await prisma.invoiceLineItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InvoiceLineItemFindFirstOrThrowArgs>(args?: SelectSubset<T, InvoiceLineItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__InvoiceLineItemClient<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more InvoiceLineItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceLineItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all InvoiceLineItems
+     * const invoiceLineItems = await prisma.invoiceLineItem.findMany()
+     * 
+     * // Get first 10 InvoiceLineItems
+     * const invoiceLineItems = await prisma.invoiceLineItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const invoiceLineItemWithIdOnly = await prisma.invoiceLineItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends InvoiceLineItemFindManyArgs>(args?: SelectSubset<T, InvoiceLineItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a InvoiceLineItem.
+     * @param {InvoiceLineItemCreateArgs} args - Arguments to create a InvoiceLineItem.
+     * @example
+     * // Create one InvoiceLineItem
+     * const InvoiceLineItem = await prisma.invoiceLineItem.create({
+     *   data: {
+     *     // ... data to create a InvoiceLineItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends InvoiceLineItemCreateArgs>(args: SelectSubset<T, InvoiceLineItemCreateArgs<ExtArgs>>): Prisma__InvoiceLineItemClient<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many InvoiceLineItems.
+     * @param {InvoiceLineItemCreateManyArgs} args - Arguments to create many InvoiceLineItems.
+     * @example
+     * // Create many InvoiceLineItems
+     * const invoiceLineItem = await prisma.invoiceLineItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InvoiceLineItemCreateManyArgs>(args?: SelectSubset<T, InvoiceLineItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many InvoiceLineItems and returns the data saved in the database.
+     * @param {InvoiceLineItemCreateManyAndReturnArgs} args - Arguments to create many InvoiceLineItems.
+     * @example
+     * // Create many InvoiceLineItems
+     * const invoiceLineItem = await prisma.invoiceLineItem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many InvoiceLineItems and only return the `id`
+     * const invoiceLineItemWithIdOnly = await prisma.invoiceLineItem.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends InvoiceLineItemCreateManyAndReturnArgs>(args?: SelectSubset<T, InvoiceLineItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a InvoiceLineItem.
+     * @param {InvoiceLineItemDeleteArgs} args - Arguments to delete one InvoiceLineItem.
+     * @example
+     * // Delete one InvoiceLineItem
+     * const InvoiceLineItem = await prisma.invoiceLineItem.delete({
+     *   where: {
+     *     // ... filter to delete one InvoiceLineItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InvoiceLineItemDeleteArgs>(args: SelectSubset<T, InvoiceLineItemDeleteArgs<ExtArgs>>): Prisma__InvoiceLineItemClient<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one InvoiceLineItem.
+     * @param {InvoiceLineItemUpdateArgs} args - Arguments to update one InvoiceLineItem.
+     * @example
+     * // Update one InvoiceLineItem
+     * const invoiceLineItem = await prisma.invoiceLineItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InvoiceLineItemUpdateArgs>(args: SelectSubset<T, InvoiceLineItemUpdateArgs<ExtArgs>>): Prisma__InvoiceLineItemClient<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more InvoiceLineItems.
+     * @param {InvoiceLineItemDeleteManyArgs} args - Arguments to filter InvoiceLineItems to delete.
+     * @example
+     * // Delete a few InvoiceLineItems
+     * const { count } = await prisma.invoiceLineItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InvoiceLineItemDeleteManyArgs>(args?: SelectSubset<T, InvoiceLineItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InvoiceLineItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceLineItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many InvoiceLineItems
+     * const invoiceLineItem = await prisma.invoiceLineItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InvoiceLineItemUpdateManyArgs>(args: SelectSubset<T, InvoiceLineItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InvoiceLineItems and returns the data updated in the database.
+     * @param {InvoiceLineItemUpdateManyAndReturnArgs} args - Arguments to update many InvoiceLineItems.
+     * @example
+     * // Update many InvoiceLineItems
+     * const invoiceLineItem = await prisma.invoiceLineItem.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more InvoiceLineItems and only return the `id`
+     * const invoiceLineItemWithIdOnly = await prisma.invoiceLineItem.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends InvoiceLineItemUpdateManyAndReturnArgs>(args: SelectSubset<T, InvoiceLineItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one InvoiceLineItem.
+     * @param {InvoiceLineItemUpsertArgs} args - Arguments to update or create a InvoiceLineItem.
+     * @example
+     * // Update or create a InvoiceLineItem
+     * const invoiceLineItem = await prisma.invoiceLineItem.upsert({
+     *   create: {
+     *     // ... data to create a InvoiceLineItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the InvoiceLineItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InvoiceLineItemUpsertArgs>(args: SelectSubset<T, InvoiceLineItemUpsertArgs<ExtArgs>>): Prisma__InvoiceLineItemClient<$Result.GetResult<Prisma.$InvoiceLineItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of InvoiceLineItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceLineItemCountArgs} args - Arguments to filter InvoiceLineItems to count.
+     * @example
+     * // Count the number of InvoiceLineItems
+     * const count = await prisma.invoiceLineItem.count({
+     *   where: {
+     *     // ... the filter for the InvoiceLineItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends InvoiceLineItemCountArgs>(
+      args?: Subset<T, InvoiceLineItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InvoiceLineItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a InvoiceLineItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceLineItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InvoiceLineItemAggregateArgs>(args: Subset<T, InvoiceLineItemAggregateArgs>): Prisma.PrismaPromise<GetInvoiceLineItemAggregateType<T>>
+
+    /**
+     * Group by InvoiceLineItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceLineItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InvoiceLineItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InvoiceLineItemGroupByArgs['orderBy'] }
+        : { orderBy?: InvoiceLineItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InvoiceLineItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInvoiceLineItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the InvoiceLineItem model
+   */
+  readonly fields: InvoiceLineItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for InvoiceLineItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InvoiceLineItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    invoice<T extends InvoiceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, InvoiceDefaultArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the InvoiceLineItem model
+   */
+  interface InvoiceLineItemFieldRefs {
+    readonly id: FieldRef<"InvoiceLineItem", 'String'>
+    readonly invoiceId: FieldRef<"InvoiceLineItem", 'String'>
+    readonly description: FieldRef<"InvoiceLineItem", 'String'>
+    readonly quantity: FieldRef<"InvoiceLineItem", 'Int'>
+    readonly unitPriceInr: FieldRef<"InvoiceLineItem", 'Int'>
+    readonly amountInr: FieldRef<"InvoiceLineItem", 'Int'>
+    readonly sortOrder: FieldRef<"InvoiceLineItem", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * InvoiceLineItem findUnique
+   */
+  export type InvoiceLineItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceLineItem to fetch.
+     */
+    where: InvoiceLineItemWhereUniqueInput
+  }
+
+  /**
+   * InvoiceLineItem findUniqueOrThrow
+   */
+  export type InvoiceLineItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceLineItem to fetch.
+     */
+    where: InvoiceLineItemWhereUniqueInput
+  }
+
+  /**
+   * InvoiceLineItem findFirst
+   */
+  export type InvoiceLineItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceLineItem to fetch.
+     */
+    where?: InvoiceLineItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InvoiceLineItems to fetch.
+     */
+    orderBy?: InvoiceLineItemOrderByWithRelationInput | InvoiceLineItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InvoiceLineItems.
+     */
+    cursor?: InvoiceLineItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InvoiceLineItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InvoiceLineItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InvoiceLineItems.
+     */
+    distinct?: InvoiceLineItemScalarFieldEnum | InvoiceLineItemScalarFieldEnum[]
+  }
+
+  /**
+   * InvoiceLineItem findFirstOrThrow
+   */
+  export type InvoiceLineItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceLineItem to fetch.
+     */
+    where?: InvoiceLineItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InvoiceLineItems to fetch.
+     */
+    orderBy?: InvoiceLineItemOrderByWithRelationInput | InvoiceLineItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InvoiceLineItems.
+     */
+    cursor?: InvoiceLineItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InvoiceLineItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InvoiceLineItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InvoiceLineItems.
+     */
+    distinct?: InvoiceLineItemScalarFieldEnum | InvoiceLineItemScalarFieldEnum[]
+  }
+
+  /**
+   * InvoiceLineItem findMany
+   */
+  export type InvoiceLineItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceLineItems to fetch.
+     */
+    where?: InvoiceLineItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InvoiceLineItems to fetch.
+     */
+    orderBy?: InvoiceLineItemOrderByWithRelationInput | InvoiceLineItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing InvoiceLineItems.
+     */
+    cursor?: InvoiceLineItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InvoiceLineItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InvoiceLineItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InvoiceLineItems.
+     */
+    distinct?: InvoiceLineItemScalarFieldEnum | InvoiceLineItemScalarFieldEnum[]
+  }
+
+  /**
+   * InvoiceLineItem create
+   */
+  export type InvoiceLineItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a InvoiceLineItem.
+     */
+    data: XOR<InvoiceLineItemCreateInput, InvoiceLineItemUncheckedCreateInput>
+  }
+
+  /**
+   * InvoiceLineItem createMany
+   */
+  export type InvoiceLineItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many InvoiceLineItems.
+     */
+    data: InvoiceLineItemCreateManyInput | InvoiceLineItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InvoiceLineItem createManyAndReturn
+   */
+  export type InvoiceLineItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * The data used to create many InvoiceLineItems.
+     */
+    data: InvoiceLineItemCreateManyInput | InvoiceLineItemCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * InvoiceLineItem update
+   */
+  export type InvoiceLineItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a InvoiceLineItem.
+     */
+    data: XOR<InvoiceLineItemUpdateInput, InvoiceLineItemUncheckedUpdateInput>
+    /**
+     * Choose, which InvoiceLineItem to update.
+     */
+    where: InvoiceLineItemWhereUniqueInput
+  }
+
+  /**
+   * InvoiceLineItem updateMany
+   */
+  export type InvoiceLineItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update InvoiceLineItems.
+     */
+    data: XOR<InvoiceLineItemUpdateManyMutationInput, InvoiceLineItemUncheckedUpdateManyInput>
+    /**
+     * Filter which InvoiceLineItems to update
+     */
+    where?: InvoiceLineItemWhereInput
+    /**
+     * Limit how many InvoiceLineItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InvoiceLineItem updateManyAndReturn
+   */
+  export type InvoiceLineItemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * The data used to update InvoiceLineItems.
+     */
+    data: XOR<InvoiceLineItemUpdateManyMutationInput, InvoiceLineItemUncheckedUpdateManyInput>
+    /**
+     * Filter which InvoiceLineItems to update
+     */
+    where?: InvoiceLineItemWhereInput
+    /**
+     * Limit how many InvoiceLineItems to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * InvoiceLineItem upsert
+   */
+  export type InvoiceLineItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the InvoiceLineItem to update in case it exists.
+     */
+    where: InvoiceLineItemWhereUniqueInput
+    /**
+     * In case the InvoiceLineItem found by the `where` argument doesn't exist, create a new InvoiceLineItem with this data.
+     */
+    create: XOR<InvoiceLineItemCreateInput, InvoiceLineItemUncheckedCreateInput>
+    /**
+     * In case the InvoiceLineItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InvoiceLineItemUpdateInput, InvoiceLineItemUncheckedUpdateInput>
+  }
+
+  /**
+   * InvoiceLineItem delete
+   */
+  export type InvoiceLineItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+    /**
+     * Filter which InvoiceLineItem to delete.
+     */
+    where: InvoiceLineItemWhereUniqueInput
+  }
+
+  /**
+   * InvoiceLineItem deleteMany
+   */
+  export type InvoiceLineItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InvoiceLineItems to delete
+     */
+    where?: InvoiceLineItemWhereInput
+    /**
+     * Limit how many InvoiceLineItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * InvoiceLineItem without action
+   */
+  export type InvoiceLineItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceLineItem
+     */
+    select?: InvoiceLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceLineItem
+     */
+    omit?: InvoiceLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceLineItemInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Payment
+   */
+
+  export type AggregatePayment = {
+    _count: PaymentCountAggregateOutputType | null
+    _avg: PaymentAvgAggregateOutputType | null
+    _sum: PaymentSumAggregateOutputType | null
+    _min: PaymentMinAggregateOutputType | null
+    _max: PaymentMaxAggregateOutputType | null
+  }
+
+  export type PaymentAvgAggregateOutputType = {
+    amountInr: number | null
+  }
+
+  export type PaymentSumAggregateOutputType = {
+    amountInr: number | null
+  }
+
+  export type PaymentMinAggregateOutputType = {
+    id: string | null
+    organizationId: string | null
+    invoiceId: string | null
+    amountInr: number | null
+    status: $Enums.PaymentStatus | null
+    method: string | null
+    reference: string | null
+    notes: string | null
+    recordedById: string | null
+    paidAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type PaymentMaxAggregateOutputType = {
+    id: string | null
+    organizationId: string | null
+    invoiceId: string | null
+    amountInr: number | null
+    status: $Enums.PaymentStatus | null
+    method: string | null
+    reference: string | null
+    notes: string | null
+    recordedById: string | null
+    paidAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type PaymentCountAggregateOutputType = {
+    id: number
+    organizationId: number
+    invoiceId: number
+    amountInr: number
+    status: number
+    method: number
+    reference: number
+    notes: number
+    recordedById: number
+    paidAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type PaymentAvgAggregateInputType = {
+    amountInr?: true
+  }
+
+  export type PaymentSumAggregateInputType = {
+    amountInr?: true
+  }
+
+  export type PaymentMinAggregateInputType = {
+    id?: true
+    organizationId?: true
+    invoiceId?: true
+    amountInr?: true
+    status?: true
+    method?: true
+    reference?: true
+    notes?: true
+    recordedById?: true
+    paidAt?: true
+    createdAt?: true
+  }
+
+  export type PaymentMaxAggregateInputType = {
+    id?: true
+    organizationId?: true
+    invoiceId?: true
+    amountInr?: true
+    status?: true
+    method?: true
+    reference?: true
+    notes?: true
+    recordedById?: true
+    paidAt?: true
+    createdAt?: true
+  }
+
+  export type PaymentCountAggregateInputType = {
+    id?: true
+    organizationId?: true
+    invoiceId?: true
+    amountInr?: true
+    status?: true
+    method?: true
+    reference?: true
+    notes?: true
+    recordedById?: true
+    paidAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type PaymentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Payment to aggregate.
+     */
+    where?: PaymentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Payments to fetch.
+     */
+    orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PaymentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Payments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Payments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Payments
+    **/
+    _count?: true | PaymentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PaymentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PaymentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PaymentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PaymentMaxAggregateInputType
+  }
+
+  export type GetPaymentAggregateType<T extends PaymentAggregateArgs> = {
+        [P in keyof T & keyof AggregatePayment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePayment[P]>
+      : GetScalarType<T[P], AggregatePayment[P]>
+  }
+
+
+
+
+  export type PaymentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PaymentWhereInput
+    orderBy?: PaymentOrderByWithAggregationInput | PaymentOrderByWithAggregationInput[]
+    by: PaymentScalarFieldEnum[] | PaymentScalarFieldEnum
+    having?: PaymentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PaymentCountAggregateInputType | true
+    _avg?: PaymentAvgAggregateInputType
+    _sum?: PaymentSumAggregateInputType
+    _min?: PaymentMinAggregateInputType
+    _max?: PaymentMaxAggregateInputType
+  }
+
+  export type PaymentGroupByOutputType = {
+    id: string
+    organizationId: string
+    invoiceId: string | null
+    amountInr: number
+    status: $Enums.PaymentStatus
+    method: string | null
+    reference: string | null
+    notes: string | null
+    recordedById: string | null
+    paidAt: Date
+    createdAt: Date
+    _count: PaymentCountAggregateOutputType | null
+    _avg: PaymentAvgAggregateOutputType | null
+    _sum: PaymentSumAggregateOutputType | null
+    _min: PaymentMinAggregateOutputType | null
+    _max: PaymentMaxAggregateOutputType | null
+  }
+
+  type GetPaymentGroupByPayload<T extends PaymentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PaymentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PaymentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PaymentGroupByOutputType[P]>
+            : GetScalarType<T[P], PaymentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PaymentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    invoiceId?: boolean
+    amountInr?: boolean
+    status?: boolean
+    method?: boolean
+    reference?: boolean
+    notes?: boolean
+    recordedById?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    invoice?: boolean | Payment$invoiceArgs<ExtArgs>
+  }, ExtArgs["result"]["payment"]>
+
+  export type PaymentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    invoiceId?: boolean
+    amountInr?: boolean
+    status?: boolean
+    method?: boolean
+    reference?: boolean
+    notes?: boolean
+    recordedById?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    invoice?: boolean | Payment$invoiceArgs<ExtArgs>
+  }, ExtArgs["result"]["payment"]>
+
+  export type PaymentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    invoiceId?: boolean
+    amountInr?: boolean
+    status?: boolean
+    method?: boolean
+    reference?: boolean
+    notes?: boolean
+    recordedById?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    invoice?: boolean | Payment$invoiceArgs<ExtArgs>
+  }, ExtArgs["result"]["payment"]>
+
+  export type PaymentSelectScalar = {
+    id?: boolean
+    organizationId?: boolean
+    invoiceId?: boolean
+    amountInr?: boolean
+    status?: boolean
+    method?: boolean
+    reference?: boolean
+    notes?: boolean
+    recordedById?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "invoiceId" | "amountInr" | "status" | "method" | "reference" | "notes" | "recordedById" | "paidAt" | "createdAt", ExtArgs["result"]["payment"]>
+  export type PaymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    invoice?: boolean | Payment$invoiceArgs<ExtArgs>
+  }
+  export type PaymentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    invoice?: boolean | Payment$invoiceArgs<ExtArgs>
+  }
+  export type PaymentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    invoice?: boolean | Payment$invoiceArgs<ExtArgs>
+  }
+
+  export type $PaymentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Payment"
+    objects: {
+      organization: Prisma.$OrganizationPayload<ExtArgs>
+      invoice: Prisma.$InvoicePayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      organizationId: string
+      invoiceId: string | null
+      amountInr: number
+      status: $Enums.PaymentStatus
+      method: string | null
+      reference: string | null
+      notes: string | null
+      recordedById: string | null
+      paidAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["payment"]>
+    composites: {}
+  }
+
+  type PaymentGetPayload<S extends boolean | null | undefined | PaymentDefaultArgs> = $Result.GetResult<Prisma.$PaymentPayload, S>
+
+  type PaymentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PaymentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PaymentCountAggregateInputType | true
+    }
+
+  export interface PaymentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Payment'], meta: { name: 'Payment' } }
+    /**
+     * Find zero or one Payment that matches the filter.
+     * @param {PaymentFindUniqueArgs} args - Arguments to find a Payment
+     * @example
+     * // Get one Payment
+     * const payment = await prisma.payment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PaymentFindUniqueArgs>(args: SelectSubset<T, PaymentFindUniqueArgs<ExtArgs>>): Prisma__PaymentClient<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Payment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PaymentFindUniqueOrThrowArgs} args - Arguments to find a Payment
+     * @example
+     * // Get one Payment
+     * const payment = await prisma.payment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PaymentFindUniqueOrThrowArgs>(args: SelectSubset<T, PaymentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PaymentClient<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Payment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PaymentFindFirstArgs} args - Arguments to find a Payment
+     * @example
+     * // Get one Payment
+     * const payment = await prisma.payment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PaymentFindFirstArgs>(args?: SelectSubset<T, PaymentFindFirstArgs<ExtArgs>>): Prisma__PaymentClient<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Payment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PaymentFindFirstOrThrowArgs} args - Arguments to find a Payment
+     * @example
+     * // Get one Payment
+     * const payment = await prisma.payment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PaymentFindFirstOrThrowArgs>(args?: SelectSubset<T, PaymentFindFirstOrThrowArgs<ExtArgs>>): Prisma__PaymentClient<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Payments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PaymentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Payments
+     * const payments = await prisma.payment.findMany()
+     * 
+     * // Get first 10 Payments
+     * const payments = await prisma.payment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const paymentWithIdOnly = await prisma.payment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PaymentFindManyArgs>(args?: SelectSubset<T, PaymentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Payment.
+     * @param {PaymentCreateArgs} args - Arguments to create a Payment.
+     * @example
+     * // Create one Payment
+     * const Payment = await prisma.payment.create({
+     *   data: {
+     *     // ... data to create a Payment
+     *   }
+     * })
+     * 
+     */
+    create<T extends PaymentCreateArgs>(args: SelectSubset<T, PaymentCreateArgs<ExtArgs>>): Prisma__PaymentClient<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Payments.
+     * @param {PaymentCreateManyArgs} args - Arguments to create many Payments.
+     * @example
+     * // Create many Payments
+     * const payment = await prisma.payment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PaymentCreateManyArgs>(args?: SelectSubset<T, PaymentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Payments and returns the data saved in the database.
+     * @param {PaymentCreateManyAndReturnArgs} args - Arguments to create many Payments.
+     * @example
+     * // Create many Payments
+     * const payment = await prisma.payment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Payments and only return the `id`
+     * const paymentWithIdOnly = await prisma.payment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PaymentCreateManyAndReturnArgs>(args?: SelectSubset<T, PaymentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Payment.
+     * @param {PaymentDeleteArgs} args - Arguments to delete one Payment.
+     * @example
+     * // Delete one Payment
+     * const Payment = await prisma.payment.delete({
+     *   where: {
+     *     // ... filter to delete one Payment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PaymentDeleteArgs>(args: SelectSubset<T, PaymentDeleteArgs<ExtArgs>>): Prisma__PaymentClient<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Payment.
+     * @param {PaymentUpdateArgs} args - Arguments to update one Payment.
+     * @example
+     * // Update one Payment
+     * const payment = await prisma.payment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PaymentUpdateArgs>(args: SelectSubset<T, PaymentUpdateArgs<ExtArgs>>): Prisma__PaymentClient<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Payments.
+     * @param {PaymentDeleteManyArgs} args - Arguments to filter Payments to delete.
+     * @example
+     * // Delete a few Payments
+     * const { count } = await prisma.payment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PaymentDeleteManyArgs>(args?: SelectSubset<T, PaymentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Payments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PaymentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Payments
+     * const payment = await prisma.payment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PaymentUpdateManyArgs>(args: SelectSubset<T, PaymentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Payments and returns the data updated in the database.
+     * @param {PaymentUpdateManyAndReturnArgs} args - Arguments to update many Payments.
+     * @example
+     * // Update many Payments
+     * const payment = await prisma.payment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Payments and only return the `id`
+     * const paymentWithIdOnly = await prisma.payment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PaymentUpdateManyAndReturnArgs>(args: SelectSubset<T, PaymentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Payment.
+     * @param {PaymentUpsertArgs} args - Arguments to update or create a Payment.
+     * @example
+     * // Update or create a Payment
+     * const payment = await prisma.payment.upsert({
+     *   create: {
+     *     // ... data to create a Payment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Payment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PaymentUpsertArgs>(args: SelectSubset<T, PaymentUpsertArgs<ExtArgs>>): Prisma__PaymentClient<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Payments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PaymentCountArgs} args - Arguments to filter Payments to count.
+     * @example
+     * // Count the number of Payments
+     * const count = await prisma.payment.count({
+     *   where: {
+     *     // ... the filter for the Payments we want to count
+     *   }
+     * })
+    **/
+    count<T extends PaymentCountArgs>(
+      args?: Subset<T, PaymentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PaymentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Payment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PaymentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PaymentAggregateArgs>(args: Subset<T, PaymentAggregateArgs>): Prisma.PrismaPromise<GetPaymentAggregateType<T>>
+
+    /**
+     * Group by Payment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PaymentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PaymentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PaymentGroupByArgs['orderBy'] }
+        : { orderBy?: PaymentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PaymentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPaymentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Payment model
+   */
+  readonly fields: PaymentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Payment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    organization<T extends OrganizationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrganizationDefaultArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    invoice<T extends Payment$invoiceArgs<ExtArgs> = {}>(args?: Subset<T, Payment$invoiceArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Payment model
+   */
+  interface PaymentFieldRefs {
+    readonly id: FieldRef<"Payment", 'String'>
+    readonly organizationId: FieldRef<"Payment", 'String'>
+    readonly invoiceId: FieldRef<"Payment", 'String'>
+    readonly amountInr: FieldRef<"Payment", 'Int'>
+    readonly status: FieldRef<"Payment", 'PaymentStatus'>
+    readonly method: FieldRef<"Payment", 'String'>
+    readonly reference: FieldRef<"Payment", 'String'>
+    readonly notes: FieldRef<"Payment", 'String'>
+    readonly recordedById: FieldRef<"Payment", 'String'>
+    readonly paidAt: FieldRef<"Payment", 'DateTime'>
+    readonly createdAt: FieldRef<"Payment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Payment findUnique
+   */
+  export type PaymentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Payment to fetch.
+     */
+    where: PaymentWhereUniqueInput
+  }
+
+  /**
+   * Payment findUniqueOrThrow
+   */
+  export type PaymentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Payment to fetch.
+     */
+    where: PaymentWhereUniqueInput
+  }
+
+  /**
+   * Payment findFirst
+   */
+  export type PaymentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Payment to fetch.
+     */
+    where?: PaymentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Payments to fetch.
+     */
+    orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Payments.
+     */
+    cursor?: PaymentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Payments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Payments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Payments.
+     */
+    distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]
+  }
+
+  /**
+   * Payment findFirstOrThrow
+   */
+  export type PaymentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Payment to fetch.
+     */
+    where?: PaymentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Payments to fetch.
+     */
+    orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Payments.
+     */
+    cursor?: PaymentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Payments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Payments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Payments.
+     */
+    distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]
+  }
+
+  /**
+   * Payment findMany
+   */
+  export type PaymentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Payments to fetch.
+     */
+    where?: PaymentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Payments to fetch.
+     */
+    orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Payments.
+     */
+    cursor?: PaymentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Payments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Payments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Payments.
+     */
+    distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]
+  }
+
+  /**
+   * Payment create
+   */
+  export type PaymentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Payment.
+     */
+    data: XOR<PaymentCreateInput, PaymentUncheckedCreateInput>
+  }
+
+  /**
+   * Payment createMany
+   */
+  export type PaymentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Payments.
+     */
+    data: PaymentCreateManyInput | PaymentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Payment createManyAndReturn
+   */
+  export type PaymentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * The data used to create many Payments.
+     */
+    data: PaymentCreateManyInput | PaymentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Payment update
+   */
+  export type PaymentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Payment.
+     */
+    data: XOR<PaymentUpdateInput, PaymentUncheckedUpdateInput>
+    /**
+     * Choose, which Payment to update.
+     */
+    where: PaymentWhereUniqueInput
+  }
+
+  /**
+   * Payment updateMany
+   */
+  export type PaymentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Payments.
+     */
+    data: XOR<PaymentUpdateManyMutationInput, PaymentUncheckedUpdateManyInput>
+    /**
+     * Filter which Payments to update
+     */
+    where?: PaymentWhereInput
+    /**
+     * Limit how many Payments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Payment updateManyAndReturn
+   */
+  export type PaymentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * The data used to update Payments.
+     */
+    data: XOR<PaymentUpdateManyMutationInput, PaymentUncheckedUpdateManyInput>
+    /**
+     * Filter which Payments to update
+     */
+    where?: PaymentWhereInput
+    /**
+     * Limit how many Payments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Payment upsert
+   */
+  export type PaymentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Payment to update in case it exists.
+     */
+    where: PaymentWhereUniqueInput
+    /**
+     * In case the Payment found by the `where` argument doesn't exist, create a new Payment with this data.
+     */
+    create: XOR<PaymentCreateInput, PaymentUncheckedCreateInput>
+    /**
+     * In case the Payment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PaymentUpdateInput, PaymentUncheckedUpdateInput>
+  }
+
+  /**
+   * Payment delete
+   */
+  export type PaymentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    /**
+     * Filter which Payment to delete.
+     */
+    where: PaymentWhereUniqueInput
+  }
+
+  /**
+   * Payment deleteMany
+   */
+  export type PaymentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Payments to delete
+     */
+    where?: PaymentWhereInput
+    /**
+     * Limit how many Payments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Payment.invoice
+   */
+  export type Payment$invoiceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    where?: InvoiceWhereInput
+  }
+
+  /**
+   * Payment without action
+   */
+  export type PaymentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model InvoiceDelivery
+   */
+
+  export type AggregateInvoiceDelivery = {
+    _count: InvoiceDeliveryCountAggregateOutputType | null
+    _min: InvoiceDeliveryMinAggregateOutputType | null
+    _max: InvoiceDeliveryMaxAggregateOutputType | null
+  }
+
+  export type InvoiceDeliveryMinAggregateOutputType = {
+    id: string | null
+    invoiceId: string | null
+    organizationId: string | null
+    recipientEmail: string | null
+    status: $Enums.InvoiceDeliveryStatus | null
+    error: string | null
+    sentAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type InvoiceDeliveryMaxAggregateOutputType = {
+    id: string | null
+    invoiceId: string | null
+    organizationId: string | null
+    recipientEmail: string | null
+    status: $Enums.InvoiceDeliveryStatus | null
+    error: string | null
+    sentAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type InvoiceDeliveryCountAggregateOutputType = {
+    id: number
+    invoiceId: number
+    organizationId: number
+    recipientEmail: number
+    status: number
+    error: number
+    sentAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type InvoiceDeliveryMinAggregateInputType = {
+    id?: true
+    invoiceId?: true
+    organizationId?: true
+    recipientEmail?: true
+    status?: true
+    error?: true
+    sentAt?: true
+    createdAt?: true
+  }
+
+  export type InvoiceDeliveryMaxAggregateInputType = {
+    id?: true
+    invoiceId?: true
+    organizationId?: true
+    recipientEmail?: true
+    status?: true
+    error?: true
+    sentAt?: true
+    createdAt?: true
+  }
+
+  export type InvoiceDeliveryCountAggregateInputType = {
+    id?: true
+    invoiceId?: true
+    organizationId?: true
+    recipientEmail?: true
+    status?: true
+    error?: true
+    sentAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type InvoiceDeliveryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InvoiceDelivery to aggregate.
+     */
+    where?: InvoiceDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InvoiceDeliveries to fetch.
+     */
+    orderBy?: InvoiceDeliveryOrderByWithRelationInput | InvoiceDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InvoiceDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InvoiceDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InvoiceDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned InvoiceDeliveries
+    **/
+    _count?: true | InvoiceDeliveryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InvoiceDeliveryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InvoiceDeliveryMaxAggregateInputType
+  }
+
+  export type GetInvoiceDeliveryAggregateType<T extends InvoiceDeliveryAggregateArgs> = {
+        [P in keyof T & keyof AggregateInvoiceDelivery]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInvoiceDelivery[P]>
+      : GetScalarType<T[P], AggregateInvoiceDelivery[P]>
+  }
+
+
+
+
+  export type InvoiceDeliveryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceDeliveryWhereInput
+    orderBy?: InvoiceDeliveryOrderByWithAggregationInput | InvoiceDeliveryOrderByWithAggregationInput[]
+    by: InvoiceDeliveryScalarFieldEnum[] | InvoiceDeliveryScalarFieldEnum
+    having?: InvoiceDeliveryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InvoiceDeliveryCountAggregateInputType | true
+    _min?: InvoiceDeliveryMinAggregateInputType
+    _max?: InvoiceDeliveryMaxAggregateInputType
+  }
+
+  export type InvoiceDeliveryGroupByOutputType = {
+    id: string
+    invoiceId: string
+    organizationId: string
+    recipientEmail: string
+    status: $Enums.InvoiceDeliveryStatus
+    error: string | null
+    sentAt: Date | null
+    createdAt: Date
+    _count: InvoiceDeliveryCountAggregateOutputType | null
+    _min: InvoiceDeliveryMinAggregateOutputType | null
+    _max: InvoiceDeliveryMaxAggregateOutputType | null
+  }
+
+  type GetInvoiceDeliveryGroupByPayload<T extends InvoiceDeliveryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InvoiceDeliveryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InvoiceDeliveryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InvoiceDeliveryGroupByOutputType[P]>
+            : GetScalarType<T[P], InvoiceDeliveryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InvoiceDeliverySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    invoiceId?: boolean
+    organizationId?: boolean
+    recipientEmail?: boolean
+    status?: boolean
+    error?: boolean
+    sentAt?: boolean
+    createdAt?: boolean
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoiceDelivery"]>
+
+  export type InvoiceDeliverySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    invoiceId?: boolean
+    organizationId?: boolean
+    recipientEmail?: boolean
+    status?: boolean
+    error?: boolean
+    sentAt?: boolean
+    createdAt?: boolean
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoiceDelivery"]>
+
+  export type InvoiceDeliverySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    invoiceId?: boolean
+    organizationId?: boolean
+    recipientEmail?: boolean
+    status?: boolean
+    error?: boolean
+    sentAt?: boolean
+    createdAt?: boolean
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["invoiceDelivery"]>
+
+  export type InvoiceDeliverySelectScalar = {
+    id?: boolean
+    invoiceId?: boolean
+    organizationId?: boolean
+    recipientEmail?: boolean
+    status?: boolean
+    error?: boolean
+    sentAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type InvoiceDeliveryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "invoiceId" | "organizationId" | "recipientEmail" | "status" | "error" | "sentAt" | "createdAt", ExtArgs["result"]["invoiceDelivery"]>
+  export type InvoiceDeliveryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }
+  export type InvoiceDeliveryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }
+  export type InvoiceDeliveryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    invoice?: boolean | InvoiceDefaultArgs<ExtArgs>
+  }
+
+  export type $InvoiceDeliveryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "InvoiceDelivery"
+    objects: {
+      invoice: Prisma.$InvoicePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      invoiceId: string
+      organizationId: string
+      recipientEmail: string
+      status: $Enums.InvoiceDeliveryStatus
+      error: string | null
+      sentAt: Date | null
+      createdAt: Date
+    }, ExtArgs["result"]["invoiceDelivery"]>
+    composites: {}
+  }
+
+  type InvoiceDeliveryGetPayload<S extends boolean | null | undefined | InvoiceDeliveryDefaultArgs> = $Result.GetResult<Prisma.$InvoiceDeliveryPayload, S>
+
+  type InvoiceDeliveryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InvoiceDeliveryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InvoiceDeliveryCountAggregateInputType | true
+    }
+
+  export interface InvoiceDeliveryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InvoiceDelivery'], meta: { name: 'InvoiceDelivery' } }
+    /**
+     * Find zero or one InvoiceDelivery that matches the filter.
+     * @param {InvoiceDeliveryFindUniqueArgs} args - Arguments to find a InvoiceDelivery
+     * @example
+     * // Get one InvoiceDelivery
+     * const invoiceDelivery = await prisma.invoiceDelivery.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InvoiceDeliveryFindUniqueArgs>(args: SelectSubset<T, InvoiceDeliveryFindUniqueArgs<ExtArgs>>): Prisma__InvoiceDeliveryClient<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one InvoiceDelivery that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InvoiceDeliveryFindUniqueOrThrowArgs} args - Arguments to find a InvoiceDelivery
+     * @example
+     * // Get one InvoiceDelivery
+     * const invoiceDelivery = await prisma.invoiceDelivery.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InvoiceDeliveryFindUniqueOrThrowArgs>(args: SelectSubset<T, InvoiceDeliveryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InvoiceDeliveryClient<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InvoiceDelivery that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceDeliveryFindFirstArgs} args - Arguments to find a InvoiceDelivery
+     * @example
+     * // Get one InvoiceDelivery
+     * const invoiceDelivery = await prisma.invoiceDelivery.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InvoiceDeliveryFindFirstArgs>(args?: SelectSubset<T, InvoiceDeliveryFindFirstArgs<ExtArgs>>): Prisma__InvoiceDeliveryClient<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InvoiceDelivery that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceDeliveryFindFirstOrThrowArgs} args - Arguments to find a InvoiceDelivery
+     * @example
+     * // Get one InvoiceDelivery
+     * const invoiceDelivery = await prisma.invoiceDelivery.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InvoiceDeliveryFindFirstOrThrowArgs>(args?: SelectSubset<T, InvoiceDeliveryFindFirstOrThrowArgs<ExtArgs>>): Prisma__InvoiceDeliveryClient<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more InvoiceDeliveries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceDeliveryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all InvoiceDeliveries
+     * const invoiceDeliveries = await prisma.invoiceDelivery.findMany()
+     * 
+     * // Get first 10 InvoiceDeliveries
+     * const invoiceDeliveries = await prisma.invoiceDelivery.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const invoiceDeliveryWithIdOnly = await prisma.invoiceDelivery.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends InvoiceDeliveryFindManyArgs>(args?: SelectSubset<T, InvoiceDeliveryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a InvoiceDelivery.
+     * @param {InvoiceDeliveryCreateArgs} args - Arguments to create a InvoiceDelivery.
+     * @example
+     * // Create one InvoiceDelivery
+     * const InvoiceDelivery = await prisma.invoiceDelivery.create({
+     *   data: {
+     *     // ... data to create a InvoiceDelivery
+     *   }
+     * })
+     * 
+     */
+    create<T extends InvoiceDeliveryCreateArgs>(args: SelectSubset<T, InvoiceDeliveryCreateArgs<ExtArgs>>): Prisma__InvoiceDeliveryClient<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many InvoiceDeliveries.
+     * @param {InvoiceDeliveryCreateManyArgs} args - Arguments to create many InvoiceDeliveries.
+     * @example
+     * // Create many InvoiceDeliveries
+     * const invoiceDelivery = await prisma.invoiceDelivery.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InvoiceDeliveryCreateManyArgs>(args?: SelectSubset<T, InvoiceDeliveryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many InvoiceDeliveries and returns the data saved in the database.
+     * @param {InvoiceDeliveryCreateManyAndReturnArgs} args - Arguments to create many InvoiceDeliveries.
+     * @example
+     * // Create many InvoiceDeliveries
+     * const invoiceDelivery = await prisma.invoiceDelivery.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many InvoiceDeliveries and only return the `id`
+     * const invoiceDeliveryWithIdOnly = await prisma.invoiceDelivery.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends InvoiceDeliveryCreateManyAndReturnArgs>(args?: SelectSubset<T, InvoiceDeliveryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a InvoiceDelivery.
+     * @param {InvoiceDeliveryDeleteArgs} args - Arguments to delete one InvoiceDelivery.
+     * @example
+     * // Delete one InvoiceDelivery
+     * const InvoiceDelivery = await prisma.invoiceDelivery.delete({
+     *   where: {
+     *     // ... filter to delete one InvoiceDelivery
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InvoiceDeliveryDeleteArgs>(args: SelectSubset<T, InvoiceDeliveryDeleteArgs<ExtArgs>>): Prisma__InvoiceDeliveryClient<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one InvoiceDelivery.
+     * @param {InvoiceDeliveryUpdateArgs} args - Arguments to update one InvoiceDelivery.
+     * @example
+     * // Update one InvoiceDelivery
+     * const invoiceDelivery = await prisma.invoiceDelivery.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InvoiceDeliveryUpdateArgs>(args: SelectSubset<T, InvoiceDeliveryUpdateArgs<ExtArgs>>): Prisma__InvoiceDeliveryClient<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more InvoiceDeliveries.
+     * @param {InvoiceDeliveryDeleteManyArgs} args - Arguments to filter InvoiceDeliveries to delete.
+     * @example
+     * // Delete a few InvoiceDeliveries
+     * const { count } = await prisma.invoiceDelivery.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InvoiceDeliveryDeleteManyArgs>(args?: SelectSubset<T, InvoiceDeliveryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InvoiceDeliveries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceDeliveryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many InvoiceDeliveries
+     * const invoiceDelivery = await prisma.invoiceDelivery.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InvoiceDeliveryUpdateManyArgs>(args: SelectSubset<T, InvoiceDeliveryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InvoiceDeliveries and returns the data updated in the database.
+     * @param {InvoiceDeliveryUpdateManyAndReturnArgs} args - Arguments to update many InvoiceDeliveries.
+     * @example
+     * // Update many InvoiceDeliveries
+     * const invoiceDelivery = await prisma.invoiceDelivery.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more InvoiceDeliveries and only return the `id`
+     * const invoiceDeliveryWithIdOnly = await prisma.invoiceDelivery.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends InvoiceDeliveryUpdateManyAndReturnArgs>(args: SelectSubset<T, InvoiceDeliveryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one InvoiceDelivery.
+     * @param {InvoiceDeliveryUpsertArgs} args - Arguments to update or create a InvoiceDelivery.
+     * @example
+     * // Update or create a InvoiceDelivery
+     * const invoiceDelivery = await prisma.invoiceDelivery.upsert({
+     *   create: {
+     *     // ... data to create a InvoiceDelivery
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the InvoiceDelivery we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InvoiceDeliveryUpsertArgs>(args: SelectSubset<T, InvoiceDeliveryUpsertArgs<ExtArgs>>): Prisma__InvoiceDeliveryClient<$Result.GetResult<Prisma.$InvoiceDeliveryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of InvoiceDeliveries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceDeliveryCountArgs} args - Arguments to filter InvoiceDeliveries to count.
+     * @example
+     * // Count the number of InvoiceDeliveries
+     * const count = await prisma.invoiceDelivery.count({
+     *   where: {
+     *     // ... the filter for the InvoiceDeliveries we want to count
+     *   }
+     * })
+    **/
+    count<T extends InvoiceDeliveryCountArgs>(
+      args?: Subset<T, InvoiceDeliveryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InvoiceDeliveryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a InvoiceDelivery.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceDeliveryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InvoiceDeliveryAggregateArgs>(args: Subset<T, InvoiceDeliveryAggregateArgs>): Prisma.PrismaPromise<GetInvoiceDeliveryAggregateType<T>>
+
+    /**
+     * Group by InvoiceDelivery.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InvoiceDeliveryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InvoiceDeliveryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InvoiceDeliveryGroupByArgs['orderBy'] }
+        : { orderBy?: InvoiceDeliveryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InvoiceDeliveryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInvoiceDeliveryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the InvoiceDelivery model
+   */
+  readonly fields: InvoiceDeliveryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for InvoiceDelivery.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InvoiceDeliveryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    invoice<T extends InvoiceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, InvoiceDefaultArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the InvoiceDelivery model
+   */
+  interface InvoiceDeliveryFieldRefs {
+    readonly id: FieldRef<"InvoiceDelivery", 'String'>
+    readonly invoiceId: FieldRef<"InvoiceDelivery", 'String'>
+    readonly organizationId: FieldRef<"InvoiceDelivery", 'String'>
+    readonly recipientEmail: FieldRef<"InvoiceDelivery", 'String'>
+    readonly status: FieldRef<"InvoiceDelivery", 'InvoiceDeliveryStatus'>
+    readonly error: FieldRef<"InvoiceDelivery", 'String'>
+    readonly sentAt: FieldRef<"InvoiceDelivery", 'DateTime'>
+    readonly createdAt: FieldRef<"InvoiceDelivery", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * InvoiceDelivery findUnique
+   */
+  export type InvoiceDeliveryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceDelivery to fetch.
+     */
+    where: InvoiceDeliveryWhereUniqueInput
+  }
+
+  /**
+   * InvoiceDelivery findUniqueOrThrow
+   */
+  export type InvoiceDeliveryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceDelivery to fetch.
+     */
+    where: InvoiceDeliveryWhereUniqueInput
+  }
+
+  /**
+   * InvoiceDelivery findFirst
+   */
+  export type InvoiceDeliveryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceDelivery to fetch.
+     */
+    where?: InvoiceDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InvoiceDeliveries to fetch.
+     */
+    orderBy?: InvoiceDeliveryOrderByWithRelationInput | InvoiceDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InvoiceDeliveries.
+     */
+    cursor?: InvoiceDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InvoiceDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InvoiceDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InvoiceDeliveries.
+     */
+    distinct?: InvoiceDeliveryScalarFieldEnum | InvoiceDeliveryScalarFieldEnum[]
+  }
+
+  /**
+   * InvoiceDelivery findFirstOrThrow
+   */
+  export type InvoiceDeliveryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceDelivery to fetch.
+     */
+    where?: InvoiceDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InvoiceDeliveries to fetch.
+     */
+    orderBy?: InvoiceDeliveryOrderByWithRelationInput | InvoiceDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InvoiceDeliveries.
+     */
+    cursor?: InvoiceDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InvoiceDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InvoiceDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InvoiceDeliveries.
+     */
+    distinct?: InvoiceDeliveryScalarFieldEnum | InvoiceDeliveryScalarFieldEnum[]
+  }
+
+  /**
+   * InvoiceDelivery findMany
+   */
+  export type InvoiceDeliveryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter, which InvoiceDeliveries to fetch.
+     */
+    where?: InvoiceDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InvoiceDeliveries to fetch.
+     */
+    orderBy?: InvoiceDeliveryOrderByWithRelationInput | InvoiceDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing InvoiceDeliveries.
+     */
+    cursor?: InvoiceDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InvoiceDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InvoiceDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InvoiceDeliveries.
+     */
+    distinct?: InvoiceDeliveryScalarFieldEnum | InvoiceDeliveryScalarFieldEnum[]
+  }
+
+  /**
+   * InvoiceDelivery create
+   */
+  export type InvoiceDeliveryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a InvoiceDelivery.
+     */
+    data: XOR<InvoiceDeliveryCreateInput, InvoiceDeliveryUncheckedCreateInput>
+  }
+
+  /**
+   * InvoiceDelivery createMany
+   */
+  export type InvoiceDeliveryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many InvoiceDeliveries.
+     */
+    data: InvoiceDeliveryCreateManyInput | InvoiceDeliveryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InvoiceDelivery createManyAndReturn
+   */
+  export type InvoiceDeliveryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * The data used to create many InvoiceDeliveries.
+     */
+    data: InvoiceDeliveryCreateManyInput | InvoiceDeliveryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * InvoiceDelivery update
+   */
+  export type InvoiceDeliveryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a InvoiceDelivery.
+     */
+    data: XOR<InvoiceDeliveryUpdateInput, InvoiceDeliveryUncheckedUpdateInput>
+    /**
+     * Choose, which InvoiceDelivery to update.
+     */
+    where: InvoiceDeliveryWhereUniqueInput
+  }
+
+  /**
+   * InvoiceDelivery updateMany
+   */
+  export type InvoiceDeliveryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update InvoiceDeliveries.
+     */
+    data: XOR<InvoiceDeliveryUpdateManyMutationInput, InvoiceDeliveryUncheckedUpdateManyInput>
+    /**
+     * Filter which InvoiceDeliveries to update
+     */
+    where?: InvoiceDeliveryWhereInput
+    /**
+     * Limit how many InvoiceDeliveries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InvoiceDelivery updateManyAndReturn
+   */
+  export type InvoiceDeliveryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * The data used to update InvoiceDeliveries.
+     */
+    data: XOR<InvoiceDeliveryUpdateManyMutationInput, InvoiceDeliveryUncheckedUpdateManyInput>
+    /**
+     * Filter which InvoiceDeliveries to update
+     */
+    where?: InvoiceDeliveryWhereInput
+    /**
+     * Limit how many InvoiceDeliveries to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * InvoiceDelivery upsert
+   */
+  export type InvoiceDeliveryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the InvoiceDelivery to update in case it exists.
+     */
+    where: InvoiceDeliveryWhereUniqueInput
+    /**
+     * In case the InvoiceDelivery found by the `where` argument doesn't exist, create a new InvoiceDelivery with this data.
+     */
+    create: XOR<InvoiceDeliveryCreateInput, InvoiceDeliveryUncheckedCreateInput>
+    /**
+     * In case the InvoiceDelivery was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InvoiceDeliveryUpdateInput, InvoiceDeliveryUncheckedUpdateInput>
+  }
+
+  /**
+   * InvoiceDelivery delete
+   */
+  export type InvoiceDeliveryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+    /**
+     * Filter which InvoiceDelivery to delete.
+     */
+    where: InvoiceDeliveryWhereUniqueInput
+  }
+
+  /**
+   * InvoiceDelivery deleteMany
+   */
+  export type InvoiceDeliveryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InvoiceDeliveries to delete
+     */
+    where?: InvoiceDeliveryWhereInput
+    /**
+     * Limit how many InvoiceDeliveries to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * InvoiceDelivery without action
+   */
+  export type InvoiceDeliveryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InvoiceDelivery
+     */
+    select?: InvoiceDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InvoiceDelivery
+     */
+    omit?: InvoiceDeliveryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceDeliveryInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BillingEvent
+   */
+
+  export type AggregateBillingEvent = {
+    _count: BillingEventCountAggregateOutputType | null
+    _min: BillingEventMinAggregateOutputType | null
+    _max: BillingEventMaxAggregateOutputType | null
+  }
+
+  export type BillingEventMinAggregateOutputType = {
+    id: string | null
+    organizationId: string | null
+    type: string | null
+    actorId: string | null
+    createdAt: Date | null
+  }
+
+  export type BillingEventMaxAggregateOutputType = {
+    id: string | null
+    organizationId: string | null
+    type: string | null
+    actorId: string | null
+    createdAt: Date | null
+  }
+
+  export type BillingEventCountAggregateOutputType = {
+    id: number
+    organizationId: number
+    type: number
+    metadata: number
+    actorId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type BillingEventMinAggregateInputType = {
+    id?: true
+    organizationId?: true
+    type?: true
+    actorId?: true
+    createdAt?: true
+  }
+
+  export type BillingEventMaxAggregateInputType = {
+    id?: true
+    organizationId?: true
+    type?: true
+    actorId?: true
+    createdAt?: true
+  }
+
+  export type BillingEventCountAggregateInputType = {
+    id?: true
+    organizationId?: true
+    type?: true
+    metadata?: true
+    actorId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type BillingEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BillingEvent to aggregate.
+     */
+    where?: BillingEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BillingEvents to fetch.
+     */
+    orderBy?: BillingEventOrderByWithRelationInput | BillingEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BillingEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BillingEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BillingEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BillingEvents
+    **/
+    _count?: true | BillingEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BillingEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BillingEventMaxAggregateInputType
+  }
+
+  export type GetBillingEventAggregateType<T extends BillingEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateBillingEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBillingEvent[P]>
+      : GetScalarType<T[P], AggregateBillingEvent[P]>
+  }
+
+
+
+
+  export type BillingEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BillingEventWhereInput
+    orderBy?: BillingEventOrderByWithAggregationInput | BillingEventOrderByWithAggregationInput[]
+    by: BillingEventScalarFieldEnum[] | BillingEventScalarFieldEnum
+    having?: BillingEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BillingEventCountAggregateInputType | true
+    _min?: BillingEventMinAggregateInputType
+    _max?: BillingEventMaxAggregateInputType
+  }
+
+  export type BillingEventGroupByOutputType = {
+    id: string
+    organizationId: string
+    type: string
+    metadata: JsonValue | null
+    actorId: string | null
+    createdAt: Date
+    _count: BillingEventCountAggregateOutputType | null
+    _min: BillingEventMinAggregateOutputType | null
+    _max: BillingEventMaxAggregateOutputType | null
+  }
+
+  type GetBillingEventGroupByPayload<T extends BillingEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BillingEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BillingEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BillingEventGroupByOutputType[P]>
+            : GetScalarType<T[P], BillingEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BillingEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    type?: boolean
+    metadata?: boolean
+    actorId?: boolean
+    createdAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["billingEvent"]>
+
+  export type BillingEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    type?: boolean
+    metadata?: boolean
+    actorId?: boolean
+    createdAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["billingEvent"]>
+
+  export type BillingEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    type?: boolean
+    metadata?: boolean
+    actorId?: boolean
+    createdAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["billingEvent"]>
+
+  export type BillingEventSelectScalar = {
+    id?: boolean
+    organizationId?: boolean
+    type?: boolean
+    metadata?: boolean
+    actorId?: boolean
+    createdAt?: boolean
+  }
+
+  export type BillingEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "type" | "metadata" | "actorId" | "createdAt", ExtArgs["result"]["billingEvent"]>
+  export type BillingEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }
+  export type BillingEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }
+  export type BillingEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }
+
+  export type $BillingEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BillingEvent"
+    objects: {
+      organization: Prisma.$OrganizationPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      organizationId: string
+      type: string
+      metadata: Prisma.JsonValue | null
+      actorId: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["billingEvent"]>
+    composites: {}
+  }
+
+  type BillingEventGetPayload<S extends boolean | null | undefined | BillingEventDefaultArgs> = $Result.GetResult<Prisma.$BillingEventPayload, S>
+
+  type BillingEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BillingEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BillingEventCountAggregateInputType | true
+    }
+
+  export interface BillingEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BillingEvent'], meta: { name: 'BillingEvent' } }
+    /**
+     * Find zero or one BillingEvent that matches the filter.
+     * @param {BillingEventFindUniqueArgs} args - Arguments to find a BillingEvent
+     * @example
+     * // Get one BillingEvent
+     * const billingEvent = await prisma.billingEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BillingEventFindUniqueArgs>(args: SelectSubset<T, BillingEventFindUniqueArgs<ExtArgs>>): Prisma__BillingEventClient<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BillingEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BillingEventFindUniqueOrThrowArgs} args - Arguments to find a BillingEvent
+     * @example
+     * // Get one BillingEvent
+     * const billingEvent = await prisma.billingEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BillingEventFindUniqueOrThrowArgs>(args: SelectSubset<T, BillingEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BillingEventClient<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BillingEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingEventFindFirstArgs} args - Arguments to find a BillingEvent
+     * @example
+     * // Get one BillingEvent
+     * const billingEvent = await prisma.billingEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BillingEventFindFirstArgs>(args?: SelectSubset<T, BillingEventFindFirstArgs<ExtArgs>>): Prisma__BillingEventClient<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BillingEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingEventFindFirstOrThrowArgs} args - Arguments to find a BillingEvent
+     * @example
+     * // Get one BillingEvent
+     * const billingEvent = await prisma.billingEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BillingEventFindFirstOrThrowArgs>(args?: SelectSubset<T, BillingEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__BillingEventClient<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BillingEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BillingEvents
+     * const billingEvents = await prisma.billingEvent.findMany()
+     * 
+     * // Get first 10 BillingEvents
+     * const billingEvents = await prisma.billingEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const billingEventWithIdOnly = await prisma.billingEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BillingEventFindManyArgs>(args?: SelectSubset<T, BillingEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BillingEvent.
+     * @param {BillingEventCreateArgs} args - Arguments to create a BillingEvent.
+     * @example
+     * // Create one BillingEvent
+     * const BillingEvent = await prisma.billingEvent.create({
+     *   data: {
+     *     // ... data to create a BillingEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends BillingEventCreateArgs>(args: SelectSubset<T, BillingEventCreateArgs<ExtArgs>>): Prisma__BillingEventClient<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BillingEvents.
+     * @param {BillingEventCreateManyArgs} args - Arguments to create many BillingEvents.
+     * @example
+     * // Create many BillingEvents
+     * const billingEvent = await prisma.billingEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BillingEventCreateManyArgs>(args?: SelectSubset<T, BillingEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BillingEvents and returns the data saved in the database.
+     * @param {BillingEventCreateManyAndReturnArgs} args - Arguments to create many BillingEvents.
+     * @example
+     * // Create many BillingEvents
+     * const billingEvent = await prisma.billingEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BillingEvents and only return the `id`
+     * const billingEventWithIdOnly = await prisma.billingEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BillingEventCreateManyAndReturnArgs>(args?: SelectSubset<T, BillingEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BillingEvent.
+     * @param {BillingEventDeleteArgs} args - Arguments to delete one BillingEvent.
+     * @example
+     * // Delete one BillingEvent
+     * const BillingEvent = await prisma.billingEvent.delete({
+     *   where: {
+     *     // ... filter to delete one BillingEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BillingEventDeleteArgs>(args: SelectSubset<T, BillingEventDeleteArgs<ExtArgs>>): Prisma__BillingEventClient<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BillingEvent.
+     * @param {BillingEventUpdateArgs} args - Arguments to update one BillingEvent.
+     * @example
+     * // Update one BillingEvent
+     * const billingEvent = await prisma.billingEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BillingEventUpdateArgs>(args: SelectSubset<T, BillingEventUpdateArgs<ExtArgs>>): Prisma__BillingEventClient<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BillingEvents.
+     * @param {BillingEventDeleteManyArgs} args - Arguments to filter BillingEvents to delete.
+     * @example
+     * // Delete a few BillingEvents
+     * const { count } = await prisma.billingEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BillingEventDeleteManyArgs>(args?: SelectSubset<T, BillingEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BillingEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BillingEvents
+     * const billingEvent = await prisma.billingEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BillingEventUpdateManyArgs>(args: SelectSubset<T, BillingEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BillingEvents and returns the data updated in the database.
+     * @param {BillingEventUpdateManyAndReturnArgs} args - Arguments to update many BillingEvents.
+     * @example
+     * // Update many BillingEvents
+     * const billingEvent = await prisma.billingEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BillingEvents and only return the `id`
+     * const billingEventWithIdOnly = await prisma.billingEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BillingEventUpdateManyAndReturnArgs>(args: SelectSubset<T, BillingEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BillingEvent.
+     * @param {BillingEventUpsertArgs} args - Arguments to update or create a BillingEvent.
+     * @example
+     * // Update or create a BillingEvent
+     * const billingEvent = await prisma.billingEvent.upsert({
+     *   create: {
+     *     // ... data to create a BillingEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BillingEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BillingEventUpsertArgs>(args: SelectSubset<T, BillingEventUpsertArgs<ExtArgs>>): Prisma__BillingEventClient<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BillingEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingEventCountArgs} args - Arguments to filter BillingEvents to count.
+     * @example
+     * // Count the number of BillingEvents
+     * const count = await prisma.billingEvent.count({
+     *   where: {
+     *     // ... the filter for the BillingEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends BillingEventCountArgs>(
+      args?: Subset<T, BillingEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BillingEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BillingEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BillingEventAggregateArgs>(args: Subset<T, BillingEventAggregateArgs>): Prisma.PrismaPromise<GetBillingEventAggregateType<T>>
+
+    /**
+     * Group by BillingEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BillingEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BillingEventGroupByArgs['orderBy'] }
+        : { orderBy?: BillingEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BillingEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBillingEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BillingEvent model
+   */
+  readonly fields: BillingEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BillingEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BillingEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    organization<T extends OrganizationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrganizationDefaultArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BillingEvent model
+   */
+  interface BillingEventFieldRefs {
+    readonly id: FieldRef<"BillingEvent", 'String'>
+    readonly organizationId: FieldRef<"BillingEvent", 'String'>
+    readonly type: FieldRef<"BillingEvent", 'String'>
+    readonly metadata: FieldRef<"BillingEvent", 'Json'>
+    readonly actorId: FieldRef<"BillingEvent", 'String'>
+    readonly createdAt: FieldRef<"BillingEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BillingEvent findUnique
+   */
+  export type BillingEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * Filter, which BillingEvent to fetch.
+     */
+    where: BillingEventWhereUniqueInput
+  }
+
+  /**
+   * BillingEvent findUniqueOrThrow
+   */
+  export type BillingEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * Filter, which BillingEvent to fetch.
+     */
+    where: BillingEventWhereUniqueInput
+  }
+
+  /**
+   * BillingEvent findFirst
+   */
+  export type BillingEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * Filter, which BillingEvent to fetch.
+     */
+    where?: BillingEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BillingEvents to fetch.
+     */
+    orderBy?: BillingEventOrderByWithRelationInput | BillingEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BillingEvents.
+     */
+    cursor?: BillingEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BillingEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BillingEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BillingEvents.
+     */
+    distinct?: BillingEventScalarFieldEnum | BillingEventScalarFieldEnum[]
+  }
+
+  /**
+   * BillingEvent findFirstOrThrow
+   */
+  export type BillingEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * Filter, which BillingEvent to fetch.
+     */
+    where?: BillingEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BillingEvents to fetch.
+     */
+    orderBy?: BillingEventOrderByWithRelationInput | BillingEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BillingEvents.
+     */
+    cursor?: BillingEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BillingEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BillingEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BillingEvents.
+     */
+    distinct?: BillingEventScalarFieldEnum | BillingEventScalarFieldEnum[]
+  }
+
+  /**
+   * BillingEvent findMany
+   */
+  export type BillingEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * Filter, which BillingEvents to fetch.
+     */
+    where?: BillingEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BillingEvents to fetch.
+     */
+    orderBy?: BillingEventOrderByWithRelationInput | BillingEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BillingEvents.
+     */
+    cursor?: BillingEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BillingEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BillingEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BillingEvents.
+     */
+    distinct?: BillingEventScalarFieldEnum | BillingEventScalarFieldEnum[]
+  }
+
+  /**
+   * BillingEvent create
+   */
+  export type BillingEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BillingEvent.
+     */
+    data: XOR<BillingEventCreateInput, BillingEventUncheckedCreateInput>
+  }
+
+  /**
+   * BillingEvent createMany
+   */
+  export type BillingEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BillingEvents.
+     */
+    data: BillingEventCreateManyInput | BillingEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BillingEvent createManyAndReturn
+   */
+  export type BillingEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many BillingEvents.
+     */
+    data: BillingEventCreateManyInput | BillingEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BillingEvent update
+   */
+  export type BillingEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BillingEvent.
+     */
+    data: XOR<BillingEventUpdateInput, BillingEventUncheckedUpdateInput>
+    /**
+     * Choose, which BillingEvent to update.
+     */
+    where: BillingEventWhereUniqueInput
+  }
+
+  /**
+   * BillingEvent updateMany
+   */
+  export type BillingEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BillingEvents.
+     */
+    data: XOR<BillingEventUpdateManyMutationInput, BillingEventUncheckedUpdateManyInput>
+    /**
+     * Filter which BillingEvents to update
+     */
+    where?: BillingEventWhereInput
+    /**
+     * Limit how many BillingEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BillingEvent updateManyAndReturn
+   */
+  export type BillingEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * The data used to update BillingEvents.
+     */
+    data: XOR<BillingEventUpdateManyMutationInput, BillingEventUncheckedUpdateManyInput>
+    /**
+     * Filter which BillingEvents to update
+     */
+    where?: BillingEventWhereInput
+    /**
+     * Limit how many BillingEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BillingEvent upsert
+   */
+  export type BillingEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BillingEvent to update in case it exists.
+     */
+    where: BillingEventWhereUniqueInput
+    /**
+     * In case the BillingEvent found by the `where` argument doesn't exist, create a new BillingEvent with this data.
+     */
+    create: XOR<BillingEventCreateInput, BillingEventUncheckedCreateInput>
+    /**
+     * In case the BillingEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BillingEventUpdateInput, BillingEventUncheckedUpdateInput>
+  }
+
+  /**
+   * BillingEvent delete
+   */
+  export type BillingEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    /**
+     * Filter which BillingEvent to delete.
+     */
+    where: BillingEventWhereUniqueInput
+  }
+
+  /**
+   * BillingEvent deleteMany
+   */
+  export type BillingEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BillingEvents to delete
+     */
+    where?: BillingEventWhereInput
+    /**
+     * Limit how many BillingEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BillingEvent without action
+   */
+  export type BillingEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PricingChangeLog
+   */
+
+  export type AggregatePricingChangeLog = {
+    _count: PricingChangeLogCountAggregateOutputType | null
+    _min: PricingChangeLogMinAggregateOutputType | null
+    _max: PricingChangeLogMaxAggregateOutputType | null
+  }
+
+  export type PricingChangeLogMinAggregateOutputType = {
+    id: string | null
+    actorId: string | null
+    actorName: string | null
+    createdAt: Date | null
+  }
+
+  export type PricingChangeLogMaxAggregateOutputType = {
+    id: string | null
+    actorId: string | null
+    actorName: string | null
+    createdAt: Date | null
+  }
+
+  export type PricingChangeLogCountAggregateOutputType = {
+    id: number
+    actorId: number
+    actorName: number
+    previous: number
+    next: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type PricingChangeLogMinAggregateInputType = {
+    id?: true
+    actorId?: true
+    actorName?: true
+    createdAt?: true
+  }
+
+  export type PricingChangeLogMaxAggregateInputType = {
+    id?: true
+    actorId?: true
+    actorName?: true
+    createdAt?: true
+  }
+
+  export type PricingChangeLogCountAggregateInputType = {
+    id?: true
+    actorId?: true
+    actorName?: true
+    previous?: true
+    next?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type PricingChangeLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PricingChangeLog to aggregate.
+     */
+    where?: PricingChangeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PricingChangeLogs to fetch.
+     */
+    orderBy?: PricingChangeLogOrderByWithRelationInput | PricingChangeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PricingChangeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PricingChangeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PricingChangeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PricingChangeLogs
+    **/
+    _count?: true | PricingChangeLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PricingChangeLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PricingChangeLogMaxAggregateInputType
+  }
+
+  export type GetPricingChangeLogAggregateType<T extends PricingChangeLogAggregateArgs> = {
+        [P in keyof T & keyof AggregatePricingChangeLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePricingChangeLog[P]>
+      : GetScalarType<T[P], AggregatePricingChangeLog[P]>
+  }
+
+
+
+
+  export type PricingChangeLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PricingChangeLogWhereInput
+    orderBy?: PricingChangeLogOrderByWithAggregationInput | PricingChangeLogOrderByWithAggregationInput[]
+    by: PricingChangeLogScalarFieldEnum[] | PricingChangeLogScalarFieldEnum
+    having?: PricingChangeLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PricingChangeLogCountAggregateInputType | true
+    _min?: PricingChangeLogMinAggregateInputType
+    _max?: PricingChangeLogMaxAggregateInputType
+  }
+
+  export type PricingChangeLogGroupByOutputType = {
+    id: string
+    actorId: string | null
+    actorName: string | null
+    previous: JsonValue
+    next: JsonValue
+    createdAt: Date
+    _count: PricingChangeLogCountAggregateOutputType | null
+    _min: PricingChangeLogMinAggregateOutputType | null
+    _max: PricingChangeLogMaxAggregateOutputType | null
+  }
+
+  type GetPricingChangeLogGroupByPayload<T extends PricingChangeLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PricingChangeLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PricingChangeLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PricingChangeLogGroupByOutputType[P]>
+            : GetScalarType<T[P], PricingChangeLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PricingChangeLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    actorId?: boolean
+    actorName?: boolean
+    previous?: boolean
+    next?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["pricingChangeLog"]>
+
+  export type PricingChangeLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    actorId?: boolean
+    actorName?: boolean
+    previous?: boolean
+    next?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["pricingChangeLog"]>
+
+  export type PricingChangeLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    actorId?: boolean
+    actorName?: boolean
+    previous?: boolean
+    next?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["pricingChangeLog"]>
+
+  export type PricingChangeLogSelectScalar = {
+    id?: boolean
+    actorId?: boolean
+    actorName?: boolean
+    previous?: boolean
+    next?: boolean
+    createdAt?: boolean
+  }
+
+  export type PricingChangeLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "actorId" | "actorName" | "previous" | "next" | "createdAt", ExtArgs["result"]["pricingChangeLog"]>
+
+  export type $PricingChangeLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PricingChangeLog"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      actorId: string | null
+      actorName: string | null
+      previous: Prisma.JsonValue
+      next: Prisma.JsonValue
+      createdAt: Date
+    }, ExtArgs["result"]["pricingChangeLog"]>
+    composites: {}
+  }
+
+  type PricingChangeLogGetPayload<S extends boolean | null | undefined | PricingChangeLogDefaultArgs> = $Result.GetResult<Prisma.$PricingChangeLogPayload, S>
+
+  type PricingChangeLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PricingChangeLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PricingChangeLogCountAggregateInputType | true
+    }
+
+  export interface PricingChangeLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PricingChangeLog'], meta: { name: 'PricingChangeLog' } }
+    /**
+     * Find zero or one PricingChangeLog that matches the filter.
+     * @param {PricingChangeLogFindUniqueArgs} args - Arguments to find a PricingChangeLog
+     * @example
+     * // Get one PricingChangeLog
+     * const pricingChangeLog = await prisma.pricingChangeLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PricingChangeLogFindUniqueArgs>(args: SelectSubset<T, PricingChangeLogFindUniqueArgs<ExtArgs>>): Prisma__PricingChangeLogClient<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PricingChangeLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PricingChangeLogFindUniqueOrThrowArgs} args - Arguments to find a PricingChangeLog
+     * @example
+     * // Get one PricingChangeLog
+     * const pricingChangeLog = await prisma.pricingChangeLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PricingChangeLogFindUniqueOrThrowArgs>(args: SelectSubset<T, PricingChangeLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PricingChangeLogClient<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PricingChangeLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PricingChangeLogFindFirstArgs} args - Arguments to find a PricingChangeLog
+     * @example
+     * // Get one PricingChangeLog
+     * const pricingChangeLog = await prisma.pricingChangeLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PricingChangeLogFindFirstArgs>(args?: SelectSubset<T, PricingChangeLogFindFirstArgs<ExtArgs>>): Prisma__PricingChangeLogClient<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PricingChangeLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PricingChangeLogFindFirstOrThrowArgs} args - Arguments to find a PricingChangeLog
+     * @example
+     * // Get one PricingChangeLog
+     * const pricingChangeLog = await prisma.pricingChangeLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PricingChangeLogFindFirstOrThrowArgs>(args?: SelectSubset<T, PricingChangeLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__PricingChangeLogClient<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PricingChangeLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PricingChangeLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PricingChangeLogs
+     * const pricingChangeLogs = await prisma.pricingChangeLog.findMany()
+     * 
+     * // Get first 10 PricingChangeLogs
+     * const pricingChangeLogs = await prisma.pricingChangeLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const pricingChangeLogWithIdOnly = await prisma.pricingChangeLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PricingChangeLogFindManyArgs>(args?: SelectSubset<T, PricingChangeLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PricingChangeLog.
+     * @param {PricingChangeLogCreateArgs} args - Arguments to create a PricingChangeLog.
+     * @example
+     * // Create one PricingChangeLog
+     * const PricingChangeLog = await prisma.pricingChangeLog.create({
+     *   data: {
+     *     // ... data to create a PricingChangeLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends PricingChangeLogCreateArgs>(args: SelectSubset<T, PricingChangeLogCreateArgs<ExtArgs>>): Prisma__PricingChangeLogClient<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PricingChangeLogs.
+     * @param {PricingChangeLogCreateManyArgs} args - Arguments to create many PricingChangeLogs.
+     * @example
+     * // Create many PricingChangeLogs
+     * const pricingChangeLog = await prisma.pricingChangeLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PricingChangeLogCreateManyArgs>(args?: SelectSubset<T, PricingChangeLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PricingChangeLogs and returns the data saved in the database.
+     * @param {PricingChangeLogCreateManyAndReturnArgs} args - Arguments to create many PricingChangeLogs.
+     * @example
+     * // Create many PricingChangeLogs
+     * const pricingChangeLog = await prisma.pricingChangeLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PricingChangeLogs and only return the `id`
+     * const pricingChangeLogWithIdOnly = await prisma.pricingChangeLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PricingChangeLogCreateManyAndReturnArgs>(args?: SelectSubset<T, PricingChangeLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PricingChangeLog.
+     * @param {PricingChangeLogDeleteArgs} args - Arguments to delete one PricingChangeLog.
+     * @example
+     * // Delete one PricingChangeLog
+     * const PricingChangeLog = await prisma.pricingChangeLog.delete({
+     *   where: {
+     *     // ... filter to delete one PricingChangeLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PricingChangeLogDeleteArgs>(args: SelectSubset<T, PricingChangeLogDeleteArgs<ExtArgs>>): Prisma__PricingChangeLogClient<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PricingChangeLog.
+     * @param {PricingChangeLogUpdateArgs} args - Arguments to update one PricingChangeLog.
+     * @example
+     * // Update one PricingChangeLog
+     * const pricingChangeLog = await prisma.pricingChangeLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PricingChangeLogUpdateArgs>(args: SelectSubset<T, PricingChangeLogUpdateArgs<ExtArgs>>): Prisma__PricingChangeLogClient<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PricingChangeLogs.
+     * @param {PricingChangeLogDeleteManyArgs} args - Arguments to filter PricingChangeLogs to delete.
+     * @example
+     * // Delete a few PricingChangeLogs
+     * const { count } = await prisma.pricingChangeLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PricingChangeLogDeleteManyArgs>(args?: SelectSubset<T, PricingChangeLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PricingChangeLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PricingChangeLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PricingChangeLogs
+     * const pricingChangeLog = await prisma.pricingChangeLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PricingChangeLogUpdateManyArgs>(args: SelectSubset<T, PricingChangeLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PricingChangeLogs and returns the data updated in the database.
+     * @param {PricingChangeLogUpdateManyAndReturnArgs} args - Arguments to update many PricingChangeLogs.
+     * @example
+     * // Update many PricingChangeLogs
+     * const pricingChangeLog = await prisma.pricingChangeLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PricingChangeLogs and only return the `id`
+     * const pricingChangeLogWithIdOnly = await prisma.pricingChangeLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PricingChangeLogUpdateManyAndReturnArgs>(args: SelectSubset<T, PricingChangeLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PricingChangeLog.
+     * @param {PricingChangeLogUpsertArgs} args - Arguments to update or create a PricingChangeLog.
+     * @example
+     * // Update or create a PricingChangeLog
+     * const pricingChangeLog = await prisma.pricingChangeLog.upsert({
+     *   create: {
+     *     // ... data to create a PricingChangeLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PricingChangeLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PricingChangeLogUpsertArgs>(args: SelectSubset<T, PricingChangeLogUpsertArgs<ExtArgs>>): Prisma__PricingChangeLogClient<$Result.GetResult<Prisma.$PricingChangeLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PricingChangeLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PricingChangeLogCountArgs} args - Arguments to filter PricingChangeLogs to count.
+     * @example
+     * // Count the number of PricingChangeLogs
+     * const count = await prisma.pricingChangeLog.count({
+     *   where: {
+     *     // ... the filter for the PricingChangeLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends PricingChangeLogCountArgs>(
+      args?: Subset<T, PricingChangeLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PricingChangeLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PricingChangeLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PricingChangeLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PricingChangeLogAggregateArgs>(args: Subset<T, PricingChangeLogAggregateArgs>): Prisma.PrismaPromise<GetPricingChangeLogAggregateType<T>>
+
+    /**
+     * Group by PricingChangeLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PricingChangeLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PricingChangeLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PricingChangeLogGroupByArgs['orderBy'] }
+        : { orderBy?: PricingChangeLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PricingChangeLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPricingChangeLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PricingChangeLog model
+   */
+  readonly fields: PricingChangeLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PricingChangeLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PricingChangeLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PricingChangeLog model
+   */
+  interface PricingChangeLogFieldRefs {
+    readonly id: FieldRef<"PricingChangeLog", 'String'>
+    readonly actorId: FieldRef<"PricingChangeLog", 'String'>
+    readonly actorName: FieldRef<"PricingChangeLog", 'String'>
+    readonly previous: FieldRef<"PricingChangeLog", 'Json'>
+    readonly next: FieldRef<"PricingChangeLog", 'Json'>
+    readonly createdAt: FieldRef<"PricingChangeLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PricingChangeLog findUnique
+   */
+  export type PricingChangeLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which PricingChangeLog to fetch.
+     */
+    where: PricingChangeLogWhereUniqueInput
+  }
+
+  /**
+   * PricingChangeLog findUniqueOrThrow
+   */
+  export type PricingChangeLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which PricingChangeLog to fetch.
+     */
+    where: PricingChangeLogWhereUniqueInput
+  }
+
+  /**
+   * PricingChangeLog findFirst
+   */
+  export type PricingChangeLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which PricingChangeLog to fetch.
+     */
+    where?: PricingChangeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PricingChangeLogs to fetch.
+     */
+    orderBy?: PricingChangeLogOrderByWithRelationInput | PricingChangeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PricingChangeLogs.
+     */
+    cursor?: PricingChangeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PricingChangeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PricingChangeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PricingChangeLogs.
+     */
+    distinct?: PricingChangeLogScalarFieldEnum | PricingChangeLogScalarFieldEnum[]
+  }
+
+  /**
+   * PricingChangeLog findFirstOrThrow
+   */
+  export type PricingChangeLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which PricingChangeLog to fetch.
+     */
+    where?: PricingChangeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PricingChangeLogs to fetch.
+     */
+    orderBy?: PricingChangeLogOrderByWithRelationInput | PricingChangeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PricingChangeLogs.
+     */
+    cursor?: PricingChangeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PricingChangeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PricingChangeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PricingChangeLogs.
+     */
+    distinct?: PricingChangeLogScalarFieldEnum | PricingChangeLogScalarFieldEnum[]
+  }
+
+  /**
+   * PricingChangeLog findMany
+   */
+  export type PricingChangeLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which PricingChangeLogs to fetch.
+     */
+    where?: PricingChangeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PricingChangeLogs to fetch.
+     */
+    orderBy?: PricingChangeLogOrderByWithRelationInput | PricingChangeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PricingChangeLogs.
+     */
+    cursor?: PricingChangeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PricingChangeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PricingChangeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PricingChangeLogs.
+     */
+    distinct?: PricingChangeLogScalarFieldEnum | PricingChangeLogScalarFieldEnum[]
+  }
+
+  /**
+   * PricingChangeLog create
+   */
+  export type PricingChangeLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * The data needed to create a PricingChangeLog.
+     */
+    data: XOR<PricingChangeLogCreateInput, PricingChangeLogUncheckedCreateInput>
+  }
+
+  /**
+   * PricingChangeLog createMany
+   */
+  export type PricingChangeLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PricingChangeLogs.
+     */
+    data: PricingChangeLogCreateManyInput | PricingChangeLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PricingChangeLog createManyAndReturn
+   */
+  export type PricingChangeLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many PricingChangeLogs.
+     */
+    data: PricingChangeLogCreateManyInput | PricingChangeLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PricingChangeLog update
+   */
+  export type PricingChangeLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * The data needed to update a PricingChangeLog.
+     */
+    data: XOR<PricingChangeLogUpdateInput, PricingChangeLogUncheckedUpdateInput>
+    /**
+     * Choose, which PricingChangeLog to update.
+     */
+    where: PricingChangeLogWhereUniqueInput
+  }
+
+  /**
+   * PricingChangeLog updateMany
+   */
+  export type PricingChangeLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PricingChangeLogs.
+     */
+    data: XOR<PricingChangeLogUpdateManyMutationInput, PricingChangeLogUncheckedUpdateManyInput>
+    /**
+     * Filter which PricingChangeLogs to update
+     */
+    where?: PricingChangeLogWhereInput
+    /**
+     * Limit how many PricingChangeLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PricingChangeLog updateManyAndReturn
+   */
+  export type PricingChangeLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * The data used to update PricingChangeLogs.
+     */
+    data: XOR<PricingChangeLogUpdateManyMutationInput, PricingChangeLogUncheckedUpdateManyInput>
+    /**
+     * Filter which PricingChangeLogs to update
+     */
+    where?: PricingChangeLogWhereInput
+    /**
+     * Limit how many PricingChangeLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PricingChangeLog upsert
+   */
+  export type PricingChangeLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * The filter to search for the PricingChangeLog to update in case it exists.
+     */
+    where: PricingChangeLogWhereUniqueInput
+    /**
+     * In case the PricingChangeLog found by the `where` argument doesn't exist, create a new PricingChangeLog with this data.
+     */
+    create: XOR<PricingChangeLogCreateInput, PricingChangeLogUncheckedCreateInput>
+    /**
+     * In case the PricingChangeLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PricingChangeLogUpdateInput, PricingChangeLogUncheckedUpdateInput>
+  }
+
+  /**
+   * PricingChangeLog delete
+   */
+  export type PricingChangeLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter which PricingChangeLog to delete.
+     */
+    where: PricingChangeLogWhereUniqueInput
+  }
+
+  /**
+   * PricingChangeLog deleteMany
+   */
+  export type PricingChangeLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PricingChangeLogs to delete
+     */
+    where?: PricingChangeLogWhereInput
+    /**
+     * Limit how many PricingChangeLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PricingChangeLog without action
+   */
+  export type PricingChangeLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PricingChangeLog
+     */
+    select?: PricingChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PricingChangeLog
+     */
+    omit?: PricingChangeLogOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model Organization
    */
 
@@ -5120,6 +13259,7 @@ export namespace Prisma {
     subscriptionPlan: $Enums.SubscriptionPlan | null
     createdAt: Date | null
     updatedAt: Date | null
+    defaultMomTemplateId: string | null
   }
 
   export type OrganizationMaxAggregateOutputType = {
@@ -5145,6 +13285,7 @@ export namespace Prisma {
     subscriptionPlan: $Enums.SubscriptionPlan | null
     createdAt: Date | null
     updatedAt: Date | null
+    defaultMomTemplateId: string | null
   }
 
   export type OrganizationCountAggregateOutputType = {
@@ -5170,6 +13311,7 @@ export namespace Prisma {
     subscriptionPlan: number
     createdAt: number
     updatedAt: number
+    defaultMomTemplateId: number
     _all: number
   }
 
@@ -5205,6 +13347,7 @@ export namespace Prisma {
     subscriptionPlan?: true
     createdAt?: true
     updatedAt?: true
+    defaultMomTemplateId?: true
   }
 
   export type OrganizationMaxAggregateInputType = {
@@ -5230,6 +13373,7 @@ export namespace Prisma {
     subscriptionPlan?: true
     createdAt?: true
     updatedAt?: true
+    defaultMomTemplateId?: true
   }
 
   export type OrganizationCountAggregateInputType = {
@@ -5255,6 +13399,7 @@ export namespace Prisma {
     subscriptionPlan?: true
     createdAt?: true
     updatedAt?: true
+    defaultMomTemplateId?: true
     _all?: true
   }
 
@@ -5367,6 +13512,7 @@ export namespace Prisma {
     subscriptionPlan: $Enums.SubscriptionPlan
     createdAt: Date
     updatedAt: Date
+    defaultMomTemplateId: string | null
     _count: OrganizationCountAggregateOutputType | null
     _avg: OrganizationAvgAggregateOutputType | null
     _sum: OrganizationSumAggregateOutputType | null
@@ -5411,10 +13557,16 @@ export namespace Prisma {
     subscriptionPlan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    defaultMomTemplateId?: boolean
     users?: boolean | Organization$usersArgs<ExtArgs>
     meetings?: boolean | Organization$meetingsArgs<ExtArgs>
     auditEvents?: boolean | Organization$auditEventsArgs<ExtArgs>
     billingProfile?: boolean | Organization$billingProfileArgs<ExtArgs>
+    momTemplates?: boolean | Organization$momTemplatesArgs<ExtArgs>
+    defaultMomTemplate?: boolean | Organization$defaultMomTemplateArgs<ExtArgs>
+    invoices?: boolean | Organization$invoicesArgs<ExtArgs>
+    payments?: boolean | Organization$paymentsArgs<ExtArgs>
+    billingEvents?: boolean | Organization$billingEventsArgs<ExtArgs>
     _count?: boolean | OrganizationCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["organization"]>
 
@@ -5441,6 +13593,8 @@ export namespace Prisma {
     subscriptionPlan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    defaultMomTemplateId?: boolean
+    defaultMomTemplate?: boolean | Organization$defaultMomTemplateArgs<ExtArgs>
   }, ExtArgs["result"]["organization"]>
 
   export type OrganizationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5466,6 +13620,8 @@ export namespace Prisma {
     subscriptionPlan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    defaultMomTemplateId?: boolean
+    defaultMomTemplate?: boolean | Organization$defaultMomTemplateArgs<ExtArgs>
   }, ExtArgs["result"]["organization"]>
 
   export type OrganizationSelectScalar = {
@@ -5491,18 +13647,28 @@ export namespace Prisma {
     subscriptionPlan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    defaultMomTemplateId?: boolean
   }
 
-  export type OrganizationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "code" | "slug" | "legalName" | "primaryContactName" | "industry" | "email" | "phone" | "website" | "companySize" | "country" | "state" | "city" | "logoUrl" | "address" | "timezone" | "meetingDefaultDurationMinutes" | "status" | "subscriptionPlan" | "createdAt" | "updatedAt", ExtArgs["result"]["organization"]>
+  export type OrganizationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "code" | "slug" | "legalName" | "primaryContactName" | "industry" | "email" | "phone" | "website" | "companySize" | "country" | "state" | "city" | "logoUrl" | "address" | "timezone" | "meetingDefaultDurationMinutes" | "status" | "subscriptionPlan" | "createdAt" | "updatedAt" | "defaultMomTemplateId", ExtArgs["result"]["organization"]>
   export type OrganizationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | Organization$usersArgs<ExtArgs>
     meetings?: boolean | Organization$meetingsArgs<ExtArgs>
     auditEvents?: boolean | Organization$auditEventsArgs<ExtArgs>
     billingProfile?: boolean | Organization$billingProfileArgs<ExtArgs>
+    momTemplates?: boolean | Organization$momTemplatesArgs<ExtArgs>
+    defaultMomTemplate?: boolean | Organization$defaultMomTemplateArgs<ExtArgs>
+    invoices?: boolean | Organization$invoicesArgs<ExtArgs>
+    payments?: boolean | Organization$paymentsArgs<ExtArgs>
+    billingEvents?: boolean | Organization$billingEventsArgs<ExtArgs>
     _count?: boolean | OrganizationCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type OrganizationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    defaultMomTemplate?: boolean | Organization$defaultMomTemplateArgs<ExtArgs>
+  }
+  export type OrganizationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    defaultMomTemplate?: boolean | Organization$defaultMomTemplateArgs<ExtArgs>
+  }
 
   export type $OrganizationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Organization"
@@ -5511,6 +13677,11 @@ export namespace Prisma {
       meetings: Prisma.$MeetingPayload<ExtArgs>[]
       auditEvents: Prisma.$TenantAuditLogPayload<ExtArgs>[]
       billingProfile: Prisma.$OrganizationBillingPayload<ExtArgs> | null
+      momTemplates: Prisma.$MomTemplatePayload<ExtArgs>[]
+      defaultMomTemplate: Prisma.$MomTemplatePayload<ExtArgs> | null
+      invoices: Prisma.$InvoicePayload<ExtArgs>[]
+      payments: Prisma.$PaymentPayload<ExtArgs>[]
+      billingEvents: Prisma.$BillingEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5535,6 +13706,7 @@ export namespace Prisma {
       subscriptionPlan: $Enums.SubscriptionPlan
       createdAt: Date
       updatedAt: Date
+      defaultMomTemplateId: string | null
     }, ExtArgs["result"]["organization"]>
     composites: {}
   }
@@ -5933,6 +14105,11 @@ export namespace Prisma {
     meetings<T extends Organization$meetingsArgs<ExtArgs> = {}>(args?: Subset<T, Organization$meetingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MeetingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     auditEvents<T extends Organization$auditEventsArgs<ExtArgs> = {}>(args?: Subset<T, Organization$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TenantAuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billingProfile<T extends Organization$billingProfileArgs<ExtArgs> = {}>(args?: Subset<T, Organization$billingProfileArgs<ExtArgs>>): Prisma__OrganizationBillingClient<$Result.GetResult<Prisma.$OrganizationBillingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    momTemplates<T extends Organization$momTemplatesArgs<ExtArgs> = {}>(args?: Subset<T, Organization$momTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    defaultMomTemplate<T extends Organization$defaultMomTemplateArgs<ExtArgs> = {}>(args?: Subset<T, Organization$defaultMomTemplateArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    invoices<T extends Organization$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, Organization$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    payments<T extends Organization$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Organization$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    billingEvents<T extends Organization$billingEventsArgs<ExtArgs> = {}>(args?: Subset<T, Organization$billingEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5984,6 +14161,7 @@ export namespace Prisma {
     readonly subscriptionPlan: FieldRef<"Organization", 'SubscriptionPlan'>
     readonly createdAt: FieldRef<"Organization", 'DateTime'>
     readonly updatedAt: FieldRef<"Organization", 'DateTime'>
+    readonly defaultMomTemplateId: FieldRef<"Organization", 'String'>
   }
     
 
@@ -6238,6 +14416,10 @@ export namespace Prisma {
      */
     data: OrganizationCreateManyInput | OrganizationCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrganizationIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6308,6 +14490,10 @@ export namespace Prisma {
      * Limit how many Organizations to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrganizationIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6465,6 +14651,121 @@ export namespace Prisma {
      */
     include?: OrganizationBillingInclude<ExtArgs> | null
     where?: OrganizationBillingWhereInput
+  }
+
+  /**
+   * Organization.momTemplates
+   */
+  export type Organization$momTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    where?: MomTemplateWhereInput
+    orderBy?: MomTemplateOrderByWithRelationInput | MomTemplateOrderByWithRelationInput[]
+    cursor?: MomTemplateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MomTemplateScalarFieldEnum | MomTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * Organization.defaultMomTemplate
+   */
+  export type Organization$defaultMomTemplateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    where?: MomTemplateWhereInput
+  }
+
+  /**
+   * Organization.invoices
+   */
+  export type Organization$invoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    where?: InvoiceWhereInput
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    cursor?: InvoiceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Organization.payments
+   */
+  export type Organization$paymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    where?: PaymentWhereInput
+    orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    cursor?: PaymentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]
+  }
+
+  /**
+   * Organization.billingEvents
+   */
+  export type Organization$billingEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingEvent
+     */
+    select?: BillingEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BillingEvent
+     */
+    omit?: BillingEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BillingEventInclude<ExtArgs> | null
+    where?: BillingEventWhereInput
+    orderBy?: BillingEventOrderByWithRelationInput | BillingEventOrderByWithRelationInput[]
+    cursor?: BillingEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BillingEventScalarFieldEnum | BillingEventScalarFieldEnum[]
   }
 
   /**
@@ -11186,6 +19487,7 @@ export namespace Prisma {
     liveEndedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    momTemplateId: string | null
   }
 
   export type MeetingMaxAggregateOutputType = {
@@ -11208,6 +19510,7 @@ export namespace Prisma {
     liveEndedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    momTemplateId: string | null
   }
 
   export type MeetingCountAggregateOutputType = {
@@ -11230,6 +19533,7 @@ export namespace Prisma {
     liveEndedAt: number
     createdAt: number
     updatedAt: number
+    momTemplateId: number
     _all: number
   }
 
@@ -11262,6 +19566,7 @@ export namespace Prisma {
     liveEndedAt?: true
     createdAt?: true
     updatedAt?: true
+    momTemplateId?: true
   }
 
   export type MeetingMaxAggregateInputType = {
@@ -11284,6 +19589,7 @@ export namespace Prisma {
     liveEndedAt?: true
     createdAt?: true
     updatedAt?: true
+    momTemplateId?: true
   }
 
   export type MeetingCountAggregateInputType = {
@@ -11306,6 +19612,7 @@ export namespace Prisma {
     liveEndedAt?: true
     createdAt?: true
     updatedAt?: true
+    momTemplateId?: true
     _all?: true
   }
 
@@ -11415,6 +19722,7 @@ export namespace Prisma {
     liveEndedAt: Date | null
     createdAt: Date
     updatedAt: Date
+    momTemplateId: string | null
     _count: MeetingCountAggregateOutputType | null
     _avg: MeetingAvgAggregateOutputType | null
     _sum: MeetingSumAggregateOutputType | null
@@ -11456,7 +19764,9 @@ export namespace Prisma {
     liveEndedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    momTemplateId?: boolean
     organization?: boolean | Meeting$organizationArgs<ExtArgs>
+    momTemplate?: boolean | Meeting$momTemplateArgs<ExtArgs>
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
     participants?: boolean | Meeting$participantsArgs<ExtArgs>
     audioFiles?: boolean | Meeting$audioFilesArgs<ExtArgs>
@@ -11490,7 +19800,9 @@ export namespace Prisma {
     liveEndedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    momTemplateId?: boolean
     organization?: boolean | Meeting$organizationArgs<ExtArgs>
+    momTemplate?: boolean | Meeting$momTemplateArgs<ExtArgs>
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
   }, ExtArgs["result"]["meeting"]>
 
@@ -11514,7 +19826,9 @@ export namespace Prisma {
     liveEndedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    momTemplateId?: boolean
     organization?: boolean | Meeting$organizationArgs<ExtArgs>
+    momTemplate?: boolean | Meeting$momTemplateArgs<ExtArgs>
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
   }, ExtArgs["result"]["meeting"]>
 
@@ -11538,11 +19852,13 @@ export namespace Prisma {
     liveEndedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    momTemplateId?: boolean
   }
 
-  export type MeetingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "title" | "description" | "scheduledAt" | "durationMinutes" | "status" | "tag" | "notes" | "calendarEventId" | "recordingUrl" | "organizerId" | "livekitRoomId" | "joinSlug" | "liveStartedAt" | "liveBroadcastAt" | "liveEndedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["meeting"]>
+  export type MeetingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "title" | "description" | "scheduledAt" | "durationMinutes" | "status" | "tag" | "notes" | "calendarEventId" | "recordingUrl" | "organizerId" | "livekitRoomId" | "joinSlug" | "liveStartedAt" | "liveBroadcastAt" | "liveEndedAt" | "createdAt" | "updatedAt" | "momTemplateId", ExtArgs["result"]["meeting"]>
   export type MeetingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organization?: boolean | Meeting$organizationArgs<ExtArgs>
+    momTemplate?: boolean | Meeting$momTemplateArgs<ExtArgs>
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
     participants?: boolean | Meeting$participantsArgs<ExtArgs>
     audioFiles?: boolean | Meeting$audioFilesArgs<ExtArgs>
@@ -11557,10 +19873,12 @@ export namespace Prisma {
   }
   export type MeetingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organization?: boolean | Meeting$organizationArgs<ExtArgs>
+    momTemplate?: boolean | Meeting$momTemplateArgs<ExtArgs>
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
   }
   export type MeetingIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organization?: boolean | Meeting$organizationArgs<ExtArgs>
+    momTemplate?: boolean | Meeting$momTemplateArgs<ExtArgs>
     organizer?: boolean | Meeting$organizerArgs<ExtArgs>
   }
 
@@ -11568,6 +19886,7 @@ export namespace Prisma {
     name: "Meeting"
     objects: {
       organization: Prisma.$OrganizationPayload<ExtArgs> | null
+      momTemplate: Prisma.$MomTemplatePayload<ExtArgs> | null
       organizer: Prisma.$UserPayload<ExtArgs> | null
       participants: Prisma.$MeetingParticipantPayload<ExtArgs>[]
       audioFiles: Prisma.$AudioFilePayload<ExtArgs>[]
@@ -11599,6 +19918,7 @@ export namespace Prisma {
       liveEndedAt: Date | null
       createdAt: Date
       updatedAt: Date
+      momTemplateId: string | null
     }, ExtArgs["result"]["meeting"]>
     composites: {}
   }
@@ -11994,6 +20314,7 @@ export namespace Prisma {
   export interface Prisma__MeetingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     organization<T extends Meeting$organizationArgs<ExtArgs> = {}>(args?: Subset<T, Meeting$organizationArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    momTemplate<T extends Meeting$momTemplateArgs<ExtArgs> = {}>(args?: Subset<T, Meeting$momTemplateArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     organizer<T extends Meeting$organizerArgs<ExtArgs> = {}>(args?: Subset<T, Meeting$organizerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     participants<T extends Meeting$participantsArgs<ExtArgs> = {}>(args?: Subset<T, Meeting$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MeetingParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     audioFiles<T extends Meeting$audioFilesArgs<ExtArgs> = {}>(args?: Subset<T, Meeting$audioFilesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AudioFilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -12052,6 +20373,7 @@ export namespace Prisma {
     readonly liveEndedAt: FieldRef<"Meeting", 'DateTime'>
     readonly createdAt: FieldRef<"Meeting", 'DateTime'>
     readonly updatedAt: FieldRef<"Meeting", 'DateTime'>
+    readonly momTemplateId: FieldRef<"Meeting", 'String'>
   }
     
 
@@ -12472,6 +20794,25 @@ export namespace Prisma {
   }
 
   /**
+   * Meeting.momTemplate
+   */
+  export type Meeting$momTemplateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    where?: MomTemplateWhereInput
+  }
+
+  /**
    * Meeting.organizer
    */
   export type Meeting$organizerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -12707,6 +21048,3559 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: MeetingInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MomTemplate
+   */
+
+  export type AggregateMomTemplate = {
+    _count: MomTemplateCountAggregateOutputType | null
+    _min: MomTemplateMinAggregateOutputType | null
+    _max: MomTemplateMaxAggregateOutputType | null
+  }
+
+  export type MomTemplateMinAggregateOutputType = {
+    id: string | null
+    organizationId: string | null
+    name: string | null
+    description: string | null
+    category: $Enums.MomTemplateCategory | null
+    source: $Enums.MomTemplateSource | null
+    isDefault: boolean | null
+    isArchived: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MomTemplateMaxAggregateOutputType = {
+    id: string | null
+    organizationId: string | null
+    name: string | null
+    description: string | null
+    category: $Enums.MomTemplateCategory | null
+    source: $Enums.MomTemplateSource | null
+    isDefault: boolean | null
+    isArchived: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MomTemplateCountAggregateOutputType = {
+    id: number
+    organizationId: number
+    name: number
+    description: number
+    category: number
+    source: number
+    isDefault: number
+    isArchived: number
+    metadata: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MomTemplateMinAggregateInputType = {
+    id?: true
+    organizationId?: true
+    name?: true
+    description?: true
+    category?: true
+    source?: true
+    isDefault?: true
+    isArchived?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MomTemplateMaxAggregateInputType = {
+    id?: true
+    organizationId?: true
+    name?: true
+    description?: true
+    category?: true
+    source?: true
+    isDefault?: true
+    isArchived?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MomTemplateCountAggregateInputType = {
+    id?: true
+    organizationId?: true
+    name?: true
+    description?: true
+    category?: true
+    source?: true
+    isDefault?: true
+    isArchived?: true
+    metadata?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MomTemplateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MomTemplate to aggregate.
+     */
+    where?: MomTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplates to fetch.
+     */
+    orderBy?: MomTemplateOrderByWithRelationInput | MomTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MomTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MomTemplates
+    **/
+    _count?: true | MomTemplateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MomTemplateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MomTemplateMaxAggregateInputType
+  }
+
+  export type GetMomTemplateAggregateType<T extends MomTemplateAggregateArgs> = {
+        [P in keyof T & keyof AggregateMomTemplate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMomTemplate[P]>
+      : GetScalarType<T[P], AggregateMomTemplate[P]>
+  }
+
+
+
+
+  export type MomTemplateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MomTemplateWhereInput
+    orderBy?: MomTemplateOrderByWithAggregationInput | MomTemplateOrderByWithAggregationInput[]
+    by: MomTemplateScalarFieldEnum[] | MomTemplateScalarFieldEnum
+    having?: MomTemplateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MomTemplateCountAggregateInputType | true
+    _min?: MomTemplateMinAggregateInputType
+    _max?: MomTemplateMaxAggregateInputType
+  }
+
+  export type MomTemplateGroupByOutputType = {
+    id: string
+    organizationId: string
+    name: string
+    description: string | null
+    category: $Enums.MomTemplateCategory
+    source: $Enums.MomTemplateSource
+    isDefault: boolean
+    isArchived: boolean
+    metadata: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MomTemplateCountAggregateOutputType | null
+    _min: MomTemplateMinAggregateOutputType | null
+    _max: MomTemplateMaxAggregateOutputType | null
+  }
+
+  type GetMomTemplateGroupByPayload<T extends MomTemplateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MomTemplateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MomTemplateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MomTemplateGroupByOutputType[P]>
+            : GetScalarType<T[P], MomTemplateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MomTemplateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    source?: boolean
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    defaultForOrganization?: boolean | MomTemplate$defaultForOrganizationArgs<ExtArgs>
+    sections?: boolean | MomTemplate$sectionsArgs<ExtArgs>
+    upload?: boolean | MomTemplate$uploadArgs<ExtArgs>
+    meetings?: boolean | MomTemplate$meetingsArgs<ExtArgs>
+    _count?: boolean | MomTemplateCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplate"]>
+
+  export type MomTemplateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    source?: boolean
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplate"]>
+
+  export type MomTemplateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    organizationId?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    source?: boolean
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplate"]>
+
+  export type MomTemplateSelectScalar = {
+    id?: boolean
+    organizationId?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    source?: boolean
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MomTemplateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "name" | "description" | "category" | "source" | "isDefault" | "isArchived" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["momTemplate"]>
+  export type MomTemplateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+    defaultForOrganization?: boolean | MomTemplate$defaultForOrganizationArgs<ExtArgs>
+    sections?: boolean | MomTemplate$sectionsArgs<ExtArgs>
+    upload?: boolean | MomTemplate$uploadArgs<ExtArgs>
+    meetings?: boolean | MomTemplate$meetingsArgs<ExtArgs>
+    _count?: boolean | MomTemplateCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type MomTemplateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }
+  export type MomTemplateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organization?: boolean | OrganizationDefaultArgs<ExtArgs>
+  }
+
+  export type $MomTemplatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MomTemplate"
+    objects: {
+      organization: Prisma.$OrganizationPayload<ExtArgs>
+      defaultForOrganization: Prisma.$OrganizationPayload<ExtArgs>[]
+      sections: Prisma.$MomTemplateSectionPayload<ExtArgs>[]
+      upload: Prisma.$MomTemplateUploadPayload<ExtArgs> | null
+      meetings: Prisma.$MeetingPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      organizationId: string
+      name: string
+      description: string | null
+      category: $Enums.MomTemplateCategory
+      source: $Enums.MomTemplateSource
+      isDefault: boolean
+      isArchived: boolean
+      metadata: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["momTemplate"]>
+    composites: {}
+  }
+
+  type MomTemplateGetPayload<S extends boolean | null | undefined | MomTemplateDefaultArgs> = $Result.GetResult<Prisma.$MomTemplatePayload, S>
+
+  type MomTemplateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MomTemplateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MomTemplateCountAggregateInputType | true
+    }
+
+  export interface MomTemplateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MomTemplate'], meta: { name: 'MomTemplate' } }
+    /**
+     * Find zero or one MomTemplate that matches the filter.
+     * @param {MomTemplateFindUniqueArgs} args - Arguments to find a MomTemplate
+     * @example
+     * // Get one MomTemplate
+     * const momTemplate = await prisma.momTemplate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MomTemplateFindUniqueArgs>(args: SelectSubset<T, MomTemplateFindUniqueArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MomTemplate that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MomTemplateFindUniqueOrThrowArgs} args - Arguments to find a MomTemplate
+     * @example
+     * // Get one MomTemplate
+     * const momTemplate = await prisma.momTemplate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MomTemplateFindUniqueOrThrowArgs>(args: SelectSubset<T, MomTemplateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MomTemplate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateFindFirstArgs} args - Arguments to find a MomTemplate
+     * @example
+     * // Get one MomTemplate
+     * const momTemplate = await prisma.momTemplate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MomTemplateFindFirstArgs>(args?: SelectSubset<T, MomTemplateFindFirstArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MomTemplate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateFindFirstOrThrowArgs} args - Arguments to find a MomTemplate
+     * @example
+     * // Get one MomTemplate
+     * const momTemplate = await prisma.momTemplate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MomTemplateFindFirstOrThrowArgs>(args?: SelectSubset<T, MomTemplateFindFirstOrThrowArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MomTemplates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MomTemplates
+     * const momTemplates = await prisma.momTemplate.findMany()
+     * 
+     * // Get first 10 MomTemplates
+     * const momTemplates = await prisma.momTemplate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const momTemplateWithIdOnly = await prisma.momTemplate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MomTemplateFindManyArgs>(args?: SelectSubset<T, MomTemplateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MomTemplate.
+     * @param {MomTemplateCreateArgs} args - Arguments to create a MomTemplate.
+     * @example
+     * // Create one MomTemplate
+     * const MomTemplate = await prisma.momTemplate.create({
+     *   data: {
+     *     // ... data to create a MomTemplate
+     *   }
+     * })
+     * 
+     */
+    create<T extends MomTemplateCreateArgs>(args: SelectSubset<T, MomTemplateCreateArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MomTemplates.
+     * @param {MomTemplateCreateManyArgs} args - Arguments to create many MomTemplates.
+     * @example
+     * // Create many MomTemplates
+     * const momTemplate = await prisma.momTemplate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MomTemplateCreateManyArgs>(args?: SelectSubset<T, MomTemplateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MomTemplates and returns the data saved in the database.
+     * @param {MomTemplateCreateManyAndReturnArgs} args - Arguments to create many MomTemplates.
+     * @example
+     * // Create many MomTemplates
+     * const momTemplate = await prisma.momTemplate.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MomTemplates and only return the `id`
+     * const momTemplateWithIdOnly = await prisma.momTemplate.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MomTemplateCreateManyAndReturnArgs>(args?: SelectSubset<T, MomTemplateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MomTemplate.
+     * @param {MomTemplateDeleteArgs} args - Arguments to delete one MomTemplate.
+     * @example
+     * // Delete one MomTemplate
+     * const MomTemplate = await prisma.momTemplate.delete({
+     *   where: {
+     *     // ... filter to delete one MomTemplate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MomTemplateDeleteArgs>(args: SelectSubset<T, MomTemplateDeleteArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MomTemplate.
+     * @param {MomTemplateUpdateArgs} args - Arguments to update one MomTemplate.
+     * @example
+     * // Update one MomTemplate
+     * const momTemplate = await prisma.momTemplate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MomTemplateUpdateArgs>(args: SelectSubset<T, MomTemplateUpdateArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MomTemplates.
+     * @param {MomTemplateDeleteManyArgs} args - Arguments to filter MomTemplates to delete.
+     * @example
+     * // Delete a few MomTemplates
+     * const { count } = await prisma.momTemplate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MomTemplateDeleteManyArgs>(args?: SelectSubset<T, MomTemplateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MomTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MomTemplates
+     * const momTemplate = await prisma.momTemplate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MomTemplateUpdateManyArgs>(args: SelectSubset<T, MomTemplateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MomTemplates and returns the data updated in the database.
+     * @param {MomTemplateUpdateManyAndReturnArgs} args - Arguments to update many MomTemplates.
+     * @example
+     * // Update many MomTemplates
+     * const momTemplate = await prisma.momTemplate.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MomTemplates and only return the `id`
+     * const momTemplateWithIdOnly = await prisma.momTemplate.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MomTemplateUpdateManyAndReturnArgs>(args: SelectSubset<T, MomTemplateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MomTemplate.
+     * @param {MomTemplateUpsertArgs} args - Arguments to update or create a MomTemplate.
+     * @example
+     * // Update or create a MomTemplate
+     * const momTemplate = await prisma.momTemplate.upsert({
+     *   create: {
+     *     // ... data to create a MomTemplate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MomTemplate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MomTemplateUpsertArgs>(args: SelectSubset<T, MomTemplateUpsertArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MomTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateCountArgs} args - Arguments to filter MomTemplates to count.
+     * @example
+     * // Count the number of MomTemplates
+     * const count = await prisma.momTemplate.count({
+     *   where: {
+     *     // ... the filter for the MomTemplates we want to count
+     *   }
+     * })
+    **/
+    count<T extends MomTemplateCountArgs>(
+      args?: Subset<T, MomTemplateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MomTemplateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MomTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MomTemplateAggregateArgs>(args: Subset<T, MomTemplateAggregateArgs>): Prisma.PrismaPromise<GetMomTemplateAggregateType<T>>
+
+    /**
+     * Group by MomTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MomTemplateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MomTemplateGroupByArgs['orderBy'] }
+        : { orderBy?: MomTemplateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MomTemplateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMomTemplateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MomTemplate model
+   */
+  readonly fields: MomTemplateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MomTemplate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MomTemplateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    organization<T extends OrganizationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrganizationDefaultArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    defaultForOrganization<T extends MomTemplate$defaultForOrganizationArgs<ExtArgs> = {}>(args?: Subset<T, MomTemplate$defaultForOrganizationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sections<T extends MomTemplate$sectionsArgs<ExtArgs> = {}>(args?: Subset<T, MomTemplate$sectionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    upload<T extends MomTemplate$uploadArgs<ExtArgs> = {}>(args?: Subset<T, MomTemplate$uploadArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    meetings<T extends MomTemplate$meetingsArgs<ExtArgs> = {}>(args?: Subset<T, MomTemplate$meetingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MeetingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MomTemplate model
+   */
+  interface MomTemplateFieldRefs {
+    readonly id: FieldRef<"MomTemplate", 'String'>
+    readonly organizationId: FieldRef<"MomTemplate", 'String'>
+    readonly name: FieldRef<"MomTemplate", 'String'>
+    readonly description: FieldRef<"MomTemplate", 'String'>
+    readonly category: FieldRef<"MomTemplate", 'MomTemplateCategory'>
+    readonly source: FieldRef<"MomTemplate", 'MomTemplateSource'>
+    readonly isDefault: FieldRef<"MomTemplate", 'Boolean'>
+    readonly isArchived: FieldRef<"MomTemplate", 'Boolean'>
+    readonly metadata: FieldRef<"MomTemplate", 'Json'>
+    readonly createdAt: FieldRef<"MomTemplate", 'DateTime'>
+    readonly updatedAt: FieldRef<"MomTemplate", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MomTemplate findUnique
+   */
+  export type MomTemplateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplate to fetch.
+     */
+    where: MomTemplateWhereUniqueInput
+  }
+
+  /**
+   * MomTemplate findUniqueOrThrow
+   */
+  export type MomTemplateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplate to fetch.
+     */
+    where: MomTemplateWhereUniqueInput
+  }
+
+  /**
+   * MomTemplate findFirst
+   */
+  export type MomTemplateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplate to fetch.
+     */
+    where?: MomTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplates to fetch.
+     */
+    orderBy?: MomTemplateOrderByWithRelationInput | MomTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MomTemplates.
+     */
+    cursor?: MomTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplates.
+     */
+    distinct?: MomTemplateScalarFieldEnum | MomTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplate findFirstOrThrow
+   */
+  export type MomTemplateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplate to fetch.
+     */
+    where?: MomTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplates to fetch.
+     */
+    orderBy?: MomTemplateOrderByWithRelationInput | MomTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MomTemplates.
+     */
+    cursor?: MomTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplates.
+     */
+    distinct?: MomTemplateScalarFieldEnum | MomTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplate findMany
+   */
+  export type MomTemplateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplates to fetch.
+     */
+    where?: MomTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplates to fetch.
+     */
+    orderBy?: MomTemplateOrderByWithRelationInput | MomTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MomTemplates.
+     */
+    cursor?: MomTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplates.
+     */
+    distinct?: MomTemplateScalarFieldEnum | MomTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplate create
+   */
+  export type MomTemplateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MomTemplate.
+     */
+    data: XOR<MomTemplateCreateInput, MomTemplateUncheckedCreateInput>
+  }
+
+  /**
+   * MomTemplate createMany
+   */
+  export type MomTemplateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MomTemplates.
+     */
+    data: MomTemplateCreateManyInput | MomTemplateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MomTemplate createManyAndReturn
+   */
+  export type MomTemplateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * The data used to create many MomTemplates.
+     */
+    data: MomTemplateCreateManyInput | MomTemplateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MomTemplate update
+   */
+  export type MomTemplateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MomTemplate.
+     */
+    data: XOR<MomTemplateUpdateInput, MomTemplateUncheckedUpdateInput>
+    /**
+     * Choose, which MomTemplate to update.
+     */
+    where: MomTemplateWhereUniqueInput
+  }
+
+  /**
+   * MomTemplate updateMany
+   */
+  export type MomTemplateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MomTemplates.
+     */
+    data: XOR<MomTemplateUpdateManyMutationInput, MomTemplateUncheckedUpdateManyInput>
+    /**
+     * Filter which MomTemplates to update
+     */
+    where?: MomTemplateWhereInput
+    /**
+     * Limit how many MomTemplates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MomTemplate updateManyAndReturn
+   */
+  export type MomTemplateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * The data used to update MomTemplates.
+     */
+    data: XOR<MomTemplateUpdateManyMutationInput, MomTemplateUncheckedUpdateManyInput>
+    /**
+     * Filter which MomTemplates to update
+     */
+    where?: MomTemplateWhereInput
+    /**
+     * Limit how many MomTemplates to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MomTemplate upsert
+   */
+  export type MomTemplateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MomTemplate to update in case it exists.
+     */
+    where: MomTemplateWhereUniqueInput
+    /**
+     * In case the MomTemplate found by the `where` argument doesn't exist, create a new MomTemplate with this data.
+     */
+    create: XOR<MomTemplateCreateInput, MomTemplateUncheckedCreateInput>
+    /**
+     * In case the MomTemplate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MomTemplateUpdateInput, MomTemplateUncheckedUpdateInput>
+  }
+
+  /**
+   * MomTemplate delete
+   */
+  export type MomTemplateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+    /**
+     * Filter which MomTemplate to delete.
+     */
+    where: MomTemplateWhereUniqueInput
+  }
+
+  /**
+   * MomTemplate deleteMany
+   */
+  export type MomTemplateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MomTemplates to delete
+     */
+    where?: MomTemplateWhereInput
+    /**
+     * Limit how many MomTemplates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MomTemplate.defaultForOrganization
+   */
+  export type MomTemplate$defaultForOrganizationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Organization
+     */
+    select?: OrganizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Organization
+     */
+    omit?: OrganizationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrganizationInclude<ExtArgs> | null
+    where?: OrganizationWhereInput
+    orderBy?: OrganizationOrderByWithRelationInput | OrganizationOrderByWithRelationInput[]
+    cursor?: OrganizationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrganizationScalarFieldEnum | OrganizationScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplate.sections
+   */
+  export type MomTemplate$sectionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    where?: MomTemplateSectionWhereInput
+    orderBy?: MomTemplateSectionOrderByWithRelationInput | MomTemplateSectionOrderByWithRelationInput[]
+    cursor?: MomTemplateSectionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MomTemplateSectionScalarFieldEnum | MomTemplateSectionScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplate.upload
+   */
+  export type MomTemplate$uploadArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    where?: MomTemplateUploadWhereInput
+  }
+
+  /**
+   * MomTemplate.meetings
+   */
+  export type MomTemplate$meetingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Meeting
+     */
+    select?: MeetingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Meeting
+     */
+    omit?: MeetingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MeetingInclude<ExtArgs> | null
+    where?: MeetingWhereInput
+    orderBy?: MeetingOrderByWithRelationInput | MeetingOrderByWithRelationInput[]
+    cursor?: MeetingWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MeetingScalarFieldEnum | MeetingScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplate without action
+   */
+  export type MomTemplateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplate
+     */
+    select?: MomTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplate
+     */
+    omit?: MomTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MomTemplateSection
+   */
+
+  export type AggregateMomTemplateSection = {
+    _count: MomTemplateSectionCountAggregateOutputType | null
+    _avg: MomTemplateSectionAvgAggregateOutputType | null
+    _sum: MomTemplateSectionSumAggregateOutputType | null
+    _min: MomTemplateSectionMinAggregateOutputType | null
+    _max: MomTemplateSectionMaxAggregateOutputType | null
+  }
+
+  export type MomTemplateSectionAvgAggregateOutputType = {
+    sortOrder: number | null
+  }
+
+  export type MomTemplateSectionSumAggregateOutputType = {
+    sortOrder: number | null
+  }
+
+  export type MomTemplateSectionMinAggregateOutputType = {
+    id: string | null
+    templateId: string | null
+    title: string | null
+    description: string | null
+    aiInstructions: string | null
+    isRequired: boolean | null
+    sortOrder: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MomTemplateSectionMaxAggregateOutputType = {
+    id: string | null
+    templateId: string | null
+    title: string | null
+    description: string | null
+    aiInstructions: string | null
+    isRequired: boolean | null
+    sortOrder: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MomTemplateSectionCountAggregateOutputType = {
+    id: number
+    templateId: number
+    title: number
+    description: number
+    aiInstructions: number
+    isRequired: number
+    sortOrder: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MomTemplateSectionAvgAggregateInputType = {
+    sortOrder?: true
+  }
+
+  export type MomTemplateSectionSumAggregateInputType = {
+    sortOrder?: true
+  }
+
+  export type MomTemplateSectionMinAggregateInputType = {
+    id?: true
+    templateId?: true
+    title?: true
+    description?: true
+    aiInstructions?: true
+    isRequired?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MomTemplateSectionMaxAggregateInputType = {
+    id?: true
+    templateId?: true
+    title?: true
+    description?: true
+    aiInstructions?: true
+    isRequired?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MomTemplateSectionCountAggregateInputType = {
+    id?: true
+    templateId?: true
+    title?: true
+    description?: true
+    aiInstructions?: true
+    isRequired?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MomTemplateSectionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MomTemplateSection to aggregate.
+     */
+    where?: MomTemplateSectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplateSections to fetch.
+     */
+    orderBy?: MomTemplateSectionOrderByWithRelationInput | MomTemplateSectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MomTemplateSectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplateSections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplateSections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MomTemplateSections
+    **/
+    _count?: true | MomTemplateSectionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MomTemplateSectionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MomTemplateSectionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MomTemplateSectionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MomTemplateSectionMaxAggregateInputType
+  }
+
+  export type GetMomTemplateSectionAggregateType<T extends MomTemplateSectionAggregateArgs> = {
+        [P in keyof T & keyof AggregateMomTemplateSection]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMomTemplateSection[P]>
+      : GetScalarType<T[P], AggregateMomTemplateSection[P]>
+  }
+
+
+
+
+  export type MomTemplateSectionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MomTemplateSectionWhereInput
+    orderBy?: MomTemplateSectionOrderByWithAggregationInput | MomTemplateSectionOrderByWithAggregationInput[]
+    by: MomTemplateSectionScalarFieldEnum[] | MomTemplateSectionScalarFieldEnum
+    having?: MomTemplateSectionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MomTemplateSectionCountAggregateInputType | true
+    _avg?: MomTemplateSectionAvgAggregateInputType
+    _sum?: MomTemplateSectionSumAggregateInputType
+    _min?: MomTemplateSectionMinAggregateInputType
+    _max?: MomTemplateSectionMaxAggregateInputType
+  }
+
+  export type MomTemplateSectionGroupByOutputType = {
+    id: string
+    templateId: string
+    title: string
+    description: string | null
+    aiInstructions: string
+    isRequired: boolean
+    sortOrder: number
+    createdAt: Date
+    updatedAt: Date
+    _count: MomTemplateSectionCountAggregateOutputType | null
+    _avg: MomTemplateSectionAvgAggregateOutputType | null
+    _sum: MomTemplateSectionSumAggregateOutputType | null
+    _min: MomTemplateSectionMinAggregateOutputType | null
+    _max: MomTemplateSectionMaxAggregateOutputType | null
+  }
+
+  type GetMomTemplateSectionGroupByPayload<T extends MomTemplateSectionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MomTemplateSectionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MomTemplateSectionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MomTemplateSectionGroupByOutputType[P]>
+            : GetScalarType<T[P], MomTemplateSectionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MomTemplateSectionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    templateId?: boolean
+    title?: boolean
+    description?: boolean
+    aiInstructions?: boolean
+    isRequired?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplateSection"]>
+
+  export type MomTemplateSectionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    templateId?: boolean
+    title?: boolean
+    description?: boolean
+    aiInstructions?: boolean
+    isRequired?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplateSection"]>
+
+  export type MomTemplateSectionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    templateId?: boolean
+    title?: boolean
+    description?: boolean
+    aiInstructions?: boolean
+    isRequired?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplateSection"]>
+
+  export type MomTemplateSectionSelectScalar = {
+    id?: boolean
+    templateId?: boolean
+    title?: boolean
+    description?: boolean
+    aiInstructions?: boolean
+    isRequired?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MomTemplateSectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "templateId" | "title" | "description" | "aiInstructions" | "isRequired" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["momTemplateSection"]>
+  export type MomTemplateSectionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }
+  export type MomTemplateSectionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }
+  export type MomTemplateSectionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }
+
+  export type $MomTemplateSectionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MomTemplateSection"
+    objects: {
+      template: Prisma.$MomTemplatePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      templateId: string
+      title: string
+      description: string | null
+      aiInstructions: string
+      isRequired: boolean
+      sortOrder: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["momTemplateSection"]>
+    composites: {}
+  }
+
+  type MomTemplateSectionGetPayload<S extends boolean | null | undefined | MomTemplateSectionDefaultArgs> = $Result.GetResult<Prisma.$MomTemplateSectionPayload, S>
+
+  type MomTemplateSectionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MomTemplateSectionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MomTemplateSectionCountAggregateInputType | true
+    }
+
+  export interface MomTemplateSectionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MomTemplateSection'], meta: { name: 'MomTemplateSection' } }
+    /**
+     * Find zero or one MomTemplateSection that matches the filter.
+     * @param {MomTemplateSectionFindUniqueArgs} args - Arguments to find a MomTemplateSection
+     * @example
+     * // Get one MomTemplateSection
+     * const momTemplateSection = await prisma.momTemplateSection.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MomTemplateSectionFindUniqueArgs>(args: SelectSubset<T, MomTemplateSectionFindUniqueArgs<ExtArgs>>): Prisma__MomTemplateSectionClient<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MomTemplateSection that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MomTemplateSectionFindUniqueOrThrowArgs} args - Arguments to find a MomTemplateSection
+     * @example
+     * // Get one MomTemplateSection
+     * const momTemplateSection = await prisma.momTemplateSection.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MomTemplateSectionFindUniqueOrThrowArgs>(args: SelectSubset<T, MomTemplateSectionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MomTemplateSectionClient<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MomTemplateSection that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateSectionFindFirstArgs} args - Arguments to find a MomTemplateSection
+     * @example
+     * // Get one MomTemplateSection
+     * const momTemplateSection = await prisma.momTemplateSection.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MomTemplateSectionFindFirstArgs>(args?: SelectSubset<T, MomTemplateSectionFindFirstArgs<ExtArgs>>): Prisma__MomTemplateSectionClient<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MomTemplateSection that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateSectionFindFirstOrThrowArgs} args - Arguments to find a MomTemplateSection
+     * @example
+     * // Get one MomTemplateSection
+     * const momTemplateSection = await prisma.momTemplateSection.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MomTemplateSectionFindFirstOrThrowArgs>(args?: SelectSubset<T, MomTemplateSectionFindFirstOrThrowArgs<ExtArgs>>): Prisma__MomTemplateSectionClient<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MomTemplateSections that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateSectionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MomTemplateSections
+     * const momTemplateSections = await prisma.momTemplateSection.findMany()
+     * 
+     * // Get first 10 MomTemplateSections
+     * const momTemplateSections = await prisma.momTemplateSection.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const momTemplateSectionWithIdOnly = await prisma.momTemplateSection.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MomTemplateSectionFindManyArgs>(args?: SelectSubset<T, MomTemplateSectionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MomTemplateSection.
+     * @param {MomTemplateSectionCreateArgs} args - Arguments to create a MomTemplateSection.
+     * @example
+     * // Create one MomTemplateSection
+     * const MomTemplateSection = await prisma.momTemplateSection.create({
+     *   data: {
+     *     // ... data to create a MomTemplateSection
+     *   }
+     * })
+     * 
+     */
+    create<T extends MomTemplateSectionCreateArgs>(args: SelectSubset<T, MomTemplateSectionCreateArgs<ExtArgs>>): Prisma__MomTemplateSectionClient<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MomTemplateSections.
+     * @param {MomTemplateSectionCreateManyArgs} args - Arguments to create many MomTemplateSections.
+     * @example
+     * // Create many MomTemplateSections
+     * const momTemplateSection = await prisma.momTemplateSection.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MomTemplateSectionCreateManyArgs>(args?: SelectSubset<T, MomTemplateSectionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MomTemplateSections and returns the data saved in the database.
+     * @param {MomTemplateSectionCreateManyAndReturnArgs} args - Arguments to create many MomTemplateSections.
+     * @example
+     * // Create many MomTemplateSections
+     * const momTemplateSection = await prisma.momTemplateSection.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MomTemplateSections and only return the `id`
+     * const momTemplateSectionWithIdOnly = await prisma.momTemplateSection.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MomTemplateSectionCreateManyAndReturnArgs>(args?: SelectSubset<T, MomTemplateSectionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MomTemplateSection.
+     * @param {MomTemplateSectionDeleteArgs} args - Arguments to delete one MomTemplateSection.
+     * @example
+     * // Delete one MomTemplateSection
+     * const MomTemplateSection = await prisma.momTemplateSection.delete({
+     *   where: {
+     *     // ... filter to delete one MomTemplateSection
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MomTemplateSectionDeleteArgs>(args: SelectSubset<T, MomTemplateSectionDeleteArgs<ExtArgs>>): Prisma__MomTemplateSectionClient<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MomTemplateSection.
+     * @param {MomTemplateSectionUpdateArgs} args - Arguments to update one MomTemplateSection.
+     * @example
+     * // Update one MomTemplateSection
+     * const momTemplateSection = await prisma.momTemplateSection.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MomTemplateSectionUpdateArgs>(args: SelectSubset<T, MomTemplateSectionUpdateArgs<ExtArgs>>): Prisma__MomTemplateSectionClient<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MomTemplateSections.
+     * @param {MomTemplateSectionDeleteManyArgs} args - Arguments to filter MomTemplateSections to delete.
+     * @example
+     * // Delete a few MomTemplateSections
+     * const { count } = await prisma.momTemplateSection.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MomTemplateSectionDeleteManyArgs>(args?: SelectSubset<T, MomTemplateSectionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MomTemplateSections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateSectionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MomTemplateSections
+     * const momTemplateSection = await prisma.momTemplateSection.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MomTemplateSectionUpdateManyArgs>(args: SelectSubset<T, MomTemplateSectionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MomTemplateSections and returns the data updated in the database.
+     * @param {MomTemplateSectionUpdateManyAndReturnArgs} args - Arguments to update many MomTemplateSections.
+     * @example
+     * // Update many MomTemplateSections
+     * const momTemplateSection = await prisma.momTemplateSection.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MomTemplateSections and only return the `id`
+     * const momTemplateSectionWithIdOnly = await prisma.momTemplateSection.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MomTemplateSectionUpdateManyAndReturnArgs>(args: SelectSubset<T, MomTemplateSectionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MomTemplateSection.
+     * @param {MomTemplateSectionUpsertArgs} args - Arguments to update or create a MomTemplateSection.
+     * @example
+     * // Update or create a MomTemplateSection
+     * const momTemplateSection = await prisma.momTemplateSection.upsert({
+     *   create: {
+     *     // ... data to create a MomTemplateSection
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MomTemplateSection we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MomTemplateSectionUpsertArgs>(args: SelectSubset<T, MomTemplateSectionUpsertArgs<ExtArgs>>): Prisma__MomTemplateSectionClient<$Result.GetResult<Prisma.$MomTemplateSectionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MomTemplateSections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateSectionCountArgs} args - Arguments to filter MomTemplateSections to count.
+     * @example
+     * // Count the number of MomTemplateSections
+     * const count = await prisma.momTemplateSection.count({
+     *   where: {
+     *     // ... the filter for the MomTemplateSections we want to count
+     *   }
+     * })
+    **/
+    count<T extends MomTemplateSectionCountArgs>(
+      args?: Subset<T, MomTemplateSectionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MomTemplateSectionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MomTemplateSection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateSectionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MomTemplateSectionAggregateArgs>(args: Subset<T, MomTemplateSectionAggregateArgs>): Prisma.PrismaPromise<GetMomTemplateSectionAggregateType<T>>
+
+    /**
+     * Group by MomTemplateSection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateSectionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MomTemplateSectionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MomTemplateSectionGroupByArgs['orderBy'] }
+        : { orderBy?: MomTemplateSectionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MomTemplateSectionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMomTemplateSectionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MomTemplateSection model
+   */
+  readonly fields: MomTemplateSectionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MomTemplateSection.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MomTemplateSectionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    template<T extends MomTemplateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MomTemplateDefaultArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MomTemplateSection model
+   */
+  interface MomTemplateSectionFieldRefs {
+    readonly id: FieldRef<"MomTemplateSection", 'String'>
+    readonly templateId: FieldRef<"MomTemplateSection", 'String'>
+    readonly title: FieldRef<"MomTemplateSection", 'String'>
+    readonly description: FieldRef<"MomTemplateSection", 'String'>
+    readonly aiInstructions: FieldRef<"MomTemplateSection", 'String'>
+    readonly isRequired: FieldRef<"MomTemplateSection", 'Boolean'>
+    readonly sortOrder: FieldRef<"MomTemplateSection", 'Int'>
+    readonly createdAt: FieldRef<"MomTemplateSection", 'DateTime'>
+    readonly updatedAt: FieldRef<"MomTemplateSection", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MomTemplateSection findUnique
+   */
+  export type MomTemplateSectionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateSection to fetch.
+     */
+    where: MomTemplateSectionWhereUniqueInput
+  }
+
+  /**
+   * MomTemplateSection findUniqueOrThrow
+   */
+  export type MomTemplateSectionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateSection to fetch.
+     */
+    where: MomTemplateSectionWhereUniqueInput
+  }
+
+  /**
+   * MomTemplateSection findFirst
+   */
+  export type MomTemplateSectionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateSection to fetch.
+     */
+    where?: MomTemplateSectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplateSections to fetch.
+     */
+    orderBy?: MomTemplateSectionOrderByWithRelationInput | MomTemplateSectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MomTemplateSections.
+     */
+    cursor?: MomTemplateSectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplateSections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplateSections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplateSections.
+     */
+    distinct?: MomTemplateSectionScalarFieldEnum | MomTemplateSectionScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplateSection findFirstOrThrow
+   */
+  export type MomTemplateSectionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateSection to fetch.
+     */
+    where?: MomTemplateSectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplateSections to fetch.
+     */
+    orderBy?: MomTemplateSectionOrderByWithRelationInput | MomTemplateSectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MomTemplateSections.
+     */
+    cursor?: MomTemplateSectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplateSections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplateSections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplateSections.
+     */
+    distinct?: MomTemplateSectionScalarFieldEnum | MomTemplateSectionScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplateSection findMany
+   */
+  export type MomTemplateSectionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateSections to fetch.
+     */
+    where?: MomTemplateSectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplateSections to fetch.
+     */
+    orderBy?: MomTemplateSectionOrderByWithRelationInput | MomTemplateSectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MomTemplateSections.
+     */
+    cursor?: MomTemplateSectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplateSections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplateSections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplateSections.
+     */
+    distinct?: MomTemplateSectionScalarFieldEnum | MomTemplateSectionScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplateSection create
+   */
+  export type MomTemplateSectionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MomTemplateSection.
+     */
+    data: XOR<MomTemplateSectionCreateInput, MomTemplateSectionUncheckedCreateInput>
+  }
+
+  /**
+   * MomTemplateSection createMany
+   */
+  export type MomTemplateSectionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MomTemplateSections.
+     */
+    data: MomTemplateSectionCreateManyInput | MomTemplateSectionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MomTemplateSection createManyAndReturn
+   */
+  export type MomTemplateSectionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * The data used to create many MomTemplateSections.
+     */
+    data: MomTemplateSectionCreateManyInput | MomTemplateSectionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MomTemplateSection update
+   */
+  export type MomTemplateSectionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MomTemplateSection.
+     */
+    data: XOR<MomTemplateSectionUpdateInput, MomTemplateSectionUncheckedUpdateInput>
+    /**
+     * Choose, which MomTemplateSection to update.
+     */
+    where: MomTemplateSectionWhereUniqueInput
+  }
+
+  /**
+   * MomTemplateSection updateMany
+   */
+  export type MomTemplateSectionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MomTemplateSections.
+     */
+    data: XOR<MomTemplateSectionUpdateManyMutationInput, MomTemplateSectionUncheckedUpdateManyInput>
+    /**
+     * Filter which MomTemplateSections to update
+     */
+    where?: MomTemplateSectionWhereInput
+    /**
+     * Limit how many MomTemplateSections to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MomTemplateSection updateManyAndReturn
+   */
+  export type MomTemplateSectionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * The data used to update MomTemplateSections.
+     */
+    data: XOR<MomTemplateSectionUpdateManyMutationInput, MomTemplateSectionUncheckedUpdateManyInput>
+    /**
+     * Filter which MomTemplateSections to update
+     */
+    where?: MomTemplateSectionWhereInput
+    /**
+     * Limit how many MomTemplateSections to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MomTemplateSection upsert
+   */
+  export type MomTemplateSectionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MomTemplateSection to update in case it exists.
+     */
+    where: MomTemplateSectionWhereUniqueInput
+    /**
+     * In case the MomTemplateSection found by the `where` argument doesn't exist, create a new MomTemplateSection with this data.
+     */
+    create: XOR<MomTemplateSectionCreateInput, MomTemplateSectionUncheckedCreateInput>
+    /**
+     * In case the MomTemplateSection was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MomTemplateSectionUpdateInput, MomTemplateSectionUncheckedUpdateInput>
+  }
+
+  /**
+   * MomTemplateSection delete
+   */
+  export type MomTemplateSectionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+    /**
+     * Filter which MomTemplateSection to delete.
+     */
+    where: MomTemplateSectionWhereUniqueInput
+  }
+
+  /**
+   * MomTemplateSection deleteMany
+   */
+  export type MomTemplateSectionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MomTemplateSections to delete
+     */
+    where?: MomTemplateSectionWhereInput
+    /**
+     * Limit how many MomTemplateSections to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MomTemplateSection without action
+   */
+  export type MomTemplateSectionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateSection
+     */
+    select?: MomTemplateSectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateSection
+     */
+    omit?: MomTemplateSectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateSectionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MomTemplateUpload
+   */
+
+  export type AggregateMomTemplateUpload = {
+    _count: MomTemplateUploadCountAggregateOutputType | null
+    _avg: MomTemplateUploadAvgAggregateOutputType | null
+    _sum: MomTemplateUploadSumAggregateOutputType | null
+    _min: MomTemplateUploadMinAggregateOutputType | null
+    _max: MomTemplateUploadMaxAggregateOutputType | null
+  }
+
+  export type MomTemplateUploadAvgAggregateOutputType = {
+    sizeBytes: number | null
+  }
+
+  export type MomTemplateUploadSumAggregateOutputType = {
+    sizeBytes: number | null
+  }
+
+  export type MomTemplateUploadMinAggregateOutputType = {
+    id: string | null
+    templateId: string | null
+    organizationId: string | null
+    fileName: string | null
+    mimeType: string | null
+    storageKey: string | null
+    storageBackend: $Enums.TemplateFileStorageBackend | null
+    sizeBytes: number | null
+    createdAt: Date | null
+  }
+
+  export type MomTemplateUploadMaxAggregateOutputType = {
+    id: string | null
+    templateId: string | null
+    organizationId: string | null
+    fileName: string | null
+    mimeType: string | null
+    storageKey: string | null
+    storageBackend: $Enums.TemplateFileStorageBackend | null
+    sizeBytes: number | null
+    createdAt: Date | null
+  }
+
+  export type MomTemplateUploadCountAggregateOutputType = {
+    id: number
+    templateId: number
+    organizationId: number
+    fileName: number
+    mimeType: number
+    storageKey: number
+    storageBackend: number
+    sizeBytes: number
+    extractedHeadings: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type MomTemplateUploadAvgAggregateInputType = {
+    sizeBytes?: true
+  }
+
+  export type MomTemplateUploadSumAggregateInputType = {
+    sizeBytes?: true
+  }
+
+  export type MomTemplateUploadMinAggregateInputType = {
+    id?: true
+    templateId?: true
+    organizationId?: true
+    fileName?: true
+    mimeType?: true
+    storageKey?: true
+    storageBackend?: true
+    sizeBytes?: true
+    createdAt?: true
+  }
+
+  export type MomTemplateUploadMaxAggregateInputType = {
+    id?: true
+    templateId?: true
+    organizationId?: true
+    fileName?: true
+    mimeType?: true
+    storageKey?: true
+    storageBackend?: true
+    sizeBytes?: true
+    createdAt?: true
+  }
+
+  export type MomTemplateUploadCountAggregateInputType = {
+    id?: true
+    templateId?: true
+    organizationId?: true
+    fileName?: true
+    mimeType?: true
+    storageKey?: true
+    storageBackend?: true
+    sizeBytes?: true
+    extractedHeadings?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type MomTemplateUploadAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MomTemplateUpload to aggregate.
+     */
+    where?: MomTemplateUploadWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplateUploads to fetch.
+     */
+    orderBy?: MomTemplateUploadOrderByWithRelationInput | MomTemplateUploadOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MomTemplateUploadWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplateUploads from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplateUploads.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MomTemplateUploads
+    **/
+    _count?: true | MomTemplateUploadCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MomTemplateUploadAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MomTemplateUploadSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MomTemplateUploadMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MomTemplateUploadMaxAggregateInputType
+  }
+
+  export type GetMomTemplateUploadAggregateType<T extends MomTemplateUploadAggregateArgs> = {
+        [P in keyof T & keyof AggregateMomTemplateUpload]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMomTemplateUpload[P]>
+      : GetScalarType<T[P], AggregateMomTemplateUpload[P]>
+  }
+
+
+
+
+  export type MomTemplateUploadGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MomTemplateUploadWhereInput
+    orderBy?: MomTemplateUploadOrderByWithAggregationInput | MomTemplateUploadOrderByWithAggregationInput[]
+    by: MomTemplateUploadScalarFieldEnum[] | MomTemplateUploadScalarFieldEnum
+    having?: MomTemplateUploadScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MomTemplateUploadCountAggregateInputType | true
+    _avg?: MomTemplateUploadAvgAggregateInputType
+    _sum?: MomTemplateUploadSumAggregateInputType
+    _min?: MomTemplateUploadMinAggregateInputType
+    _max?: MomTemplateUploadMaxAggregateInputType
+  }
+
+  export type MomTemplateUploadGroupByOutputType = {
+    id: string
+    templateId: string
+    organizationId: string
+    fileName: string
+    mimeType: string
+    storageKey: string
+    storageBackend: $Enums.TemplateFileStorageBackend
+    sizeBytes: number
+    extractedHeadings: JsonValue | null
+    createdAt: Date
+    _count: MomTemplateUploadCountAggregateOutputType | null
+    _avg: MomTemplateUploadAvgAggregateOutputType | null
+    _sum: MomTemplateUploadSumAggregateOutputType | null
+    _min: MomTemplateUploadMinAggregateOutputType | null
+    _max: MomTemplateUploadMaxAggregateOutputType | null
+  }
+
+  type GetMomTemplateUploadGroupByPayload<T extends MomTemplateUploadGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MomTemplateUploadGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MomTemplateUploadGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MomTemplateUploadGroupByOutputType[P]>
+            : GetScalarType<T[P], MomTemplateUploadGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MomTemplateUploadSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    templateId?: boolean
+    organizationId?: boolean
+    fileName?: boolean
+    mimeType?: boolean
+    storageKey?: boolean
+    storageBackend?: boolean
+    sizeBytes?: boolean
+    extractedHeadings?: boolean
+    createdAt?: boolean
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplateUpload"]>
+
+  export type MomTemplateUploadSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    templateId?: boolean
+    organizationId?: boolean
+    fileName?: boolean
+    mimeType?: boolean
+    storageKey?: boolean
+    storageBackend?: boolean
+    sizeBytes?: boolean
+    extractedHeadings?: boolean
+    createdAt?: boolean
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplateUpload"]>
+
+  export type MomTemplateUploadSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    templateId?: boolean
+    organizationId?: boolean
+    fileName?: boolean
+    mimeType?: boolean
+    storageKey?: boolean
+    storageBackend?: boolean
+    sizeBytes?: boolean
+    extractedHeadings?: boolean
+    createdAt?: boolean
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["momTemplateUpload"]>
+
+  export type MomTemplateUploadSelectScalar = {
+    id?: boolean
+    templateId?: boolean
+    organizationId?: boolean
+    fileName?: boolean
+    mimeType?: boolean
+    storageKey?: boolean
+    storageBackend?: boolean
+    sizeBytes?: boolean
+    extractedHeadings?: boolean
+    createdAt?: boolean
+  }
+
+  export type MomTemplateUploadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "templateId" | "organizationId" | "fileName" | "mimeType" | "storageKey" | "storageBackend" | "sizeBytes" | "extractedHeadings" | "createdAt", ExtArgs["result"]["momTemplateUpload"]>
+  export type MomTemplateUploadInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }
+  export type MomTemplateUploadIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }
+  export type MomTemplateUploadIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | MomTemplateDefaultArgs<ExtArgs>
+  }
+
+  export type $MomTemplateUploadPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MomTemplateUpload"
+    objects: {
+      template: Prisma.$MomTemplatePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      templateId: string
+      organizationId: string
+      fileName: string
+      mimeType: string
+      storageKey: string
+      storageBackend: $Enums.TemplateFileStorageBackend
+      sizeBytes: number
+      extractedHeadings: Prisma.JsonValue | null
+      createdAt: Date
+    }, ExtArgs["result"]["momTemplateUpload"]>
+    composites: {}
+  }
+
+  type MomTemplateUploadGetPayload<S extends boolean | null | undefined | MomTemplateUploadDefaultArgs> = $Result.GetResult<Prisma.$MomTemplateUploadPayload, S>
+
+  type MomTemplateUploadCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MomTemplateUploadFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MomTemplateUploadCountAggregateInputType | true
+    }
+
+  export interface MomTemplateUploadDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MomTemplateUpload'], meta: { name: 'MomTemplateUpload' } }
+    /**
+     * Find zero or one MomTemplateUpload that matches the filter.
+     * @param {MomTemplateUploadFindUniqueArgs} args - Arguments to find a MomTemplateUpload
+     * @example
+     * // Get one MomTemplateUpload
+     * const momTemplateUpload = await prisma.momTemplateUpload.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MomTemplateUploadFindUniqueArgs>(args: SelectSubset<T, MomTemplateUploadFindUniqueArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MomTemplateUpload that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MomTemplateUploadFindUniqueOrThrowArgs} args - Arguments to find a MomTemplateUpload
+     * @example
+     * // Get one MomTemplateUpload
+     * const momTemplateUpload = await prisma.momTemplateUpload.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MomTemplateUploadFindUniqueOrThrowArgs>(args: SelectSubset<T, MomTemplateUploadFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MomTemplateUpload that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateUploadFindFirstArgs} args - Arguments to find a MomTemplateUpload
+     * @example
+     * // Get one MomTemplateUpload
+     * const momTemplateUpload = await prisma.momTemplateUpload.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MomTemplateUploadFindFirstArgs>(args?: SelectSubset<T, MomTemplateUploadFindFirstArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MomTemplateUpload that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateUploadFindFirstOrThrowArgs} args - Arguments to find a MomTemplateUpload
+     * @example
+     * // Get one MomTemplateUpload
+     * const momTemplateUpload = await prisma.momTemplateUpload.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MomTemplateUploadFindFirstOrThrowArgs>(args?: SelectSubset<T, MomTemplateUploadFindFirstOrThrowArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MomTemplateUploads that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateUploadFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MomTemplateUploads
+     * const momTemplateUploads = await prisma.momTemplateUpload.findMany()
+     * 
+     * // Get first 10 MomTemplateUploads
+     * const momTemplateUploads = await prisma.momTemplateUpload.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const momTemplateUploadWithIdOnly = await prisma.momTemplateUpload.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MomTemplateUploadFindManyArgs>(args?: SelectSubset<T, MomTemplateUploadFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MomTemplateUpload.
+     * @param {MomTemplateUploadCreateArgs} args - Arguments to create a MomTemplateUpload.
+     * @example
+     * // Create one MomTemplateUpload
+     * const MomTemplateUpload = await prisma.momTemplateUpload.create({
+     *   data: {
+     *     // ... data to create a MomTemplateUpload
+     *   }
+     * })
+     * 
+     */
+    create<T extends MomTemplateUploadCreateArgs>(args: SelectSubset<T, MomTemplateUploadCreateArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MomTemplateUploads.
+     * @param {MomTemplateUploadCreateManyArgs} args - Arguments to create many MomTemplateUploads.
+     * @example
+     * // Create many MomTemplateUploads
+     * const momTemplateUpload = await prisma.momTemplateUpload.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MomTemplateUploadCreateManyArgs>(args?: SelectSubset<T, MomTemplateUploadCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MomTemplateUploads and returns the data saved in the database.
+     * @param {MomTemplateUploadCreateManyAndReturnArgs} args - Arguments to create many MomTemplateUploads.
+     * @example
+     * // Create many MomTemplateUploads
+     * const momTemplateUpload = await prisma.momTemplateUpload.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MomTemplateUploads and only return the `id`
+     * const momTemplateUploadWithIdOnly = await prisma.momTemplateUpload.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MomTemplateUploadCreateManyAndReturnArgs>(args?: SelectSubset<T, MomTemplateUploadCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MomTemplateUpload.
+     * @param {MomTemplateUploadDeleteArgs} args - Arguments to delete one MomTemplateUpload.
+     * @example
+     * // Delete one MomTemplateUpload
+     * const MomTemplateUpload = await prisma.momTemplateUpload.delete({
+     *   where: {
+     *     // ... filter to delete one MomTemplateUpload
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MomTemplateUploadDeleteArgs>(args: SelectSubset<T, MomTemplateUploadDeleteArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MomTemplateUpload.
+     * @param {MomTemplateUploadUpdateArgs} args - Arguments to update one MomTemplateUpload.
+     * @example
+     * // Update one MomTemplateUpload
+     * const momTemplateUpload = await prisma.momTemplateUpload.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MomTemplateUploadUpdateArgs>(args: SelectSubset<T, MomTemplateUploadUpdateArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MomTemplateUploads.
+     * @param {MomTemplateUploadDeleteManyArgs} args - Arguments to filter MomTemplateUploads to delete.
+     * @example
+     * // Delete a few MomTemplateUploads
+     * const { count } = await prisma.momTemplateUpload.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MomTemplateUploadDeleteManyArgs>(args?: SelectSubset<T, MomTemplateUploadDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MomTemplateUploads.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateUploadUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MomTemplateUploads
+     * const momTemplateUpload = await prisma.momTemplateUpload.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MomTemplateUploadUpdateManyArgs>(args: SelectSubset<T, MomTemplateUploadUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MomTemplateUploads and returns the data updated in the database.
+     * @param {MomTemplateUploadUpdateManyAndReturnArgs} args - Arguments to update many MomTemplateUploads.
+     * @example
+     * // Update many MomTemplateUploads
+     * const momTemplateUpload = await prisma.momTemplateUpload.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MomTemplateUploads and only return the `id`
+     * const momTemplateUploadWithIdOnly = await prisma.momTemplateUpload.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MomTemplateUploadUpdateManyAndReturnArgs>(args: SelectSubset<T, MomTemplateUploadUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MomTemplateUpload.
+     * @param {MomTemplateUploadUpsertArgs} args - Arguments to update or create a MomTemplateUpload.
+     * @example
+     * // Update or create a MomTemplateUpload
+     * const momTemplateUpload = await prisma.momTemplateUpload.upsert({
+     *   create: {
+     *     // ... data to create a MomTemplateUpload
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MomTemplateUpload we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MomTemplateUploadUpsertArgs>(args: SelectSubset<T, MomTemplateUploadUpsertArgs<ExtArgs>>): Prisma__MomTemplateUploadClient<$Result.GetResult<Prisma.$MomTemplateUploadPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MomTemplateUploads.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateUploadCountArgs} args - Arguments to filter MomTemplateUploads to count.
+     * @example
+     * // Count the number of MomTemplateUploads
+     * const count = await prisma.momTemplateUpload.count({
+     *   where: {
+     *     // ... the filter for the MomTemplateUploads we want to count
+     *   }
+     * })
+    **/
+    count<T extends MomTemplateUploadCountArgs>(
+      args?: Subset<T, MomTemplateUploadCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MomTemplateUploadCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MomTemplateUpload.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateUploadAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MomTemplateUploadAggregateArgs>(args: Subset<T, MomTemplateUploadAggregateArgs>): Prisma.PrismaPromise<GetMomTemplateUploadAggregateType<T>>
+
+    /**
+     * Group by MomTemplateUpload.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MomTemplateUploadGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MomTemplateUploadGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MomTemplateUploadGroupByArgs['orderBy'] }
+        : { orderBy?: MomTemplateUploadGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MomTemplateUploadGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMomTemplateUploadGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MomTemplateUpload model
+   */
+  readonly fields: MomTemplateUploadFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MomTemplateUpload.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MomTemplateUploadClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    template<T extends MomTemplateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MomTemplateDefaultArgs<ExtArgs>>): Prisma__MomTemplateClient<$Result.GetResult<Prisma.$MomTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MomTemplateUpload model
+   */
+  interface MomTemplateUploadFieldRefs {
+    readonly id: FieldRef<"MomTemplateUpload", 'String'>
+    readonly templateId: FieldRef<"MomTemplateUpload", 'String'>
+    readonly organizationId: FieldRef<"MomTemplateUpload", 'String'>
+    readonly fileName: FieldRef<"MomTemplateUpload", 'String'>
+    readonly mimeType: FieldRef<"MomTemplateUpload", 'String'>
+    readonly storageKey: FieldRef<"MomTemplateUpload", 'String'>
+    readonly storageBackend: FieldRef<"MomTemplateUpload", 'TemplateFileStorageBackend'>
+    readonly sizeBytes: FieldRef<"MomTemplateUpload", 'Int'>
+    readonly extractedHeadings: FieldRef<"MomTemplateUpload", 'Json'>
+    readonly createdAt: FieldRef<"MomTemplateUpload", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MomTemplateUpload findUnique
+   */
+  export type MomTemplateUploadFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateUpload to fetch.
+     */
+    where: MomTemplateUploadWhereUniqueInput
+  }
+
+  /**
+   * MomTemplateUpload findUniqueOrThrow
+   */
+  export type MomTemplateUploadFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateUpload to fetch.
+     */
+    where: MomTemplateUploadWhereUniqueInput
+  }
+
+  /**
+   * MomTemplateUpload findFirst
+   */
+  export type MomTemplateUploadFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateUpload to fetch.
+     */
+    where?: MomTemplateUploadWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplateUploads to fetch.
+     */
+    orderBy?: MomTemplateUploadOrderByWithRelationInput | MomTemplateUploadOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MomTemplateUploads.
+     */
+    cursor?: MomTemplateUploadWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplateUploads from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplateUploads.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplateUploads.
+     */
+    distinct?: MomTemplateUploadScalarFieldEnum | MomTemplateUploadScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplateUpload findFirstOrThrow
+   */
+  export type MomTemplateUploadFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateUpload to fetch.
+     */
+    where?: MomTemplateUploadWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplateUploads to fetch.
+     */
+    orderBy?: MomTemplateUploadOrderByWithRelationInput | MomTemplateUploadOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MomTemplateUploads.
+     */
+    cursor?: MomTemplateUploadWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplateUploads from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplateUploads.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplateUploads.
+     */
+    distinct?: MomTemplateUploadScalarFieldEnum | MomTemplateUploadScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplateUpload findMany
+   */
+  export type MomTemplateUploadFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * Filter, which MomTemplateUploads to fetch.
+     */
+    where?: MomTemplateUploadWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MomTemplateUploads to fetch.
+     */
+    orderBy?: MomTemplateUploadOrderByWithRelationInput | MomTemplateUploadOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MomTemplateUploads.
+     */
+    cursor?: MomTemplateUploadWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MomTemplateUploads from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MomTemplateUploads.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MomTemplateUploads.
+     */
+    distinct?: MomTemplateUploadScalarFieldEnum | MomTemplateUploadScalarFieldEnum[]
+  }
+
+  /**
+   * MomTemplateUpload create
+   */
+  export type MomTemplateUploadCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MomTemplateUpload.
+     */
+    data: XOR<MomTemplateUploadCreateInput, MomTemplateUploadUncheckedCreateInput>
+  }
+
+  /**
+   * MomTemplateUpload createMany
+   */
+  export type MomTemplateUploadCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MomTemplateUploads.
+     */
+    data: MomTemplateUploadCreateManyInput | MomTemplateUploadCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MomTemplateUpload createManyAndReturn
+   */
+  export type MomTemplateUploadCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * The data used to create many MomTemplateUploads.
+     */
+    data: MomTemplateUploadCreateManyInput | MomTemplateUploadCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MomTemplateUpload update
+   */
+  export type MomTemplateUploadUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MomTemplateUpload.
+     */
+    data: XOR<MomTemplateUploadUpdateInput, MomTemplateUploadUncheckedUpdateInput>
+    /**
+     * Choose, which MomTemplateUpload to update.
+     */
+    where: MomTemplateUploadWhereUniqueInput
+  }
+
+  /**
+   * MomTemplateUpload updateMany
+   */
+  export type MomTemplateUploadUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MomTemplateUploads.
+     */
+    data: XOR<MomTemplateUploadUpdateManyMutationInput, MomTemplateUploadUncheckedUpdateManyInput>
+    /**
+     * Filter which MomTemplateUploads to update
+     */
+    where?: MomTemplateUploadWhereInput
+    /**
+     * Limit how many MomTemplateUploads to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MomTemplateUpload updateManyAndReturn
+   */
+  export type MomTemplateUploadUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * The data used to update MomTemplateUploads.
+     */
+    data: XOR<MomTemplateUploadUpdateManyMutationInput, MomTemplateUploadUncheckedUpdateManyInput>
+    /**
+     * Filter which MomTemplateUploads to update
+     */
+    where?: MomTemplateUploadWhereInput
+    /**
+     * Limit how many MomTemplateUploads to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MomTemplateUpload upsert
+   */
+  export type MomTemplateUploadUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MomTemplateUpload to update in case it exists.
+     */
+    where: MomTemplateUploadWhereUniqueInput
+    /**
+     * In case the MomTemplateUpload found by the `where` argument doesn't exist, create a new MomTemplateUpload with this data.
+     */
+    create: XOR<MomTemplateUploadCreateInput, MomTemplateUploadUncheckedCreateInput>
+    /**
+     * In case the MomTemplateUpload was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MomTemplateUploadUpdateInput, MomTemplateUploadUncheckedUpdateInput>
+  }
+
+  /**
+   * MomTemplateUpload delete
+   */
+  export type MomTemplateUploadDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
+    /**
+     * Filter which MomTemplateUpload to delete.
+     */
+    where: MomTemplateUploadWhereUniqueInput
+  }
+
+  /**
+   * MomTemplateUpload deleteMany
+   */
+  export type MomTemplateUploadDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MomTemplateUploads to delete
+     */
+    where?: MomTemplateUploadWhereInput
+    /**
+     * Limit how many MomTemplateUploads to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MomTemplateUpload without action
+   */
+  export type MomTemplateUploadDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MomTemplateUpload
+     */
+    select?: MomTemplateUploadSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MomTemplateUpload
+     */
+    omit?: MomTemplateUploadOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MomTemplateUploadInclude<ExtArgs> | null
   }
 
 
@@ -18248,6 +30142,7 @@ export namespace Prisma {
   export type MomMinAggregateOutputType = {
     id: string | null
     meetingId: string | null
+    templateId: string | null
     title: string | null
     dateTime: string | null
     approved: boolean | null
@@ -18262,6 +30157,7 @@ export namespace Prisma {
   export type MomMaxAggregateOutputType = {
     id: string | null
     meetingId: string | null
+    templateId: string | null
     title: string | null
     dateTime: string | null
     approved: boolean | null
@@ -18276,11 +30172,13 @@ export namespace Prisma {
   export type MomCountAggregateOutputType = {
     id: number
     meetingId: number
+    templateId: number
     title: number
     dateTime: number
     participants: number
     keyPoints: number
     actionItems: number
+    sections: number
     approved: number
     approvedBy: number
     approvedAt: number
@@ -18295,6 +30193,7 @@ export namespace Prisma {
   export type MomMinAggregateInputType = {
     id?: true
     meetingId?: true
+    templateId?: true
     title?: true
     dateTime?: true
     approved?: true
@@ -18309,6 +30208,7 @@ export namespace Prisma {
   export type MomMaxAggregateInputType = {
     id?: true
     meetingId?: true
+    templateId?: true
     title?: true
     dateTime?: true
     approved?: true
@@ -18323,11 +30223,13 @@ export namespace Prisma {
   export type MomCountAggregateInputType = {
     id?: true
     meetingId?: true
+    templateId?: true
     title?: true
     dateTime?: true
     participants?: true
     keyPoints?: true
     actionItems?: true
+    sections?: true
     approved?: true
     approvedBy?: true
     approvedAt?: true
@@ -18413,11 +30315,13 @@ export namespace Prisma {
   export type MomGroupByOutputType = {
     id: string
     meetingId: string
+    templateId: string | null
     title: string
     dateTime: string
     participants: JsonValue
     keyPoints: JsonValue
     actionItems: JsonValue
+    sections: JsonValue | null
     approved: boolean
     approvedBy: string | null
     approvedAt: Date | null
@@ -18447,11 +30351,13 @@ export namespace Prisma {
   export type MomSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     meetingId?: boolean
+    templateId?: boolean
     title?: boolean
     dateTime?: boolean
     participants?: boolean
     keyPoints?: boolean
     actionItems?: boolean
+    sections?: boolean
     approved?: boolean
     approvedBy?: boolean
     approvedAt?: boolean
@@ -18465,11 +30371,13 @@ export namespace Prisma {
   export type MomSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     meetingId?: boolean
+    templateId?: boolean
     title?: boolean
     dateTime?: boolean
     participants?: boolean
     keyPoints?: boolean
     actionItems?: boolean
+    sections?: boolean
     approved?: boolean
     approvedBy?: boolean
     approvedAt?: boolean
@@ -18483,11 +30391,13 @@ export namespace Prisma {
   export type MomSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     meetingId?: boolean
+    templateId?: boolean
     title?: boolean
     dateTime?: boolean
     participants?: boolean
     keyPoints?: boolean
     actionItems?: boolean
+    sections?: boolean
     approved?: boolean
     approvedBy?: boolean
     approvedAt?: boolean
@@ -18501,11 +30411,13 @@ export namespace Prisma {
   export type MomSelectScalar = {
     id?: boolean
     meetingId?: boolean
+    templateId?: boolean
     title?: boolean
     dateTime?: boolean
     participants?: boolean
     keyPoints?: boolean
     actionItems?: boolean
+    sections?: boolean
     approved?: boolean
     approvedBy?: boolean
     approvedAt?: boolean
@@ -18515,7 +30427,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type MomOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "meetingId" | "title" | "dateTime" | "participants" | "keyPoints" | "actionItems" | "approved" | "approvedBy" | "approvedAt" | "shared" | "lastEditedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["mom"]>
+  export type MomOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "meetingId" | "templateId" | "title" | "dateTime" | "participants" | "keyPoints" | "actionItems" | "sections" | "approved" | "approvedBy" | "approvedAt" | "shared" | "lastEditedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["mom"]>
   export type MomInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     meeting?: boolean | MeetingDefaultArgs<ExtArgs>
   }
@@ -18534,11 +30446,13 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       meetingId: string
+      templateId: string | null
       title: string
       dateTime: string
       participants: Prisma.JsonValue
       keyPoints: Prisma.JsonValue
       actionItems: Prisma.JsonValue
+      sections: Prisma.JsonValue | null
       approved: boolean
       approvedBy: string | null
       approvedAt: Date | null
@@ -18972,11 +30886,13 @@ export namespace Prisma {
   interface MomFieldRefs {
     readonly id: FieldRef<"Mom", 'String'>
     readonly meetingId: FieldRef<"Mom", 'String'>
+    readonly templateId: FieldRef<"Mom", 'String'>
     readonly title: FieldRef<"Mom", 'String'>
     readonly dateTime: FieldRef<"Mom", 'String'>
     readonly participants: FieldRef<"Mom", 'Json'>
     readonly keyPoints: FieldRef<"Mom", 'Json'>
     readonly actionItems: FieldRef<"Mom", 'Json'>
+    readonly sections: FieldRef<"Mom", 'Json'>
     readonly approved: FieldRef<"Mom", 'Boolean'>
     readonly approvedBy: FieldRef<"Mom", 'String'>
     readonly approvedAt: FieldRef<"Mom", 'DateTime'>
@@ -23969,10 +35885,117 @@ export namespace Prisma {
     billingStatus: 'billingStatus',
     billingCycle: 'billingCycle',
     nextBillingDate: 'nextBillingDate',
+    trialStartedAt: 'trialStartedAt',
+    trialEndsAt: 'trialEndsAt',
+    cancelledAt: 'cancelledAt',
+    currentPeriodStart: 'currentPeriodStart',
+    currentPeriodEnd: 'currentPeriodEnd',
+    discountPercent: 'discountPercent',
+    billingEmail: 'billingEmail',
+    createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type OrganizationBillingScalarFieldEnum = (typeof OrganizationBillingScalarFieldEnum)[keyof typeof OrganizationBillingScalarFieldEnum]
+
+
+  export const InvoiceScalarFieldEnum: {
+    id: 'id',
+    organizationId: 'organizationId',
+    invoiceNumber: 'invoiceNumber',
+    status: 'status',
+    planName: 'planName',
+    billingCycle: 'billingCycle',
+    periodStart: 'periodStart',
+    periodEnd: 'periodEnd',
+    includedSeats: 'includedSeats',
+    activeSeats: 'activeSeats',
+    additionalSeats: 'additionalSeats',
+    includedLocations: 'includedLocations',
+    activeLocations: 'activeLocations',
+    subtotalInr: 'subtotalInr',
+    discountInr: 'discountInr',
+    gstInr: 'gstInr',
+    totalInr: 'totalInr',
+    billingAddress: 'billingAddress',
+    storageKey: 'storageKey',
+    storageBackend: 'storageBackend',
+    issuedAt: 'issuedAt',
+    dueAt: 'dueAt',
+    paidAt: 'paidAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
+
+
+  export const InvoiceLineItemScalarFieldEnum: {
+    id: 'id',
+    invoiceId: 'invoiceId',
+    description: 'description',
+    quantity: 'quantity',
+    unitPriceInr: 'unitPriceInr',
+    amountInr: 'amountInr',
+    sortOrder: 'sortOrder'
+  };
+
+  export type InvoiceLineItemScalarFieldEnum = (typeof InvoiceLineItemScalarFieldEnum)[keyof typeof InvoiceLineItemScalarFieldEnum]
+
+
+  export const PaymentScalarFieldEnum: {
+    id: 'id',
+    organizationId: 'organizationId',
+    invoiceId: 'invoiceId',
+    amountInr: 'amountInr',
+    status: 'status',
+    method: 'method',
+    reference: 'reference',
+    notes: 'notes',
+    recordedById: 'recordedById',
+    paidAt: 'paidAt',
+    createdAt: 'createdAt'
+  };
+
+  export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+  export const InvoiceDeliveryScalarFieldEnum: {
+    id: 'id',
+    invoiceId: 'invoiceId',
+    organizationId: 'organizationId',
+    recipientEmail: 'recipientEmail',
+    status: 'status',
+    error: 'error',
+    sentAt: 'sentAt',
+    createdAt: 'createdAt'
+  };
+
+  export type InvoiceDeliveryScalarFieldEnum = (typeof InvoiceDeliveryScalarFieldEnum)[keyof typeof InvoiceDeliveryScalarFieldEnum]
+
+
+  export const BillingEventScalarFieldEnum: {
+    id: 'id',
+    organizationId: 'organizationId',
+    type: 'type',
+    metadata: 'metadata',
+    actorId: 'actorId',
+    createdAt: 'createdAt'
+  };
+
+  export type BillingEventScalarFieldEnum = (typeof BillingEventScalarFieldEnum)[keyof typeof BillingEventScalarFieldEnum]
+
+
+  export const PricingChangeLogScalarFieldEnum: {
+    id: 'id',
+    actorId: 'actorId',
+    actorName: 'actorName',
+    previous: 'previous',
+    next: 'next',
+    createdAt: 'createdAt'
+  };
+
+  export type PricingChangeLogScalarFieldEnum = (typeof PricingChangeLogScalarFieldEnum)[keyof typeof PricingChangeLogScalarFieldEnum]
 
 
   export const OrganizationScalarFieldEnum: {
@@ -23997,7 +36020,8 @@ export namespace Prisma {
     status: 'status',
     subscriptionPlan: 'subscriptionPlan',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    defaultMomTemplateId: 'defaultMomTemplateId'
   };
 
   export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
@@ -24080,10 +36104,59 @@ export namespace Prisma {
     liveBroadcastAt: 'liveBroadcastAt',
     liveEndedAt: 'liveEndedAt',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    momTemplateId: 'momTemplateId'
   };
 
   export type MeetingScalarFieldEnum = (typeof MeetingScalarFieldEnum)[keyof typeof MeetingScalarFieldEnum]
+
+
+  export const MomTemplateScalarFieldEnum: {
+    id: 'id',
+    organizationId: 'organizationId',
+    name: 'name',
+    description: 'description',
+    category: 'category',
+    source: 'source',
+    isDefault: 'isDefault',
+    isArchived: 'isArchived',
+    metadata: 'metadata',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MomTemplateScalarFieldEnum = (typeof MomTemplateScalarFieldEnum)[keyof typeof MomTemplateScalarFieldEnum]
+
+
+  export const MomTemplateSectionScalarFieldEnum: {
+    id: 'id',
+    templateId: 'templateId',
+    title: 'title',
+    description: 'description',
+    aiInstructions: 'aiInstructions',
+    isRequired: 'isRequired',
+    sortOrder: 'sortOrder',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MomTemplateSectionScalarFieldEnum = (typeof MomTemplateSectionScalarFieldEnum)[keyof typeof MomTemplateSectionScalarFieldEnum]
+
+
+  export const MomTemplateUploadScalarFieldEnum: {
+    id: 'id',
+    templateId: 'templateId',
+    organizationId: 'organizationId',
+    fileName: 'fileName',
+    mimeType: 'mimeType',
+    storageKey: 'storageKey',
+    storageBackend: 'storageBackend',
+    sizeBytes: 'sizeBytes',
+    extractedHeadings: 'extractedHeadings',
+    createdAt: 'createdAt'
+  };
+
+  export type MomTemplateUploadScalarFieldEnum = (typeof MomTemplateUploadScalarFieldEnum)[keyof typeof MomTemplateUploadScalarFieldEnum]
 
 
   export const MeetingInviteScalarFieldEnum: {
@@ -24152,11 +36225,13 @@ export namespace Prisma {
   export const MomScalarFieldEnum: {
     id: 'id',
     meetingId: 'meetingId',
+    templateId: 'templateId',
     title: 'title',
     dateTime: 'dateTime',
     participants: 'participants',
     keyPoints: 'keyPoints',
     actionItems: 'actionItems',
+    sections: 'sections',
     approved: 'approved',
     approvedBy: 'approvedBy',
     approvedAt: 'approvedAt',
@@ -24348,6 +36423,76 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'InvoiceStatus'
+   */
+  export type EnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'InvoiceStatus[]'
+   */
+  export type ListEnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TemplateFileStorageBackend'
+   */
+  export type EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateFileStorageBackend'>
+    
+
+
+  /**
+   * Reference to a field of type 'TemplateFileStorageBackend[]'
+   */
+  export type ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TemplateFileStorageBackend[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentStatus'
+   */
+  export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentStatus[]'
+   */
+  export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'InvoiceDeliveryStatus'
+   */
+  export type EnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceDeliveryStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'InvoiceDeliveryStatus[]'
+   */
+  export type ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceDeliveryStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
    * Reference to a field of type 'OrganizationStatus'
    */
   export type EnumOrganizationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrganizationStatus'>
@@ -24411,20 +36556,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
    * Reference to a field of type 'MeetingStatus'
    */
   export type EnumMeetingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MeetingStatus'>
@@ -24449,6 +36580,34 @@ export namespace Prisma {
    * Reference to a field of type 'MeetingTag[]'
    */
   export type ListEnumMeetingTagFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MeetingTag[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'MomTemplateCategory'
+   */
+  export type EnumMomTemplateCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MomTemplateCategory'>
+    
+
+
+  /**
+   * Reference to a field of type 'MomTemplateCategory[]'
+   */
+  export type ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MomTemplateCategory[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'MomTemplateSource'
+   */
+  export type EnumMomTemplateSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MomTemplateSource'>
+    
+
+
+  /**
+   * Reference to a field of type 'MomTemplateSource[]'
+   */
+  export type ListEnumMomTemplateSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MomTemplateSource[]'>
     
 
 
@@ -24637,6 +36796,14 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusFilter<"OrganizationBilling"> | $Enums.BillingStatus
     billingCycle?: StringFilter<"OrganizationBilling"> | string
     nextBillingDate?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    trialStartedAt?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    trialEndsAt?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    cancelledAt?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    currentPeriodStart?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    currentPeriodEnd?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    discountPercent?: DecimalFilter<"OrganizationBilling"> | Decimal | DecimalJsLike | number | string
+    billingEmail?: StringNullableFilter<"OrganizationBilling"> | string | null
+    createdAt?: DateTimeFilter<"OrganizationBilling"> | Date | string
     updatedAt?: DateTimeFilter<"OrganizationBilling"> | Date | string
     organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
   }
@@ -24647,6 +36814,14 @@ export namespace Prisma {
     billingStatus?: SortOrder
     billingCycle?: SortOrder
     nextBillingDate?: SortOrderInput | SortOrder
+    trialStartedAt?: SortOrderInput | SortOrder
+    trialEndsAt?: SortOrderInput | SortOrder
+    cancelledAt?: SortOrderInput | SortOrder
+    currentPeriodStart?: SortOrderInput | SortOrder
+    currentPeriodEnd?: SortOrderInput | SortOrder
+    discountPercent?: SortOrder
+    billingEmail?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
     updatedAt?: SortOrder
     organization?: OrganizationOrderByWithRelationInput
   }
@@ -24660,6 +36835,14 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusFilter<"OrganizationBilling"> | $Enums.BillingStatus
     billingCycle?: StringFilter<"OrganizationBilling"> | string
     nextBillingDate?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    trialStartedAt?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    trialEndsAt?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    cancelledAt?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    currentPeriodStart?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    currentPeriodEnd?: DateTimeNullableFilter<"OrganizationBilling"> | Date | string | null
+    discountPercent?: DecimalFilter<"OrganizationBilling"> | Decimal | DecimalJsLike | number | string
+    billingEmail?: StringNullableFilter<"OrganizationBilling"> | string | null
+    createdAt?: DateTimeFilter<"OrganizationBilling"> | Date | string
     updatedAt?: DateTimeFilter<"OrganizationBilling"> | Date | string
     organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
   }, "organizationId">
@@ -24670,6 +36853,14 @@ export namespace Prisma {
     billingStatus?: SortOrder
     billingCycle?: SortOrder
     nextBillingDate?: SortOrderInput | SortOrder
+    trialStartedAt?: SortOrderInput | SortOrder
+    trialEndsAt?: SortOrderInput | SortOrder
+    cancelledAt?: SortOrderInput | SortOrder
+    currentPeriodStart?: SortOrderInput | SortOrder
+    currentPeriodEnd?: SortOrderInput | SortOrder
+    discountPercent?: SortOrder
+    billingEmail?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: OrganizationBillingCountOrderByAggregateInput
     _avg?: OrganizationBillingAvgOrderByAggregateInput
@@ -24687,7 +36878,525 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusWithAggregatesFilter<"OrganizationBilling"> | $Enums.BillingStatus
     billingCycle?: StringWithAggregatesFilter<"OrganizationBilling"> | string
     nextBillingDate?: DateTimeNullableWithAggregatesFilter<"OrganizationBilling"> | Date | string | null
+    trialStartedAt?: DateTimeNullableWithAggregatesFilter<"OrganizationBilling"> | Date | string | null
+    trialEndsAt?: DateTimeNullableWithAggregatesFilter<"OrganizationBilling"> | Date | string | null
+    cancelledAt?: DateTimeNullableWithAggregatesFilter<"OrganizationBilling"> | Date | string | null
+    currentPeriodStart?: DateTimeNullableWithAggregatesFilter<"OrganizationBilling"> | Date | string | null
+    currentPeriodEnd?: DateTimeNullableWithAggregatesFilter<"OrganizationBilling"> | Date | string | null
+    discountPercent?: DecimalWithAggregatesFilter<"OrganizationBilling"> | Decimal | DecimalJsLike | number | string
+    billingEmail?: StringNullableWithAggregatesFilter<"OrganizationBilling"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"OrganizationBilling"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"OrganizationBilling"> | Date | string
+  }
+
+  export type InvoiceWhereInput = {
+    AND?: InvoiceWhereInput | InvoiceWhereInput[]
+    OR?: InvoiceWhereInput[]
+    NOT?: InvoiceWhereInput | InvoiceWhereInput[]
+    id?: StringFilter<"Invoice"> | string
+    organizationId?: StringFilter<"Invoice"> | string
+    invoiceNumber?: StringFilter<"Invoice"> | string
+    status?: EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
+    planName?: StringFilter<"Invoice"> | string
+    billingCycle?: StringFilter<"Invoice"> | string
+    periodStart?: DateTimeFilter<"Invoice"> | Date | string
+    periodEnd?: DateTimeFilter<"Invoice"> | Date | string
+    includedSeats?: IntFilter<"Invoice"> | number
+    activeSeats?: IntFilter<"Invoice"> | number
+    additionalSeats?: IntFilter<"Invoice"> | number
+    includedLocations?: IntFilter<"Invoice"> | number
+    activeLocations?: IntFilter<"Invoice"> | number
+    subtotalInr?: IntFilter<"Invoice"> | number
+    discountInr?: IntFilter<"Invoice"> | number
+    gstInr?: IntFilter<"Invoice"> | number
+    totalInr?: IntFilter<"Invoice"> | number
+    billingAddress?: StringNullableFilter<"Invoice"> | string | null
+    storageKey?: StringNullableFilter<"Invoice"> | string | null
+    storageBackend?: EnumTemplateFileStorageBackendNullableFilter<"Invoice"> | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    dueAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    paidAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    createdAt?: DateTimeFilter<"Invoice"> | Date | string
+    updatedAt?: DateTimeFilter<"Invoice"> | Date | string
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    lineItems?: InvoiceLineItemListRelationFilter
+    payments?: PaymentListRelationFilter
+    deliveries?: InvoiceDeliveryListRelationFilter
+  }
+
+  export type InvoiceOrderByWithRelationInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceNumber?: SortOrder
+    status?: SortOrder
+    planName?: SortOrder
+    billingCycle?: SortOrder
+    periodStart?: SortOrder
+    periodEnd?: SortOrder
+    includedSeats?: SortOrder
+    activeSeats?: SortOrder
+    additionalSeats?: SortOrder
+    includedLocations?: SortOrder
+    activeLocations?: SortOrder
+    subtotalInr?: SortOrder
+    discountInr?: SortOrder
+    gstInr?: SortOrder
+    totalInr?: SortOrder
+    billingAddress?: SortOrderInput | SortOrder
+    storageKey?: SortOrderInput | SortOrder
+    storageBackend?: SortOrderInput | SortOrder
+    issuedAt?: SortOrderInput | SortOrder
+    dueAt?: SortOrderInput | SortOrder
+    paidAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    organization?: OrganizationOrderByWithRelationInput
+    lineItems?: InvoiceLineItemOrderByRelationAggregateInput
+    payments?: PaymentOrderByRelationAggregateInput
+    deliveries?: InvoiceDeliveryOrderByRelationAggregateInput
+  }
+
+  export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    invoiceNumber?: string
+    AND?: InvoiceWhereInput | InvoiceWhereInput[]
+    OR?: InvoiceWhereInput[]
+    NOT?: InvoiceWhereInput | InvoiceWhereInput[]
+    organizationId?: StringFilter<"Invoice"> | string
+    status?: EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
+    planName?: StringFilter<"Invoice"> | string
+    billingCycle?: StringFilter<"Invoice"> | string
+    periodStart?: DateTimeFilter<"Invoice"> | Date | string
+    periodEnd?: DateTimeFilter<"Invoice"> | Date | string
+    includedSeats?: IntFilter<"Invoice"> | number
+    activeSeats?: IntFilter<"Invoice"> | number
+    additionalSeats?: IntFilter<"Invoice"> | number
+    includedLocations?: IntFilter<"Invoice"> | number
+    activeLocations?: IntFilter<"Invoice"> | number
+    subtotalInr?: IntFilter<"Invoice"> | number
+    discountInr?: IntFilter<"Invoice"> | number
+    gstInr?: IntFilter<"Invoice"> | number
+    totalInr?: IntFilter<"Invoice"> | number
+    billingAddress?: StringNullableFilter<"Invoice"> | string | null
+    storageKey?: StringNullableFilter<"Invoice"> | string | null
+    storageBackend?: EnumTemplateFileStorageBackendNullableFilter<"Invoice"> | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    dueAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    paidAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    createdAt?: DateTimeFilter<"Invoice"> | Date | string
+    updatedAt?: DateTimeFilter<"Invoice"> | Date | string
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    lineItems?: InvoiceLineItemListRelationFilter
+    payments?: PaymentListRelationFilter
+    deliveries?: InvoiceDeliveryListRelationFilter
+  }, "id" | "invoiceNumber">
+
+  export type InvoiceOrderByWithAggregationInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceNumber?: SortOrder
+    status?: SortOrder
+    planName?: SortOrder
+    billingCycle?: SortOrder
+    periodStart?: SortOrder
+    periodEnd?: SortOrder
+    includedSeats?: SortOrder
+    activeSeats?: SortOrder
+    additionalSeats?: SortOrder
+    includedLocations?: SortOrder
+    activeLocations?: SortOrder
+    subtotalInr?: SortOrder
+    discountInr?: SortOrder
+    gstInr?: SortOrder
+    totalInr?: SortOrder
+    billingAddress?: SortOrderInput | SortOrder
+    storageKey?: SortOrderInput | SortOrder
+    storageBackend?: SortOrderInput | SortOrder
+    issuedAt?: SortOrderInput | SortOrder
+    dueAt?: SortOrderInput | SortOrder
+    paidAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: InvoiceCountOrderByAggregateInput
+    _avg?: InvoiceAvgOrderByAggregateInput
+    _max?: InvoiceMaxOrderByAggregateInput
+    _min?: InvoiceMinOrderByAggregateInput
+    _sum?: InvoiceSumOrderByAggregateInput
+  }
+
+  export type InvoiceScalarWhereWithAggregatesInput = {
+    AND?: InvoiceScalarWhereWithAggregatesInput | InvoiceScalarWhereWithAggregatesInput[]
+    OR?: InvoiceScalarWhereWithAggregatesInput[]
+    NOT?: InvoiceScalarWhereWithAggregatesInput | InvoiceScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Invoice"> | string
+    organizationId?: StringWithAggregatesFilter<"Invoice"> | string
+    invoiceNumber?: StringWithAggregatesFilter<"Invoice"> | string
+    status?: EnumInvoiceStatusWithAggregatesFilter<"Invoice"> | $Enums.InvoiceStatus
+    planName?: StringWithAggregatesFilter<"Invoice"> | string
+    billingCycle?: StringWithAggregatesFilter<"Invoice"> | string
+    periodStart?: DateTimeWithAggregatesFilter<"Invoice"> | Date | string
+    periodEnd?: DateTimeWithAggregatesFilter<"Invoice"> | Date | string
+    includedSeats?: IntWithAggregatesFilter<"Invoice"> | number
+    activeSeats?: IntWithAggregatesFilter<"Invoice"> | number
+    additionalSeats?: IntWithAggregatesFilter<"Invoice"> | number
+    includedLocations?: IntWithAggregatesFilter<"Invoice"> | number
+    activeLocations?: IntWithAggregatesFilter<"Invoice"> | number
+    subtotalInr?: IntWithAggregatesFilter<"Invoice"> | number
+    discountInr?: IntWithAggregatesFilter<"Invoice"> | number
+    gstInr?: IntWithAggregatesFilter<"Invoice"> | number
+    totalInr?: IntWithAggregatesFilter<"Invoice"> | number
+    billingAddress?: StringNullableWithAggregatesFilter<"Invoice"> | string | null
+    storageKey?: StringNullableWithAggregatesFilter<"Invoice"> | string | null
+    storageBackend?: EnumTemplateFileStorageBackendNullableWithAggregatesFilter<"Invoice"> | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: DateTimeNullableWithAggregatesFilter<"Invoice"> | Date | string | null
+    dueAt?: DateTimeNullableWithAggregatesFilter<"Invoice"> | Date | string | null
+    paidAt?: DateTimeNullableWithAggregatesFilter<"Invoice"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Invoice"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Invoice"> | Date | string
+  }
+
+  export type InvoiceLineItemWhereInput = {
+    AND?: InvoiceLineItemWhereInput | InvoiceLineItemWhereInput[]
+    OR?: InvoiceLineItemWhereInput[]
+    NOT?: InvoiceLineItemWhereInput | InvoiceLineItemWhereInput[]
+    id?: StringFilter<"InvoiceLineItem"> | string
+    invoiceId?: StringFilter<"InvoiceLineItem"> | string
+    description?: StringFilter<"InvoiceLineItem"> | string
+    quantity?: IntFilter<"InvoiceLineItem"> | number
+    unitPriceInr?: IntFilter<"InvoiceLineItem"> | number
+    amountInr?: IntFilter<"InvoiceLineItem"> | number
+    sortOrder?: IntFilter<"InvoiceLineItem"> | number
+    invoice?: XOR<InvoiceScalarRelationFilter, InvoiceWhereInput>
+  }
+
+  export type InvoiceLineItemOrderByWithRelationInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    description?: SortOrder
+    quantity?: SortOrder
+    unitPriceInr?: SortOrder
+    amountInr?: SortOrder
+    sortOrder?: SortOrder
+    invoice?: InvoiceOrderByWithRelationInput
+  }
+
+  export type InvoiceLineItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: InvoiceLineItemWhereInput | InvoiceLineItemWhereInput[]
+    OR?: InvoiceLineItemWhereInput[]
+    NOT?: InvoiceLineItemWhereInput | InvoiceLineItemWhereInput[]
+    invoiceId?: StringFilter<"InvoiceLineItem"> | string
+    description?: StringFilter<"InvoiceLineItem"> | string
+    quantity?: IntFilter<"InvoiceLineItem"> | number
+    unitPriceInr?: IntFilter<"InvoiceLineItem"> | number
+    amountInr?: IntFilter<"InvoiceLineItem"> | number
+    sortOrder?: IntFilter<"InvoiceLineItem"> | number
+    invoice?: XOR<InvoiceScalarRelationFilter, InvoiceWhereInput>
+  }, "id">
+
+  export type InvoiceLineItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    description?: SortOrder
+    quantity?: SortOrder
+    unitPriceInr?: SortOrder
+    amountInr?: SortOrder
+    sortOrder?: SortOrder
+    _count?: InvoiceLineItemCountOrderByAggregateInput
+    _avg?: InvoiceLineItemAvgOrderByAggregateInput
+    _max?: InvoiceLineItemMaxOrderByAggregateInput
+    _min?: InvoiceLineItemMinOrderByAggregateInput
+    _sum?: InvoiceLineItemSumOrderByAggregateInput
+  }
+
+  export type InvoiceLineItemScalarWhereWithAggregatesInput = {
+    AND?: InvoiceLineItemScalarWhereWithAggregatesInput | InvoiceLineItemScalarWhereWithAggregatesInput[]
+    OR?: InvoiceLineItemScalarWhereWithAggregatesInput[]
+    NOT?: InvoiceLineItemScalarWhereWithAggregatesInput | InvoiceLineItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"InvoiceLineItem"> | string
+    invoiceId?: StringWithAggregatesFilter<"InvoiceLineItem"> | string
+    description?: StringWithAggregatesFilter<"InvoiceLineItem"> | string
+    quantity?: IntWithAggregatesFilter<"InvoiceLineItem"> | number
+    unitPriceInr?: IntWithAggregatesFilter<"InvoiceLineItem"> | number
+    amountInr?: IntWithAggregatesFilter<"InvoiceLineItem"> | number
+    sortOrder?: IntWithAggregatesFilter<"InvoiceLineItem"> | number
+  }
+
+  export type PaymentWhereInput = {
+    AND?: PaymentWhereInput | PaymentWhereInput[]
+    OR?: PaymentWhereInput[]
+    NOT?: PaymentWhereInput | PaymentWhereInput[]
+    id?: StringFilter<"Payment"> | string
+    organizationId?: StringFilter<"Payment"> | string
+    invoiceId?: StringNullableFilter<"Payment"> | string | null
+    amountInr?: IntFilter<"Payment"> | number
+    status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    method?: StringNullableFilter<"Payment"> | string | null
+    reference?: StringNullableFilter<"Payment"> | string | null
+    notes?: StringNullableFilter<"Payment"> | string | null
+    recordedById?: StringNullableFilter<"Payment"> | string | null
+    paidAt?: DateTimeFilter<"Payment"> | Date | string
+    createdAt?: DateTimeFilter<"Payment"> | Date | string
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    invoice?: XOR<InvoiceNullableScalarRelationFilter, InvoiceWhereInput> | null
+  }
+
+  export type PaymentOrderByWithRelationInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceId?: SortOrderInput | SortOrder
+    amountInr?: SortOrder
+    status?: SortOrder
+    method?: SortOrderInput | SortOrder
+    reference?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    recordedById?: SortOrderInput | SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+    organization?: OrganizationOrderByWithRelationInput
+    invoice?: InvoiceOrderByWithRelationInput
+  }
+
+  export type PaymentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PaymentWhereInput | PaymentWhereInput[]
+    OR?: PaymentWhereInput[]
+    NOT?: PaymentWhereInput | PaymentWhereInput[]
+    organizationId?: StringFilter<"Payment"> | string
+    invoiceId?: StringNullableFilter<"Payment"> | string | null
+    amountInr?: IntFilter<"Payment"> | number
+    status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    method?: StringNullableFilter<"Payment"> | string | null
+    reference?: StringNullableFilter<"Payment"> | string | null
+    notes?: StringNullableFilter<"Payment"> | string | null
+    recordedById?: StringNullableFilter<"Payment"> | string | null
+    paidAt?: DateTimeFilter<"Payment"> | Date | string
+    createdAt?: DateTimeFilter<"Payment"> | Date | string
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    invoice?: XOR<InvoiceNullableScalarRelationFilter, InvoiceWhereInput> | null
+  }, "id">
+
+  export type PaymentOrderByWithAggregationInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceId?: SortOrderInput | SortOrder
+    amountInr?: SortOrder
+    status?: SortOrder
+    method?: SortOrderInput | SortOrder
+    reference?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    recordedById?: SortOrderInput | SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: PaymentCountOrderByAggregateInput
+    _avg?: PaymentAvgOrderByAggregateInput
+    _max?: PaymentMaxOrderByAggregateInput
+    _min?: PaymentMinOrderByAggregateInput
+    _sum?: PaymentSumOrderByAggregateInput
+  }
+
+  export type PaymentScalarWhereWithAggregatesInput = {
+    AND?: PaymentScalarWhereWithAggregatesInput | PaymentScalarWhereWithAggregatesInput[]
+    OR?: PaymentScalarWhereWithAggregatesInput[]
+    NOT?: PaymentScalarWhereWithAggregatesInput | PaymentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Payment"> | string
+    organizationId?: StringWithAggregatesFilter<"Payment"> | string
+    invoiceId?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    amountInr?: IntWithAggregatesFilter<"Payment"> | number
+    status?: EnumPaymentStatusWithAggregatesFilter<"Payment"> | $Enums.PaymentStatus
+    method?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    reference?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    recordedById?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    paidAt?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
+  }
+
+  export type InvoiceDeliveryWhereInput = {
+    AND?: InvoiceDeliveryWhereInput | InvoiceDeliveryWhereInput[]
+    OR?: InvoiceDeliveryWhereInput[]
+    NOT?: InvoiceDeliveryWhereInput | InvoiceDeliveryWhereInput[]
+    id?: StringFilter<"InvoiceDelivery"> | string
+    invoiceId?: StringFilter<"InvoiceDelivery"> | string
+    organizationId?: StringFilter<"InvoiceDelivery"> | string
+    recipientEmail?: StringFilter<"InvoiceDelivery"> | string
+    status?: EnumInvoiceDeliveryStatusFilter<"InvoiceDelivery"> | $Enums.InvoiceDeliveryStatus
+    error?: StringNullableFilter<"InvoiceDelivery"> | string | null
+    sentAt?: DateTimeNullableFilter<"InvoiceDelivery"> | Date | string | null
+    createdAt?: DateTimeFilter<"InvoiceDelivery"> | Date | string
+    invoice?: XOR<InvoiceScalarRelationFilter, InvoiceWhereInput>
+  }
+
+  export type InvoiceDeliveryOrderByWithRelationInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    organizationId?: SortOrder
+    recipientEmail?: SortOrder
+    status?: SortOrder
+    error?: SortOrderInput | SortOrder
+    sentAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    invoice?: InvoiceOrderByWithRelationInput
+  }
+
+  export type InvoiceDeliveryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: InvoiceDeliveryWhereInput | InvoiceDeliveryWhereInput[]
+    OR?: InvoiceDeliveryWhereInput[]
+    NOT?: InvoiceDeliveryWhereInput | InvoiceDeliveryWhereInput[]
+    invoiceId?: StringFilter<"InvoiceDelivery"> | string
+    organizationId?: StringFilter<"InvoiceDelivery"> | string
+    recipientEmail?: StringFilter<"InvoiceDelivery"> | string
+    status?: EnumInvoiceDeliveryStatusFilter<"InvoiceDelivery"> | $Enums.InvoiceDeliveryStatus
+    error?: StringNullableFilter<"InvoiceDelivery"> | string | null
+    sentAt?: DateTimeNullableFilter<"InvoiceDelivery"> | Date | string | null
+    createdAt?: DateTimeFilter<"InvoiceDelivery"> | Date | string
+    invoice?: XOR<InvoiceScalarRelationFilter, InvoiceWhereInput>
+  }, "id">
+
+  export type InvoiceDeliveryOrderByWithAggregationInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    organizationId?: SortOrder
+    recipientEmail?: SortOrder
+    status?: SortOrder
+    error?: SortOrderInput | SortOrder
+    sentAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: InvoiceDeliveryCountOrderByAggregateInput
+    _max?: InvoiceDeliveryMaxOrderByAggregateInput
+    _min?: InvoiceDeliveryMinOrderByAggregateInput
+  }
+
+  export type InvoiceDeliveryScalarWhereWithAggregatesInput = {
+    AND?: InvoiceDeliveryScalarWhereWithAggregatesInput | InvoiceDeliveryScalarWhereWithAggregatesInput[]
+    OR?: InvoiceDeliveryScalarWhereWithAggregatesInput[]
+    NOT?: InvoiceDeliveryScalarWhereWithAggregatesInput | InvoiceDeliveryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"InvoiceDelivery"> | string
+    invoiceId?: StringWithAggregatesFilter<"InvoiceDelivery"> | string
+    organizationId?: StringWithAggregatesFilter<"InvoiceDelivery"> | string
+    recipientEmail?: StringWithAggregatesFilter<"InvoiceDelivery"> | string
+    status?: EnumInvoiceDeliveryStatusWithAggregatesFilter<"InvoiceDelivery"> | $Enums.InvoiceDeliveryStatus
+    error?: StringNullableWithAggregatesFilter<"InvoiceDelivery"> | string | null
+    sentAt?: DateTimeNullableWithAggregatesFilter<"InvoiceDelivery"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"InvoiceDelivery"> | Date | string
+  }
+
+  export type BillingEventWhereInput = {
+    AND?: BillingEventWhereInput | BillingEventWhereInput[]
+    OR?: BillingEventWhereInput[]
+    NOT?: BillingEventWhereInput | BillingEventWhereInput[]
+    id?: StringFilter<"BillingEvent"> | string
+    organizationId?: StringFilter<"BillingEvent"> | string
+    type?: StringFilter<"BillingEvent"> | string
+    metadata?: JsonNullableFilter<"BillingEvent">
+    actorId?: StringNullableFilter<"BillingEvent"> | string | null
+    createdAt?: DateTimeFilter<"BillingEvent"> | Date | string
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+  }
+
+  export type BillingEventOrderByWithRelationInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    type?: SortOrder
+    metadata?: SortOrderInput | SortOrder
+    actorId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    organization?: OrganizationOrderByWithRelationInput
+  }
+
+  export type BillingEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: BillingEventWhereInput | BillingEventWhereInput[]
+    OR?: BillingEventWhereInput[]
+    NOT?: BillingEventWhereInput | BillingEventWhereInput[]
+    organizationId?: StringFilter<"BillingEvent"> | string
+    type?: StringFilter<"BillingEvent"> | string
+    metadata?: JsonNullableFilter<"BillingEvent">
+    actorId?: StringNullableFilter<"BillingEvent"> | string | null
+    createdAt?: DateTimeFilter<"BillingEvent"> | Date | string
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+  }, "id">
+
+  export type BillingEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    type?: SortOrder
+    metadata?: SortOrderInput | SortOrder
+    actorId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: BillingEventCountOrderByAggregateInput
+    _max?: BillingEventMaxOrderByAggregateInput
+    _min?: BillingEventMinOrderByAggregateInput
+  }
+
+  export type BillingEventScalarWhereWithAggregatesInput = {
+    AND?: BillingEventScalarWhereWithAggregatesInput | BillingEventScalarWhereWithAggregatesInput[]
+    OR?: BillingEventScalarWhereWithAggregatesInput[]
+    NOT?: BillingEventScalarWhereWithAggregatesInput | BillingEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BillingEvent"> | string
+    organizationId?: StringWithAggregatesFilter<"BillingEvent"> | string
+    type?: StringWithAggregatesFilter<"BillingEvent"> | string
+    metadata?: JsonNullableWithAggregatesFilter<"BillingEvent">
+    actorId?: StringNullableWithAggregatesFilter<"BillingEvent"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BillingEvent"> | Date | string
+  }
+
+  export type PricingChangeLogWhereInput = {
+    AND?: PricingChangeLogWhereInput | PricingChangeLogWhereInput[]
+    OR?: PricingChangeLogWhereInput[]
+    NOT?: PricingChangeLogWhereInput | PricingChangeLogWhereInput[]
+    id?: StringFilter<"PricingChangeLog"> | string
+    actorId?: StringNullableFilter<"PricingChangeLog"> | string | null
+    actorName?: StringNullableFilter<"PricingChangeLog"> | string | null
+    previous?: JsonFilter<"PricingChangeLog">
+    next?: JsonFilter<"PricingChangeLog">
+    createdAt?: DateTimeFilter<"PricingChangeLog"> | Date | string
+  }
+
+  export type PricingChangeLogOrderByWithRelationInput = {
+    id?: SortOrder
+    actorId?: SortOrderInput | SortOrder
+    actorName?: SortOrderInput | SortOrder
+    previous?: SortOrder
+    next?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PricingChangeLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PricingChangeLogWhereInput | PricingChangeLogWhereInput[]
+    OR?: PricingChangeLogWhereInput[]
+    NOT?: PricingChangeLogWhereInput | PricingChangeLogWhereInput[]
+    actorId?: StringNullableFilter<"PricingChangeLog"> | string | null
+    actorName?: StringNullableFilter<"PricingChangeLog"> | string | null
+    previous?: JsonFilter<"PricingChangeLog">
+    next?: JsonFilter<"PricingChangeLog">
+    createdAt?: DateTimeFilter<"PricingChangeLog"> | Date | string
+  }, "id">
+
+  export type PricingChangeLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    actorId?: SortOrderInput | SortOrder
+    actorName?: SortOrderInput | SortOrder
+    previous?: SortOrder
+    next?: SortOrder
+    createdAt?: SortOrder
+    _count?: PricingChangeLogCountOrderByAggregateInput
+    _max?: PricingChangeLogMaxOrderByAggregateInput
+    _min?: PricingChangeLogMinOrderByAggregateInput
+  }
+
+  export type PricingChangeLogScalarWhereWithAggregatesInput = {
+    AND?: PricingChangeLogScalarWhereWithAggregatesInput | PricingChangeLogScalarWhereWithAggregatesInput[]
+    OR?: PricingChangeLogScalarWhereWithAggregatesInput[]
+    NOT?: PricingChangeLogScalarWhereWithAggregatesInput | PricingChangeLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PricingChangeLog"> | string
+    actorId?: StringNullableWithAggregatesFilter<"PricingChangeLog"> | string | null
+    actorName?: StringNullableWithAggregatesFilter<"PricingChangeLog"> | string | null
+    previous?: JsonWithAggregatesFilter<"PricingChangeLog">
+    next?: JsonWithAggregatesFilter<"PricingChangeLog">
+    createdAt?: DateTimeWithAggregatesFilter<"PricingChangeLog"> | Date | string
   }
 
   export type OrganizationWhereInput = {
@@ -24716,10 +37425,16 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanFilter<"Organization"> | $Enums.SubscriptionPlan
     createdAt?: DateTimeFilter<"Organization"> | Date | string
     updatedAt?: DateTimeFilter<"Organization"> | Date | string
+    defaultMomTemplateId?: StringNullableFilter<"Organization"> | string | null
     users?: UserListRelationFilter
     meetings?: MeetingListRelationFilter
     auditEvents?: TenantAuditLogListRelationFilter
     billingProfile?: XOR<OrganizationBillingNullableScalarRelationFilter, OrganizationBillingWhereInput> | null
+    momTemplates?: MomTemplateListRelationFilter
+    defaultMomTemplate?: XOR<MomTemplateNullableScalarRelationFilter, MomTemplateWhereInput> | null
+    invoices?: InvoiceListRelationFilter
+    payments?: PaymentListRelationFilter
+    billingEvents?: BillingEventListRelationFilter
   }
 
   export type OrganizationOrderByWithRelationInput = {
@@ -24745,10 +37460,16 @@ export namespace Prisma {
     subscriptionPlan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    defaultMomTemplateId?: SortOrderInput | SortOrder
     users?: UserOrderByRelationAggregateInput
     meetings?: MeetingOrderByRelationAggregateInput
     auditEvents?: TenantAuditLogOrderByRelationAggregateInput
     billingProfile?: OrganizationBillingOrderByWithRelationInput
+    momTemplates?: MomTemplateOrderByRelationAggregateInput
+    defaultMomTemplate?: MomTemplateOrderByWithRelationInput
+    invoices?: InvoiceOrderByRelationAggregateInput
+    payments?: PaymentOrderByRelationAggregateInput
+    billingEvents?: BillingEventOrderByRelationAggregateInput
   }
 
   export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -24777,10 +37498,16 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanFilter<"Organization"> | $Enums.SubscriptionPlan
     createdAt?: DateTimeFilter<"Organization"> | Date | string
     updatedAt?: DateTimeFilter<"Organization"> | Date | string
+    defaultMomTemplateId?: StringNullableFilter<"Organization"> | string | null
     users?: UserListRelationFilter
     meetings?: MeetingListRelationFilter
     auditEvents?: TenantAuditLogListRelationFilter
     billingProfile?: XOR<OrganizationBillingNullableScalarRelationFilter, OrganizationBillingWhereInput> | null
+    momTemplates?: MomTemplateListRelationFilter
+    defaultMomTemplate?: XOR<MomTemplateNullableScalarRelationFilter, MomTemplateWhereInput> | null
+    invoices?: InvoiceListRelationFilter
+    payments?: PaymentListRelationFilter
+    billingEvents?: BillingEventListRelationFilter
   }, "id" | "code" | "slug">
 
   export type OrganizationOrderByWithAggregationInput = {
@@ -24806,6 +37533,7 @@ export namespace Prisma {
     subscriptionPlan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    defaultMomTemplateId?: SortOrderInput | SortOrder
     _count?: OrganizationCountOrderByAggregateInput
     _avg?: OrganizationAvgOrderByAggregateInput
     _max?: OrganizationMaxOrderByAggregateInput
@@ -24839,6 +37567,7 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanWithAggregatesFilter<"Organization"> | $Enums.SubscriptionPlan
     createdAt?: DateTimeWithAggregatesFilter<"Organization"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Organization"> | Date | string
+    defaultMomTemplateId?: StringNullableWithAggregatesFilter<"Organization"> | string | null
   }
 
   export type UserWhereInput = {
@@ -25175,7 +37904,9 @@ export namespace Prisma {
     liveEndedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     createdAt?: DateTimeFilter<"Meeting"> | Date | string
     updatedAt?: DateTimeFilter<"Meeting"> | Date | string
+    momTemplateId?: StringNullableFilter<"Meeting"> | string | null
     organization?: XOR<OrganizationNullableScalarRelationFilter, OrganizationWhereInput> | null
+    momTemplate?: XOR<MomTemplateNullableScalarRelationFilter, MomTemplateWhereInput> | null
     organizer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     participants?: MeetingParticipantListRelationFilter
     audioFiles?: AudioFileListRelationFilter
@@ -25208,7 +37939,9 @@ export namespace Prisma {
     liveEndedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    momTemplateId?: SortOrderInput | SortOrder
     organization?: OrganizationOrderByWithRelationInput
+    momTemplate?: MomTemplateOrderByWithRelationInput
     organizer?: UserOrderByWithRelationInput
     participants?: MeetingParticipantOrderByRelationAggregateInput
     audioFiles?: AudioFileOrderByRelationAggregateInput
@@ -25244,7 +37977,9 @@ export namespace Prisma {
     liveEndedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     createdAt?: DateTimeFilter<"Meeting"> | Date | string
     updatedAt?: DateTimeFilter<"Meeting"> | Date | string
+    momTemplateId?: StringNullableFilter<"Meeting"> | string | null
     organization?: XOR<OrganizationNullableScalarRelationFilter, OrganizationWhereInput> | null
+    momTemplate?: XOR<MomTemplateNullableScalarRelationFilter, MomTemplateWhereInput> | null
     organizer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     participants?: MeetingParticipantListRelationFilter
     audioFiles?: AudioFileListRelationFilter
@@ -25277,6 +38012,7 @@ export namespace Prisma {
     liveEndedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    momTemplateId?: SortOrderInput | SortOrder
     _count?: MeetingCountOrderByAggregateInput
     _avg?: MeetingAvgOrderByAggregateInput
     _max?: MeetingMaxOrderByAggregateInput
@@ -25307,6 +38043,263 @@ export namespace Prisma {
     liveEndedAt?: DateTimeNullableWithAggregatesFilter<"Meeting"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Meeting"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Meeting"> | Date | string
+    momTemplateId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+  }
+
+  export type MomTemplateWhereInput = {
+    AND?: MomTemplateWhereInput | MomTemplateWhereInput[]
+    OR?: MomTemplateWhereInput[]
+    NOT?: MomTemplateWhereInput | MomTemplateWhereInput[]
+    id?: StringFilter<"MomTemplate"> | string
+    organizationId?: StringFilter<"MomTemplate"> | string
+    name?: StringFilter<"MomTemplate"> | string
+    description?: StringNullableFilter<"MomTemplate"> | string | null
+    category?: EnumMomTemplateCategoryFilter<"MomTemplate"> | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFilter<"MomTemplate"> | $Enums.MomTemplateSource
+    isDefault?: BoolFilter<"MomTemplate"> | boolean
+    isArchived?: BoolFilter<"MomTemplate"> | boolean
+    metadata?: JsonNullableFilter<"MomTemplate">
+    createdAt?: DateTimeFilter<"MomTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"MomTemplate"> | Date | string
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    defaultForOrganization?: OrganizationListRelationFilter
+    sections?: MomTemplateSectionListRelationFilter
+    upload?: XOR<MomTemplateUploadNullableScalarRelationFilter, MomTemplateUploadWhereInput> | null
+    meetings?: MeetingListRelationFilter
+  }
+
+  export type MomTemplateOrderByWithRelationInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    category?: SortOrder
+    source?: SortOrder
+    isDefault?: SortOrder
+    isArchived?: SortOrder
+    metadata?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    organization?: OrganizationOrderByWithRelationInput
+    defaultForOrganization?: OrganizationOrderByRelationAggregateInput
+    sections?: MomTemplateSectionOrderByRelationAggregateInput
+    upload?: MomTemplateUploadOrderByWithRelationInput
+    meetings?: MeetingOrderByRelationAggregateInput
+  }
+
+  export type MomTemplateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MomTemplateWhereInput | MomTemplateWhereInput[]
+    OR?: MomTemplateWhereInput[]
+    NOT?: MomTemplateWhereInput | MomTemplateWhereInput[]
+    organizationId?: StringFilter<"MomTemplate"> | string
+    name?: StringFilter<"MomTemplate"> | string
+    description?: StringNullableFilter<"MomTemplate"> | string | null
+    category?: EnumMomTemplateCategoryFilter<"MomTemplate"> | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFilter<"MomTemplate"> | $Enums.MomTemplateSource
+    isDefault?: BoolFilter<"MomTemplate"> | boolean
+    isArchived?: BoolFilter<"MomTemplate"> | boolean
+    metadata?: JsonNullableFilter<"MomTemplate">
+    createdAt?: DateTimeFilter<"MomTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"MomTemplate"> | Date | string
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    defaultForOrganization?: OrganizationListRelationFilter
+    sections?: MomTemplateSectionListRelationFilter
+    upload?: XOR<MomTemplateUploadNullableScalarRelationFilter, MomTemplateUploadWhereInput> | null
+    meetings?: MeetingListRelationFilter
+  }, "id">
+
+  export type MomTemplateOrderByWithAggregationInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    category?: SortOrder
+    source?: SortOrder
+    isDefault?: SortOrder
+    isArchived?: SortOrder
+    metadata?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MomTemplateCountOrderByAggregateInput
+    _max?: MomTemplateMaxOrderByAggregateInput
+    _min?: MomTemplateMinOrderByAggregateInput
+  }
+
+  export type MomTemplateScalarWhereWithAggregatesInput = {
+    AND?: MomTemplateScalarWhereWithAggregatesInput | MomTemplateScalarWhereWithAggregatesInput[]
+    OR?: MomTemplateScalarWhereWithAggregatesInput[]
+    NOT?: MomTemplateScalarWhereWithAggregatesInput | MomTemplateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MomTemplate"> | string
+    organizationId?: StringWithAggregatesFilter<"MomTemplate"> | string
+    name?: StringWithAggregatesFilter<"MomTemplate"> | string
+    description?: StringNullableWithAggregatesFilter<"MomTemplate"> | string | null
+    category?: EnumMomTemplateCategoryWithAggregatesFilter<"MomTemplate"> | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceWithAggregatesFilter<"MomTemplate"> | $Enums.MomTemplateSource
+    isDefault?: BoolWithAggregatesFilter<"MomTemplate"> | boolean
+    isArchived?: BoolWithAggregatesFilter<"MomTemplate"> | boolean
+    metadata?: JsonNullableWithAggregatesFilter<"MomTemplate">
+    createdAt?: DateTimeWithAggregatesFilter<"MomTemplate"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MomTemplate"> | Date | string
+  }
+
+  export type MomTemplateSectionWhereInput = {
+    AND?: MomTemplateSectionWhereInput | MomTemplateSectionWhereInput[]
+    OR?: MomTemplateSectionWhereInput[]
+    NOT?: MomTemplateSectionWhereInput | MomTemplateSectionWhereInput[]
+    id?: StringFilter<"MomTemplateSection"> | string
+    templateId?: StringFilter<"MomTemplateSection"> | string
+    title?: StringFilter<"MomTemplateSection"> | string
+    description?: StringNullableFilter<"MomTemplateSection"> | string | null
+    aiInstructions?: StringFilter<"MomTemplateSection"> | string
+    isRequired?: BoolFilter<"MomTemplateSection"> | boolean
+    sortOrder?: IntFilter<"MomTemplateSection"> | number
+    createdAt?: DateTimeFilter<"MomTemplateSection"> | Date | string
+    updatedAt?: DateTimeFilter<"MomTemplateSection"> | Date | string
+    template?: XOR<MomTemplateScalarRelationFilter, MomTemplateWhereInput>
+  }
+
+  export type MomTemplateSectionOrderByWithRelationInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    title?: SortOrder
+    description?: SortOrderInput | SortOrder
+    aiInstructions?: SortOrder
+    isRequired?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    template?: MomTemplateOrderByWithRelationInput
+  }
+
+  export type MomTemplateSectionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MomTemplateSectionWhereInput | MomTemplateSectionWhereInput[]
+    OR?: MomTemplateSectionWhereInput[]
+    NOT?: MomTemplateSectionWhereInput | MomTemplateSectionWhereInput[]
+    templateId?: StringFilter<"MomTemplateSection"> | string
+    title?: StringFilter<"MomTemplateSection"> | string
+    description?: StringNullableFilter<"MomTemplateSection"> | string | null
+    aiInstructions?: StringFilter<"MomTemplateSection"> | string
+    isRequired?: BoolFilter<"MomTemplateSection"> | boolean
+    sortOrder?: IntFilter<"MomTemplateSection"> | number
+    createdAt?: DateTimeFilter<"MomTemplateSection"> | Date | string
+    updatedAt?: DateTimeFilter<"MomTemplateSection"> | Date | string
+    template?: XOR<MomTemplateScalarRelationFilter, MomTemplateWhereInput>
+  }, "id">
+
+  export type MomTemplateSectionOrderByWithAggregationInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    title?: SortOrder
+    description?: SortOrderInput | SortOrder
+    aiInstructions?: SortOrder
+    isRequired?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MomTemplateSectionCountOrderByAggregateInput
+    _avg?: MomTemplateSectionAvgOrderByAggregateInput
+    _max?: MomTemplateSectionMaxOrderByAggregateInput
+    _min?: MomTemplateSectionMinOrderByAggregateInput
+    _sum?: MomTemplateSectionSumOrderByAggregateInput
+  }
+
+  export type MomTemplateSectionScalarWhereWithAggregatesInput = {
+    AND?: MomTemplateSectionScalarWhereWithAggregatesInput | MomTemplateSectionScalarWhereWithAggregatesInput[]
+    OR?: MomTemplateSectionScalarWhereWithAggregatesInput[]
+    NOT?: MomTemplateSectionScalarWhereWithAggregatesInput | MomTemplateSectionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MomTemplateSection"> | string
+    templateId?: StringWithAggregatesFilter<"MomTemplateSection"> | string
+    title?: StringWithAggregatesFilter<"MomTemplateSection"> | string
+    description?: StringNullableWithAggregatesFilter<"MomTemplateSection"> | string | null
+    aiInstructions?: StringWithAggregatesFilter<"MomTemplateSection"> | string
+    isRequired?: BoolWithAggregatesFilter<"MomTemplateSection"> | boolean
+    sortOrder?: IntWithAggregatesFilter<"MomTemplateSection"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"MomTemplateSection"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MomTemplateSection"> | Date | string
+  }
+
+  export type MomTemplateUploadWhereInput = {
+    AND?: MomTemplateUploadWhereInput | MomTemplateUploadWhereInput[]
+    OR?: MomTemplateUploadWhereInput[]
+    NOT?: MomTemplateUploadWhereInput | MomTemplateUploadWhereInput[]
+    id?: StringFilter<"MomTemplateUpload"> | string
+    templateId?: StringFilter<"MomTemplateUpload"> | string
+    organizationId?: StringFilter<"MomTemplateUpload"> | string
+    fileName?: StringFilter<"MomTemplateUpload"> | string
+    mimeType?: StringFilter<"MomTemplateUpload"> | string
+    storageKey?: StringFilter<"MomTemplateUpload"> | string
+    storageBackend?: EnumTemplateFileStorageBackendFilter<"MomTemplateUpload"> | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntFilter<"MomTemplateUpload"> | number
+    extractedHeadings?: JsonNullableFilter<"MomTemplateUpload">
+    createdAt?: DateTimeFilter<"MomTemplateUpload"> | Date | string
+    template?: XOR<MomTemplateScalarRelationFilter, MomTemplateWhereInput>
+  }
+
+  export type MomTemplateUploadOrderByWithRelationInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    organizationId?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    storageKey?: SortOrder
+    storageBackend?: SortOrder
+    sizeBytes?: SortOrder
+    extractedHeadings?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    template?: MomTemplateOrderByWithRelationInput
+  }
+
+  export type MomTemplateUploadWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    templateId?: string
+    AND?: MomTemplateUploadWhereInput | MomTemplateUploadWhereInput[]
+    OR?: MomTemplateUploadWhereInput[]
+    NOT?: MomTemplateUploadWhereInput | MomTemplateUploadWhereInput[]
+    organizationId?: StringFilter<"MomTemplateUpload"> | string
+    fileName?: StringFilter<"MomTemplateUpload"> | string
+    mimeType?: StringFilter<"MomTemplateUpload"> | string
+    storageKey?: StringFilter<"MomTemplateUpload"> | string
+    storageBackend?: EnumTemplateFileStorageBackendFilter<"MomTemplateUpload"> | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntFilter<"MomTemplateUpload"> | number
+    extractedHeadings?: JsonNullableFilter<"MomTemplateUpload">
+    createdAt?: DateTimeFilter<"MomTemplateUpload"> | Date | string
+    template?: XOR<MomTemplateScalarRelationFilter, MomTemplateWhereInput>
+  }, "id" | "templateId">
+
+  export type MomTemplateUploadOrderByWithAggregationInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    organizationId?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    storageKey?: SortOrder
+    storageBackend?: SortOrder
+    sizeBytes?: SortOrder
+    extractedHeadings?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: MomTemplateUploadCountOrderByAggregateInput
+    _avg?: MomTemplateUploadAvgOrderByAggregateInput
+    _max?: MomTemplateUploadMaxOrderByAggregateInput
+    _min?: MomTemplateUploadMinOrderByAggregateInput
+    _sum?: MomTemplateUploadSumOrderByAggregateInput
+  }
+
+  export type MomTemplateUploadScalarWhereWithAggregatesInput = {
+    AND?: MomTemplateUploadScalarWhereWithAggregatesInput | MomTemplateUploadScalarWhereWithAggregatesInput[]
+    OR?: MomTemplateUploadScalarWhereWithAggregatesInput[]
+    NOT?: MomTemplateUploadScalarWhereWithAggregatesInput | MomTemplateUploadScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MomTemplateUpload"> | string
+    templateId?: StringWithAggregatesFilter<"MomTemplateUpload"> | string
+    organizationId?: StringWithAggregatesFilter<"MomTemplateUpload"> | string
+    fileName?: StringWithAggregatesFilter<"MomTemplateUpload"> | string
+    mimeType?: StringWithAggregatesFilter<"MomTemplateUpload"> | string
+    storageKey?: StringWithAggregatesFilter<"MomTemplateUpload"> | string
+    storageBackend?: EnumTemplateFileStorageBackendWithAggregatesFilter<"MomTemplateUpload"> | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntWithAggregatesFilter<"MomTemplateUpload"> | number
+    extractedHeadings?: JsonNullableWithAggregatesFilter<"MomTemplateUpload">
+    createdAt?: DateTimeWithAggregatesFilter<"MomTemplateUpload"> | Date | string
   }
 
   export type MeetingInviteWhereInput = {
@@ -25637,11 +38630,13 @@ export namespace Prisma {
     NOT?: MomWhereInput | MomWhereInput[]
     id?: StringFilter<"Mom"> | string
     meetingId?: StringFilter<"Mom"> | string
+    templateId?: StringNullableFilter<"Mom"> | string | null
     title?: StringFilter<"Mom"> | string
     dateTime?: StringFilter<"Mom"> | string
     participants?: JsonFilter<"Mom">
     keyPoints?: JsonFilter<"Mom">
     actionItems?: JsonFilter<"Mom">
+    sections?: JsonNullableFilter<"Mom">
     approved?: BoolFilter<"Mom"> | boolean
     approvedBy?: StringNullableFilter<"Mom"> | string | null
     approvedAt?: DateTimeNullableFilter<"Mom"> | Date | string | null
@@ -25655,11 +38650,13 @@ export namespace Prisma {
   export type MomOrderByWithRelationInput = {
     id?: SortOrder
     meetingId?: SortOrder
+    templateId?: SortOrderInput | SortOrder
     title?: SortOrder
     dateTime?: SortOrder
     participants?: SortOrder
     keyPoints?: SortOrder
     actionItems?: SortOrder
+    sections?: SortOrderInput | SortOrder
     approved?: SortOrder
     approvedBy?: SortOrderInput | SortOrder
     approvedAt?: SortOrderInput | SortOrder
@@ -25676,11 +38673,13 @@ export namespace Prisma {
     AND?: MomWhereInput | MomWhereInput[]
     OR?: MomWhereInput[]
     NOT?: MomWhereInput | MomWhereInput[]
+    templateId?: StringNullableFilter<"Mom"> | string | null
     title?: StringFilter<"Mom"> | string
     dateTime?: StringFilter<"Mom"> | string
     participants?: JsonFilter<"Mom">
     keyPoints?: JsonFilter<"Mom">
     actionItems?: JsonFilter<"Mom">
+    sections?: JsonNullableFilter<"Mom">
     approved?: BoolFilter<"Mom"> | boolean
     approvedBy?: StringNullableFilter<"Mom"> | string | null
     approvedAt?: DateTimeNullableFilter<"Mom"> | Date | string | null
@@ -25694,11 +38693,13 @@ export namespace Prisma {
   export type MomOrderByWithAggregationInput = {
     id?: SortOrder
     meetingId?: SortOrder
+    templateId?: SortOrderInput | SortOrder
     title?: SortOrder
     dateTime?: SortOrder
     participants?: SortOrder
     keyPoints?: SortOrder
     actionItems?: SortOrder
+    sections?: SortOrderInput | SortOrder
     approved?: SortOrder
     approvedBy?: SortOrderInput | SortOrder
     approvedAt?: SortOrderInput | SortOrder
@@ -25717,11 +38718,13 @@ export namespace Prisma {
     NOT?: MomScalarWhereWithAggregatesInput | MomScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Mom"> | string
     meetingId?: StringWithAggregatesFilter<"Mom"> | string
+    templateId?: StringNullableWithAggregatesFilter<"Mom"> | string | null
     title?: StringWithAggregatesFilter<"Mom"> | string
     dateTime?: StringWithAggregatesFilter<"Mom"> | string
     participants?: JsonWithAggregatesFilter<"Mom">
     keyPoints?: JsonWithAggregatesFilter<"Mom">
     actionItems?: JsonWithAggregatesFilter<"Mom">
+    sections?: JsonNullableWithAggregatesFilter<"Mom">
     approved?: BoolWithAggregatesFilter<"Mom"> | boolean
     approvedBy?: StringNullableWithAggregatesFilter<"Mom"> | string | null
     approvedAt?: DateTimeNullableWithAggregatesFilter<"Mom"> | Date | string | null
@@ -26126,6 +39129,14 @@ export namespace Prisma {
     billingStatus?: $Enums.BillingStatus
     billingCycle?: string
     nextBillingDate?: Date | string | null
+    trialStartedAt?: Date | string | null
+    trialEndsAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    discountPercent?: Decimal | DecimalJsLike | number | string
+    billingEmail?: string | null
+    createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutBillingProfileInput
   }
@@ -26136,6 +39147,14 @@ export namespace Prisma {
     billingStatus?: $Enums.BillingStatus
     billingCycle?: string
     nextBillingDate?: Date | string | null
+    trialStartedAt?: Date | string | null
+    trialEndsAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    discountPercent?: Decimal | DecimalJsLike | number | string
+    billingEmail?: string | null
+    createdAt?: Date | string
     updatedAt?: Date | string
   }
 
@@ -26144,6 +39163,14 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
     billingCycle?: StringFieldUpdateOperationsInput | string
     nextBillingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    discountPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutBillingProfileNestedInput
   }
@@ -26154,6 +39181,14 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
     billingCycle?: StringFieldUpdateOperationsInput | string
     nextBillingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    discountPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -26163,6 +39198,14 @@ export namespace Prisma {
     billingStatus?: $Enums.BillingStatus
     billingCycle?: string
     nextBillingDate?: Date | string | null
+    trialStartedAt?: Date | string | null
+    trialEndsAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    discountPercent?: Decimal | DecimalJsLike | number | string
+    billingEmail?: string | null
+    createdAt?: Date | string
     updatedAt?: Date | string
   }
 
@@ -26171,6 +39214,14 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
     billingCycle?: StringFieldUpdateOperationsInput | string
     nextBillingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    discountPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -26180,7 +39231,588 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
     billingCycle?: StringFieldUpdateOperationsInput | string
     nextBillingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    discountPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceCreateInput = {
+    id?: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutInvoicesInput
+    lineItems?: InvoiceLineItemCreateNestedManyWithoutInvoiceInput
+    payments?: PaymentCreateNestedManyWithoutInvoiceInput
+    deliveries?: InvoiceDeliveryCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceUncheckedCreateInput = {
+    id?: string
+    organizationId: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lineItems?: InvoiceLineItemUncheckedCreateNestedManyWithoutInvoiceInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
+    deliveries?: InvoiceDeliveryUncheckedCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutInvoicesNestedInput
+    lineItems?: InvoiceLineItemUpdateManyWithoutInvoiceNestedInput
+    payments?: PaymentUpdateManyWithoutInvoiceNestedInput
+    deliveries?: InvoiceDeliveryUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type InvoiceUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lineItems?: InvoiceLineItemUncheckedUpdateManyWithoutInvoiceNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
+    deliveries?: InvoiceDeliveryUncheckedUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type InvoiceCreateManyInput = {
+    id?: string
+    organizationId: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type InvoiceUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceLineItemCreateInput = {
+    id?: string
+    description: string
+    quantity: number
+    unitPriceInr: number
+    amountInr: number
+    sortOrder: number
+    invoice: InvoiceCreateNestedOneWithoutLineItemsInput
+  }
+
+  export type InvoiceLineItemUncheckedCreateInput = {
+    id?: string
+    invoiceId: string
+    description: string
+    quantity: number
+    unitPriceInr: number
+    amountInr: number
+    sortOrder: number
+  }
+
+  export type InvoiceLineItemUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPriceInr?: IntFieldUpdateOperationsInput | number
+    amountInr?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    invoice?: InvoiceUpdateOneRequiredWithoutLineItemsNestedInput
+  }
+
+  export type InvoiceLineItemUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceId?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPriceInr?: IntFieldUpdateOperationsInput | number
+    amountInr?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InvoiceLineItemCreateManyInput = {
+    id?: string
+    invoiceId: string
+    description: string
+    quantity: number
+    unitPriceInr: number
+    amountInr: number
+    sortOrder: number
+  }
+
+  export type InvoiceLineItemUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPriceInr?: IntFieldUpdateOperationsInput | number
+    amountInr?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InvoiceLineItemUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceId?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPriceInr?: IntFieldUpdateOperationsInput | number
+    amountInr?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type PaymentCreateInput = {
+    id?: string
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutPaymentsInput
+    invoice?: InvoiceCreateNestedOneWithoutPaymentsInput
+  }
+
+  export type PaymentUncheckedCreateInput = {
+    id?: string
+    organizationId: string
+    invoiceId?: string | null
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PaymentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutPaymentsNestedInput
+    invoice?: InvoiceUpdateOneWithoutPaymentsNestedInput
+  }
+
+  export type PaymentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    invoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PaymentCreateManyInput = {
+    id?: string
+    organizationId: string
+    invoiceId?: string | null
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PaymentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PaymentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    invoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceDeliveryCreateInput = {
+    id?: string
+    organizationId: string
+    recipientEmail: string
+    status?: $Enums.InvoiceDeliveryStatus
+    error?: string | null
+    sentAt?: Date | string | null
+    createdAt?: Date | string
+    invoice: InvoiceCreateNestedOneWithoutDeliveriesInput
+  }
+
+  export type InvoiceDeliveryUncheckedCreateInput = {
+    id?: string
+    invoiceId: string
+    organizationId: string
+    recipientEmail: string
+    status?: $Enums.InvoiceDeliveryStatus
+    error?: string | null
+    sentAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type InvoiceDeliveryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    recipientEmail?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceDeliveryStatusFieldUpdateOperationsInput | $Enums.InvoiceDeliveryStatus
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invoice?: InvoiceUpdateOneRequiredWithoutDeliveriesNestedInput
+  }
+
+  export type InvoiceDeliveryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceId?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    recipientEmail?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceDeliveryStatusFieldUpdateOperationsInput | $Enums.InvoiceDeliveryStatus
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceDeliveryCreateManyInput = {
+    id?: string
+    invoiceId: string
+    organizationId: string
+    recipientEmail: string
+    status?: $Enums.InvoiceDeliveryStatus
+    error?: string | null
+    sentAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type InvoiceDeliveryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    recipientEmail?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceDeliveryStatusFieldUpdateOperationsInput | $Enums.InvoiceDeliveryStatus
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceDeliveryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceId?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    recipientEmail?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceDeliveryStatusFieldUpdateOperationsInput | $Enums.InvoiceDeliveryStatus
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingEventCreateInput = {
+    id?: string
+    type: string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: string | null
+    createdAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutBillingEventsInput
+  }
+
+  export type BillingEventUncheckedCreateInput = {
+    id?: string
+    organizationId: string
+    type: string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type BillingEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutBillingEventsNestedInput
+  }
+
+  export type BillingEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingEventCreateManyInput = {
+    id?: string
+    organizationId: string
+    type: string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type BillingEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PricingChangeLogCreateInput = {
+    id?: string
+    actorId?: string | null
+    actorName?: string | null
+    previous: JsonNullValueInput | InputJsonValue
+    next: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type PricingChangeLogUncheckedCreateInput = {
+    id?: string
+    actorId?: string | null
+    actorName?: string | null
+    previous: JsonNullValueInput | InputJsonValue
+    next: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type PricingChangeLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    actorName?: NullableStringFieldUpdateOperationsInput | string | null
+    previous?: JsonNullValueInput | InputJsonValue
+    next?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PricingChangeLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    actorName?: NullableStringFieldUpdateOperationsInput | string | null
+    previous?: JsonNullValueInput | InputJsonValue
+    next?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PricingChangeLogCreateManyInput = {
+    id?: string
+    actorId?: string | null
+    actorName?: string | null
+    previous: JsonNullValueInput | InputJsonValue
+    next: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type PricingChangeLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    actorName?: NullableStringFieldUpdateOperationsInput | string | null
+    previous?: JsonNullValueInput | InputJsonValue
+    next?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PricingChangeLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    actorName?: NullableStringFieldUpdateOperationsInput | string | null
+    previous?: JsonNullValueInput | InputJsonValue
+    next?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type OrganizationCreateInput = {
@@ -26210,6 +39842,11 @@ export namespace Prisma {
     meetings?: MeetingCreateNestedManyWithoutOrganizationInput
     auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
     billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationUncheckedCreateInput = {
@@ -26235,10 +39872,15 @@ export namespace Prisma {
     subscriptionPlan?: $Enums.SubscriptionPlan
     createdAt?: Date | string
     updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
     users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
     meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
     auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
     billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationUpdateInput = {
@@ -26268,6 +39910,11 @@ export namespace Prisma {
     meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
     auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
     billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
   }
 
   export type OrganizationUncheckedUpdateInput = {
@@ -26293,10 +39940,15 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
     meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
     auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
     billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
   }
 
   export type OrganizationCreateManyInput = {
@@ -26322,6 +39974,7 @@ export namespace Prisma {
     subscriptionPlan?: $Enums.SubscriptionPlan
     createdAt?: Date | string
     updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
   }
 
   export type OrganizationUpdateManyMutationInput = {
@@ -26372,6 +40025,7 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserCreateInput = {
@@ -26734,6 +40388,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -26766,6 +40421,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -26796,6 +40452,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -26828,6 +40485,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -26859,6 +40517,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
   }
 
   export type MeetingUpdateManyMutationInput = {
@@ -26901,6 +40560,293 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MomTemplateCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutMomTemplatesInput
+    defaultForOrganization?: OrganizationCreateNestedManyWithoutDefaultMomTemplateInput
+    sections?: MomTemplateSectionCreateNestedManyWithoutTemplateInput
+    upload?: MomTemplateUploadCreateNestedOneWithoutTemplateInput
+    meetings?: MeetingCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateUncheckedCreateInput = {
+    id?: string
+    organizationId: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultForOrganization?: OrganizationUncheckedCreateNestedManyWithoutDefaultMomTemplateInput
+    sections?: MomTemplateSectionUncheckedCreateNestedManyWithoutTemplateInput
+    upload?: MomTemplateUploadUncheckedCreateNestedOneWithoutTemplateInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutMomTemplatesNestedInput
+    defaultForOrganization?: OrganizationUpdateManyWithoutDefaultMomTemplateNestedInput
+    sections?: MomTemplateSectionUpdateManyWithoutTemplateNestedInput
+    upload?: MomTemplateUploadUpdateOneWithoutTemplateNestedInput
+    meetings?: MeetingUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type MomTemplateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultForOrganization?: OrganizationUncheckedUpdateManyWithoutDefaultMomTemplateNestedInput
+    sections?: MomTemplateSectionUncheckedUpdateManyWithoutTemplateNestedInput
+    upload?: MomTemplateUploadUncheckedUpdateOneWithoutTemplateNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type MomTemplateCreateManyInput = {
+    id?: string
+    organizationId: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MomTemplateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateSectionCreateInput = {
+    id?: string
+    title: string
+    description?: string | null
+    aiInstructions: string
+    isRequired?: boolean
+    sortOrder: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    template: MomTemplateCreateNestedOneWithoutSectionsInput
+  }
+
+  export type MomTemplateSectionUncheckedCreateInput = {
+    id?: string
+    templateId: string
+    title: string
+    description?: string | null
+    aiInstructions: string
+    isRequired?: boolean
+    sortOrder: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MomTemplateSectionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    aiInstructions?: StringFieldUpdateOperationsInput | string
+    isRequired?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    template?: MomTemplateUpdateOneRequiredWithoutSectionsNestedInput
+  }
+
+  export type MomTemplateSectionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    templateId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    aiInstructions?: StringFieldUpdateOperationsInput | string
+    isRequired?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateSectionCreateManyInput = {
+    id?: string
+    templateId: string
+    title: string
+    description?: string | null
+    aiInstructions: string
+    isRequired?: boolean
+    sortOrder: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MomTemplateSectionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    aiInstructions?: StringFieldUpdateOperationsInput | string
+    isRequired?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateSectionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    templateId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    aiInstructions?: StringFieldUpdateOperationsInput | string
+    isRequired?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateUploadCreateInput = {
+    id?: string
+    organizationId: string
+    fileName: string
+    mimeType: string
+    storageKey: string
+    storageBackend?: $Enums.TemplateFileStorageBackend
+    sizeBytes: number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    template: MomTemplateCreateNestedOneWithoutUploadInput
+  }
+
+  export type MomTemplateUploadUncheckedCreateInput = {
+    id?: string
+    templateId: string
+    organizationId: string
+    fileName: string
+    mimeType: string
+    storageKey: string
+    storageBackend?: $Enums.TemplateFileStorageBackend
+    sizeBytes: number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type MomTemplateUploadUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    template?: MomTemplateUpdateOneRequiredWithoutUploadNestedInput
+  }
+
+  export type MomTemplateUploadUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    templateId?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateUploadCreateManyInput = {
+    id?: string
+    templateId: string
+    organizationId: string
+    fileName: string
+    mimeType: string
+    storageKey: string
+    storageBackend?: $Enums.TemplateFileStorageBackend
+    sizeBytes: number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type MomTemplateUploadUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateUploadUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    templateId?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MeetingInviteCreateInput = {
@@ -27240,11 +41186,13 @@ export namespace Prisma {
 
   export type MomCreateInput = {
     id?: string
+    templateId?: string | null
     title: string
     dateTime: string
     participants: JsonNullValueInput | InputJsonValue
     keyPoints: JsonNullValueInput | InputJsonValue
     actionItems: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: boolean
     approvedBy?: string | null
     approvedAt?: Date | string | null
@@ -27258,11 +41206,13 @@ export namespace Prisma {
   export type MomUncheckedCreateInput = {
     id?: string
     meetingId: string
+    templateId?: string | null
     title: string
     dateTime: string
     participants: JsonNullValueInput | InputJsonValue
     keyPoints: JsonNullValueInput | InputJsonValue
     actionItems: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: boolean
     approvedBy?: string | null
     approvedAt?: Date | string | null
@@ -27274,11 +41224,13 @@ export namespace Prisma {
 
   export type MomUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     dateTime?: StringFieldUpdateOperationsInput | string
     participants?: JsonNullValueInput | InputJsonValue
     keyPoints?: JsonNullValueInput | InputJsonValue
     actionItems?: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: BoolFieldUpdateOperationsInput | boolean
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27292,11 +41244,13 @@ export namespace Prisma {
   export type MomUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     meetingId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     dateTime?: StringFieldUpdateOperationsInput | string
     participants?: JsonNullValueInput | InputJsonValue
     keyPoints?: JsonNullValueInput | InputJsonValue
     actionItems?: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: BoolFieldUpdateOperationsInput | boolean
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27309,11 +41263,13 @@ export namespace Prisma {
   export type MomCreateManyInput = {
     id?: string
     meetingId: string
+    templateId?: string | null
     title: string
     dateTime: string
     participants: JsonNullValueInput | InputJsonValue
     keyPoints: JsonNullValueInput | InputJsonValue
     actionItems: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: boolean
     approvedBy?: string | null
     approvedAt?: Date | string | null
@@ -27325,11 +41281,13 @@ export namespace Prisma {
 
   export type MomUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     dateTime?: StringFieldUpdateOperationsInput | string
     participants?: JsonNullValueInput | InputJsonValue
     keyPoints?: JsonNullValueInput | InputJsonValue
     actionItems?: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: BoolFieldUpdateOperationsInput | boolean
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27342,11 +41300,13 @@ export namespace Prisma {
   export type MomUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     meetingId?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     dateTime?: StringFieldUpdateOperationsInput | string
     participants?: JsonNullValueInput | InputJsonValue
     keyPoints?: JsonNullValueInput | InputJsonValue
     actionItems?: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: BoolFieldUpdateOperationsInput | boolean
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27850,6 +41810,21 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type OrganizationScalarRelationFilter = {
     is?: OrganizationWhereInput
     isNot?: OrganizationWhereInput
@@ -27866,11 +41841,20 @@ export namespace Prisma {
     billingStatus?: SortOrder
     billingCycle?: SortOrder
     nextBillingDate?: SortOrder
+    trialStartedAt?: SortOrder
+    trialEndsAt?: SortOrder
+    cancelledAt?: SortOrder
+    currentPeriodStart?: SortOrder
+    currentPeriodEnd?: SortOrder
+    discountPercent?: SortOrder
+    billingEmail?: SortOrder
+    createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type OrganizationBillingAvgOrderByAggregateInput = {
     activeLocations?: SortOrder
+    discountPercent?: SortOrder
   }
 
   export type OrganizationBillingMaxOrderByAggregateInput = {
@@ -27879,6 +41863,14 @@ export namespace Prisma {
     billingStatus?: SortOrder
     billingCycle?: SortOrder
     nextBillingDate?: SortOrder
+    trialStartedAt?: SortOrder
+    trialEndsAt?: SortOrder
+    cancelledAt?: SortOrder
+    currentPeriodStart?: SortOrder
+    currentPeriodEnd?: SortOrder
+    discountPercent?: SortOrder
+    billingEmail?: SortOrder
+    createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -27888,11 +41880,20 @@ export namespace Prisma {
     billingStatus?: SortOrder
     billingCycle?: SortOrder
     nextBillingDate?: SortOrder
+    trialStartedAt?: SortOrder
+    trialEndsAt?: SortOrder
+    cancelledAt?: SortOrder
+    currentPeriodStart?: SortOrder
+    currentPeriodEnd?: SortOrder
+    discountPercent?: SortOrder
+    billingEmail?: SortOrder
+    createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type OrganizationBillingSumOrderByAggregateInput = {
     activeLocations?: SortOrder
+    discountPercent?: SortOrder
   }
 
   export type EnumBillingStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -27919,7 +41920,7 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -27931,7 +41932,499 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type EnumInvoiceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceStatus | EnumInvoiceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceStatusFilter<$PrismaModel> | $Enums.InvoiceStatus
+  }
+
+  export type EnumTemplateFileStorageBackendNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateFileStorageBackend | EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    in?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumTemplateFileStorageBackendNullableFilter<$PrismaModel> | $Enums.TemplateFileStorageBackend | null
+  }
+
+  export type InvoiceLineItemListRelationFilter = {
+    every?: InvoiceLineItemWhereInput
+    some?: InvoiceLineItemWhereInput
+    none?: InvoiceLineItemWhereInput
+  }
+
+  export type PaymentListRelationFilter = {
+    every?: PaymentWhereInput
+    some?: PaymentWhereInput
+    none?: PaymentWhereInput
+  }
+
+  export type InvoiceDeliveryListRelationFilter = {
+    every?: InvoiceDeliveryWhereInput
+    some?: InvoiceDeliveryWhereInput
+    none?: InvoiceDeliveryWhereInput
+  }
+
+  export type InvoiceLineItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PaymentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type InvoiceDeliveryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type InvoiceCountOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceNumber?: SortOrder
+    status?: SortOrder
+    planName?: SortOrder
+    billingCycle?: SortOrder
+    periodStart?: SortOrder
+    periodEnd?: SortOrder
+    includedSeats?: SortOrder
+    activeSeats?: SortOrder
+    additionalSeats?: SortOrder
+    includedLocations?: SortOrder
+    activeLocations?: SortOrder
+    subtotalInr?: SortOrder
+    discountInr?: SortOrder
+    gstInr?: SortOrder
+    totalInr?: SortOrder
+    billingAddress?: SortOrder
+    storageKey?: SortOrder
+    storageBackend?: SortOrder
+    issuedAt?: SortOrder
+    dueAt?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type InvoiceAvgOrderByAggregateInput = {
+    includedSeats?: SortOrder
+    activeSeats?: SortOrder
+    additionalSeats?: SortOrder
+    includedLocations?: SortOrder
+    activeLocations?: SortOrder
+    subtotalInr?: SortOrder
+    discountInr?: SortOrder
+    gstInr?: SortOrder
+    totalInr?: SortOrder
+  }
+
+  export type InvoiceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceNumber?: SortOrder
+    status?: SortOrder
+    planName?: SortOrder
+    billingCycle?: SortOrder
+    periodStart?: SortOrder
+    periodEnd?: SortOrder
+    includedSeats?: SortOrder
+    activeSeats?: SortOrder
+    additionalSeats?: SortOrder
+    includedLocations?: SortOrder
+    activeLocations?: SortOrder
+    subtotalInr?: SortOrder
+    discountInr?: SortOrder
+    gstInr?: SortOrder
+    totalInr?: SortOrder
+    billingAddress?: SortOrder
+    storageKey?: SortOrder
+    storageBackend?: SortOrder
+    issuedAt?: SortOrder
+    dueAt?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type InvoiceMinOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceNumber?: SortOrder
+    status?: SortOrder
+    planName?: SortOrder
+    billingCycle?: SortOrder
+    periodStart?: SortOrder
+    periodEnd?: SortOrder
+    includedSeats?: SortOrder
+    activeSeats?: SortOrder
+    additionalSeats?: SortOrder
+    includedLocations?: SortOrder
+    activeLocations?: SortOrder
+    subtotalInr?: SortOrder
+    discountInr?: SortOrder
+    gstInr?: SortOrder
+    totalInr?: SortOrder
+    billingAddress?: SortOrder
+    storageKey?: SortOrder
+    storageBackend?: SortOrder
+    issuedAt?: SortOrder
+    dueAt?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type InvoiceSumOrderByAggregateInput = {
+    includedSeats?: SortOrder
+    activeSeats?: SortOrder
+    additionalSeats?: SortOrder
+    includedLocations?: SortOrder
+    activeLocations?: SortOrder
+    subtotalInr?: SortOrder
+    discountInr?: SortOrder
+    gstInr?: SortOrder
+    totalInr?: SortOrder
+  }
+
+  export type EnumInvoiceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceStatus | EnumInvoiceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceStatusWithAggregatesFilter<$PrismaModel> | $Enums.InvoiceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInvoiceStatusFilter<$PrismaModel>
+    _max?: NestedEnumInvoiceStatusFilter<$PrismaModel>
+  }
+
+  export type EnumTemplateFileStorageBackendNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateFileStorageBackend | EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    in?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumTemplateFileStorageBackendNullableWithAggregatesFilter<$PrismaModel> | $Enums.TemplateFileStorageBackend | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumTemplateFileStorageBackendNullableFilter<$PrismaModel>
+    _max?: NestedEnumTemplateFileStorageBackendNullableFilter<$PrismaModel>
+  }
+
+  export type InvoiceScalarRelationFilter = {
+    is?: InvoiceWhereInput
+    isNot?: InvoiceWhereInput
+  }
+
+  export type InvoiceLineItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    description?: SortOrder
+    quantity?: SortOrder
+    unitPriceInr?: SortOrder
+    amountInr?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type InvoiceLineItemAvgOrderByAggregateInput = {
+    quantity?: SortOrder
+    unitPriceInr?: SortOrder
+    amountInr?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type InvoiceLineItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    description?: SortOrder
+    quantity?: SortOrder
+    unitPriceInr?: SortOrder
+    amountInr?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type InvoiceLineItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    description?: SortOrder
+    quantity?: SortOrder
+    unitPriceInr?: SortOrder
+    amountInr?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type InvoiceLineItemSumOrderByAggregateInput = {
+    quantity?: SortOrder
+    unitPriceInr?: SortOrder
+    amountInr?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type EnumPaymentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
+  }
+
+  export type InvoiceNullableScalarRelationFilter = {
+    is?: InvoiceWhereInput | null
+    isNot?: InvoiceWhereInput | null
+  }
+
+  export type PaymentCountOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceId?: SortOrder
+    amountInr?: SortOrder
+    status?: SortOrder
+    method?: SortOrder
+    reference?: SortOrder
+    notes?: SortOrder
+    recordedById?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PaymentAvgOrderByAggregateInput = {
+    amountInr?: SortOrder
+  }
+
+  export type PaymentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceId?: SortOrder
+    amountInr?: SortOrder
+    status?: SortOrder
+    method?: SortOrder
+    reference?: SortOrder
+    notes?: SortOrder
+    recordedById?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PaymentMinOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    invoiceId?: SortOrder
+    amountInr?: SortOrder
+    status?: SortOrder
+    method?: SortOrder
+    reference?: SortOrder
+    notes?: SortOrder
+    recordedById?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PaymentSumOrderByAggregateInput = {
+    amountInr?: SortOrder
+  }
+
+  export type EnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PaymentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
+    _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
+  }
+
+  export type EnumInvoiceDeliveryStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceDeliveryStatus | EnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceDeliveryStatus[] | ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceDeliveryStatus[] | ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceDeliveryStatusFilter<$PrismaModel> | $Enums.InvoiceDeliveryStatus
+  }
+
+  export type InvoiceDeliveryCountOrderByAggregateInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    organizationId?: SortOrder
+    recipientEmail?: SortOrder
+    status?: SortOrder
+    error?: SortOrder
+    sentAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type InvoiceDeliveryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    organizationId?: SortOrder
+    recipientEmail?: SortOrder
+    status?: SortOrder
+    error?: SortOrder
+    sentAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type InvoiceDeliveryMinOrderByAggregateInput = {
+    id?: SortOrder
+    invoiceId?: SortOrder
+    organizationId?: SortOrder
+    recipientEmail?: SortOrder
+    status?: SortOrder
+    error?: SortOrder
+    sentAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type EnumInvoiceDeliveryStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceDeliveryStatus | EnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceDeliveryStatus[] | ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceDeliveryStatus[] | ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceDeliveryStatusWithAggregatesFilter<$PrismaModel> | $Enums.InvoiceDeliveryStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInvoiceDeliveryStatusFilter<$PrismaModel>
+    _max?: NestedEnumInvoiceDeliveryStatusFilter<$PrismaModel>
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type BillingEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    type?: SortOrder
+    metadata?: SortOrder
+    actorId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type BillingEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    type?: SortOrder
+    actorId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type BillingEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    type?: SortOrder
+    actorId?: SortOrder
+    createdAt?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type PricingChangeLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    actorId?: SortOrder
+    actorName?: SortOrder
+    previous?: SortOrder
+    next?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PricingChangeLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    actorId?: SortOrder
+    actorName?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PricingChangeLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    actorId?: SortOrder
+    actorName?: SortOrder
+    createdAt?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type EnumOrganizationStatusFilter<$PrismaModel = never> = {
@@ -27971,6 +42464,29 @@ export namespace Prisma {
     isNot?: OrganizationBillingWhereInput | null
   }
 
+  export type MomTemplateListRelationFilter = {
+    every?: MomTemplateWhereInput
+    some?: MomTemplateWhereInput
+    none?: MomTemplateWhereInput
+  }
+
+  export type MomTemplateNullableScalarRelationFilter = {
+    is?: MomTemplateWhereInput | null
+    isNot?: MomTemplateWhereInput | null
+  }
+
+  export type InvoiceListRelationFilter = {
+    every?: InvoiceWhereInput
+    some?: InvoiceWhereInput
+    none?: InvoiceWhereInput
+  }
+
+  export type BillingEventListRelationFilter = {
+    every?: BillingEventWhereInput
+    some?: BillingEventWhereInput
+    none?: BillingEventWhereInput
+  }
+
   export type UserOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -27980,6 +42496,18 @@ export namespace Prisma {
   }
 
   export type TenantAuditLogOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MomTemplateOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type InvoiceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BillingEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -28006,6 +42534,7 @@ export namespace Prisma {
     subscriptionPlan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    defaultMomTemplateId?: SortOrder
   }
 
   export type OrganizationAvgOrderByAggregateInput = {
@@ -28035,6 +42564,7 @@ export namespace Prisma {
     subscriptionPlan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    defaultMomTemplateId?: SortOrder
   }
 
   export type OrganizationMinOrderByAggregateInput = {
@@ -28060,28 +42590,11 @@ export namespace Prisma {
     subscriptionPlan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    defaultMomTemplateId?: SortOrder
   }
 
   export type OrganizationSumOrderByAggregateInput = {
     meetingDefaultDurationMinutes?: SortOrder
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type EnumOrganizationStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -28279,29 +42792,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
@@ -28331,32 +42821,6 @@ export namespace Prisma {
     userId?: SortOrder
     action?: SortOrder
     createdAt?: SortOrder
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type AuthOtpCountOrderByAggregateInput = {
@@ -28475,6 +42939,7 @@ export namespace Prisma {
     liveEndedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    momTemplateId?: SortOrder
   }
 
   export type MeetingAvgOrderByAggregateInput = {
@@ -28501,6 +42966,7 @@ export namespace Prisma {
     liveEndedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    momTemplateId?: SortOrder
   }
 
   export type MeetingMinOrderByAggregateInput = {
@@ -28523,6 +42989,7 @@ export namespace Prisma {
     liveEndedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    momTemplateId?: SortOrder
   }
 
   export type MeetingSumOrderByAggregateInput = {
@@ -28547,6 +43014,216 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMeetingTagFilter<$PrismaModel>
     _max?: NestedEnumMeetingTagFilter<$PrismaModel>
+  }
+
+  export type EnumMomTemplateCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.MomTemplateCategory | EnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.MomTemplateCategory[] | ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MomTemplateCategory[] | ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumMomTemplateCategoryFilter<$PrismaModel> | $Enums.MomTemplateCategory
+  }
+
+  export type EnumMomTemplateSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.MomTemplateSource | EnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.MomTemplateSource[] | ListEnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MomTemplateSource[] | ListEnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMomTemplateSourceFilter<$PrismaModel> | $Enums.MomTemplateSource
+  }
+
+  export type OrganizationListRelationFilter = {
+    every?: OrganizationWhereInput
+    some?: OrganizationWhereInput
+    none?: OrganizationWhereInput
+  }
+
+  export type MomTemplateSectionListRelationFilter = {
+    every?: MomTemplateSectionWhereInput
+    some?: MomTemplateSectionWhereInput
+    none?: MomTemplateSectionWhereInput
+  }
+
+  export type MomTemplateUploadNullableScalarRelationFilter = {
+    is?: MomTemplateUploadWhereInput | null
+    isNot?: MomTemplateUploadWhereInput | null
+  }
+
+  export type OrganizationOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MomTemplateSectionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MomTemplateCountOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    source?: SortOrder
+    isDefault?: SortOrder
+    isArchived?: SortOrder
+    metadata?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MomTemplateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    source?: SortOrder
+    isDefault?: SortOrder
+    isArchived?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MomTemplateMinOrderByAggregateInput = {
+    id?: SortOrder
+    organizationId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    source?: SortOrder
+    isDefault?: SortOrder
+    isArchived?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumMomTemplateCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MomTemplateCategory | EnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.MomTemplateCategory[] | ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MomTemplateCategory[] | ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumMomTemplateCategoryWithAggregatesFilter<$PrismaModel> | $Enums.MomTemplateCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMomTemplateCategoryFilter<$PrismaModel>
+    _max?: NestedEnumMomTemplateCategoryFilter<$PrismaModel>
+  }
+
+  export type EnumMomTemplateSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MomTemplateSource | EnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.MomTemplateSource[] | ListEnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MomTemplateSource[] | ListEnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMomTemplateSourceWithAggregatesFilter<$PrismaModel> | $Enums.MomTemplateSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMomTemplateSourceFilter<$PrismaModel>
+    _max?: NestedEnumMomTemplateSourceFilter<$PrismaModel>
+  }
+
+  export type MomTemplateScalarRelationFilter = {
+    is?: MomTemplateWhereInput
+    isNot?: MomTemplateWhereInput
+  }
+
+  export type MomTemplateSectionCountOrderByAggregateInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    aiInstructions?: SortOrder
+    isRequired?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MomTemplateSectionAvgOrderByAggregateInput = {
+    sortOrder?: SortOrder
+  }
+
+  export type MomTemplateSectionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    aiInstructions?: SortOrder
+    isRequired?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MomTemplateSectionMinOrderByAggregateInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    aiInstructions?: SortOrder
+    isRequired?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MomTemplateSectionSumOrderByAggregateInput = {
+    sortOrder?: SortOrder
+  }
+
+  export type EnumTemplateFileStorageBackendFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateFileStorageBackend | EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateFileStorageBackendFilter<$PrismaModel> | $Enums.TemplateFileStorageBackend
+  }
+
+  export type MomTemplateUploadCountOrderByAggregateInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    organizationId?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    storageKey?: SortOrder
+    storageBackend?: SortOrder
+    sizeBytes?: SortOrder
+    extractedHeadings?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MomTemplateUploadAvgOrderByAggregateInput = {
+    sizeBytes?: SortOrder
+  }
+
+  export type MomTemplateUploadMaxOrderByAggregateInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    organizationId?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    storageKey?: SortOrder
+    storageBackend?: SortOrder
+    sizeBytes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MomTemplateUploadMinOrderByAggregateInput = {
+    id?: SortOrder
+    templateId?: SortOrder
+    organizationId?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    storageKey?: SortOrder
+    storageBackend?: SortOrder
+    sizeBytes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MomTemplateUploadSumOrderByAggregateInput = {
+    sizeBytes?: SortOrder
+  }
+
+  export type EnumTemplateFileStorageBackendWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateFileStorageBackend | EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateFileStorageBackendWithAggregatesFilter<$PrismaModel> | $Enums.TemplateFileStorageBackend
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTemplateFileStorageBackendFilter<$PrismaModel>
+    _max?: NestedEnumTemplateFileStorageBackendFilter<$PrismaModel>
   }
 
   export type EnumInviteStatusFilter<$PrismaModel = never> = {
@@ -28820,38 +43497,17 @@ export namespace Prisma {
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
   }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type MomCountOrderByAggregateInput = {
     id?: SortOrder
     meetingId?: SortOrder
+    templateId?: SortOrder
     title?: SortOrder
     dateTime?: SortOrder
     participants?: SortOrder
     keyPoints?: SortOrder
     actionItems?: SortOrder
+    sections?: SortOrder
     approved?: SortOrder
     approvedBy?: SortOrder
     approvedAt?: SortOrder
@@ -28864,6 +43520,7 @@ export namespace Prisma {
   export type MomMaxOrderByAggregateInput = {
     id?: SortOrder
     meetingId?: SortOrder
+    templateId?: SortOrder
     title?: SortOrder
     dateTime?: SortOrder
     approved?: SortOrder
@@ -28878,6 +43535,7 @@ export namespace Prisma {
   export type MomMinOrderByAggregateInput = {
     id?: SortOrder
     meetingId?: SortOrder
+    templateId?: SortOrder
     title?: SortOrder
     dateTime?: SortOrder
     approved?: SortOrder
@@ -28887,32 +43545,6 @@ export namespace Prisma {
     lastEditedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type EnumTaskPriorityFilter<$PrismaModel = never> = {
@@ -29150,12 +43782,244 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type OrganizationUpdateOneRequiredWithoutBillingProfileNestedInput = {
     create?: XOR<OrganizationCreateWithoutBillingProfileInput, OrganizationUncheckedCreateWithoutBillingProfileInput>
     connectOrCreate?: OrganizationCreateOrConnectWithoutBillingProfileInput
     upsert?: OrganizationUpsertWithoutBillingProfileInput
     connect?: OrganizationWhereUniqueInput
     update?: XOR<XOR<OrganizationUpdateToOneWithWhereWithoutBillingProfileInput, OrganizationUpdateWithoutBillingProfileInput>, OrganizationUncheckedUpdateWithoutBillingProfileInput>
+  }
+
+  export type OrganizationCreateNestedOneWithoutInvoicesInput = {
+    create?: XOR<OrganizationCreateWithoutInvoicesInput, OrganizationUncheckedCreateWithoutInvoicesInput>
+    connectOrCreate?: OrganizationCreateOrConnectWithoutInvoicesInput
+    connect?: OrganizationWhereUniqueInput
+  }
+
+  export type InvoiceLineItemCreateNestedManyWithoutInvoiceInput = {
+    create?: XOR<InvoiceLineItemCreateWithoutInvoiceInput, InvoiceLineItemUncheckedCreateWithoutInvoiceInput> | InvoiceLineItemCreateWithoutInvoiceInput[] | InvoiceLineItemUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: InvoiceLineItemCreateOrConnectWithoutInvoiceInput | InvoiceLineItemCreateOrConnectWithoutInvoiceInput[]
+    createMany?: InvoiceLineItemCreateManyInvoiceInputEnvelope
+    connect?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+  }
+
+  export type PaymentCreateNestedManyWithoutInvoiceInput = {
+    create?: XOR<PaymentCreateWithoutInvoiceInput, PaymentUncheckedCreateWithoutInvoiceInput> | PaymentCreateWithoutInvoiceInput[] | PaymentUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutInvoiceInput | PaymentCreateOrConnectWithoutInvoiceInput[]
+    createMany?: PaymentCreateManyInvoiceInputEnvelope
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+  }
+
+  export type InvoiceDeliveryCreateNestedManyWithoutInvoiceInput = {
+    create?: XOR<InvoiceDeliveryCreateWithoutInvoiceInput, InvoiceDeliveryUncheckedCreateWithoutInvoiceInput> | InvoiceDeliveryCreateWithoutInvoiceInput[] | InvoiceDeliveryUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: InvoiceDeliveryCreateOrConnectWithoutInvoiceInput | InvoiceDeliveryCreateOrConnectWithoutInvoiceInput[]
+    createMany?: InvoiceDeliveryCreateManyInvoiceInputEnvelope
+    connect?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+  }
+
+  export type InvoiceLineItemUncheckedCreateNestedManyWithoutInvoiceInput = {
+    create?: XOR<InvoiceLineItemCreateWithoutInvoiceInput, InvoiceLineItemUncheckedCreateWithoutInvoiceInput> | InvoiceLineItemCreateWithoutInvoiceInput[] | InvoiceLineItemUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: InvoiceLineItemCreateOrConnectWithoutInvoiceInput | InvoiceLineItemCreateOrConnectWithoutInvoiceInput[]
+    createMany?: InvoiceLineItemCreateManyInvoiceInputEnvelope
+    connect?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+  }
+
+  export type PaymentUncheckedCreateNestedManyWithoutInvoiceInput = {
+    create?: XOR<PaymentCreateWithoutInvoiceInput, PaymentUncheckedCreateWithoutInvoiceInput> | PaymentCreateWithoutInvoiceInput[] | PaymentUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutInvoiceInput | PaymentCreateOrConnectWithoutInvoiceInput[]
+    createMany?: PaymentCreateManyInvoiceInputEnvelope
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+  }
+
+  export type InvoiceDeliveryUncheckedCreateNestedManyWithoutInvoiceInput = {
+    create?: XOR<InvoiceDeliveryCreateWithoutInvoiceInput, InvoiceDeliveryUncheckedCreateWithoutInvoiceInput> | InvoiceDeliveryCreateWithoutInvoiceInput[] | InvoiceDeliveryUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: InvoiceDeliveryCreateOrConnectWithoutInvoiceInput | InvoiceDeliveryCreateOrConnectWithoutInvoiceInput[]
+    createMany?: InvoiceDeliveryCreateManyInvoiceInputEnvelope
+    connect?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+  }
+
+  export type EnumInvoiceStatusFieldUpdateOperationsInput = {
+    set?: $Enums.InvoiceStatus
+  }
+
+  export type NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput = {
+    set?: $Enums.TemplateFileStorageBackend | null
+  }
+
+  export type OrganizationUpdateOneRequiredWithoutInvoicesNestedInput = {
+    create?: XOR<OrganizationCreateWithoutInvoicesInput, OrganizationUncheckedCreateWithoutInvoicesInput>
+    connectOrCreate?: OrganizationCreateOrConnectWithoutInvoicesInput
+    upsert?: OrganizationUpsertWithoutInvoicesInput
+    connect?: OrganizationWhereUniqueInput
+    update?: XOR<XOR<OrganizationUpdateToOneWithWhereWithoutInvoicesInput, OrganizationUpdateWithoutInvoicesInput>, OrganizationUncheckedUpdateWithoutInvoicesInput>
+  }
+
+  export type InvoiceLineItemUpdateManyWithoutInvoiceNestedInput = {
+    create?: XOR<InvoiceLineItemCreateWithoutInvoiceInput, InvoiceLineItemUncheckedCreateWithoutInvoiceInput> | InvoiceLineItemCreateWithoutInvoiceInput[] | InvoiceLineItemUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: InvoiceLineItemCreateOrConnectWithoutInvoiceInput | InvoiceLineItemCreateOrConnectWithoutInvoiceInput[]
+    upsert?: InvoiceLineItemUpsertWithWhereUniqueWithoutInvoiceInput | InvoiceLineItemUpsertWithWhereUniqueWithoutInvoiceInput[]
+    createMany?: InvoiceLineItemCreateManyInvoiceInputEnvelope
+    set?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+    disconnect?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+    delete?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+    connect?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+    update?: InvoiceLineItemUpdateWithWhereUniqueWithoutInvoiceInput | InvoiceLineItemUpdateWithWhereUniqueWithoutInvoiceInput[]
+    updateMany?: InvoiceLineItemUpdateManyWithWhereWithoutInvoiceInput | InvoiceLineItemUpdateManyWithWhereWithoutInvoiceInput[]
+    deleteMany?: InvoiceLineItemScalarWhereInput | InvoiceLineItemScalarWhereInput[]
+  }
+
+  export type PaymentUpdateManyWithoutInvoiceNestedInput = {
+    create?: XOR<PaymentCreateWithoutInvoiceInput, PaymentUncheckedCreateWithoutInvoiceInput> | PaymentCreateWithoutInvoiceInput[] | PaymentUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutInvoiceInput | PaymentCreateOrConnectWithoutInvoiceInput[]
+    upsert?: PaymentUpsertWithWhereUniqueWithoutInvoiceInput | PaymentUpsertWithWhereUniqueWithoutInvoiceInput[]
+    createMany?: PaymentCreateManyInvoiceInputEnvelope
+    set?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    disconnect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    delete?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    update?: PaymentUpdateWithWhereUniqueWithoutInvoiceInput | PaymentUpdateWithWhereUniqueWithoutInvoiceInput[]
+    updateMany?: PaymentUpdateManyWithWhereWithoutInvoiceInput | PaymentUpdateManyWithWhereWithoutInvoiceInput[]
+    deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type InvoiceDeliveryUpdateManyWithoutInvoiceNestedInput = {
+    create?: XOR<InvoiceDeliveryCreateWithoutInvoiceInput, InvoiceDeliveryUncheckedCreateWithoutInvoiceInput> | InvoiceDeliveryCreateWithoutInvoiceInput[] | InvoiceDeliveryUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: InvoiceDeliveryCreateOrConnectWithoutInvoiceInput | InvoiceDeliveryCreateOrConnectWithoutInvoiceInput[]
+    upsert?: InvoiceDeliveryUpsertWithWhereUniqueWithoutInvoiceInput | InvoiceDeliveryUpsertWithWhereUniqueWithoutInvoiceInput[]
+    createMany?: InvoiceDeliveryCreateManyInvoiceInputEnvelope
+    set?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+    disconnect?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+    delete?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+    connect?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+    update?: InvoiceDeliveryUpdateWithWhereUniqueWithoutInvoiceInput | InvoiceDeliveryUpdateWithWhereUniqueWithoutInvoiceInput[]
+    updateMany?: InvoiceDeliveryUpdateManyWithWhereWithoutInvoiceInput | InvoiceDeliveryUpdateManyWithWhereWithoutInvoiceInput[]
+    deleteMany?: InvoiceDeliveryScalarWhereInput | InvoiceDeliveryScalarWhereInput[]
+  }
+
+  export type InvoiceLineItemUncheckedUpdateManyWithoutInvoiceNestedInput = {
+    create?: XOR<InvoiceLineItemCreateWithoutInvoiceInput, InvoiceLineItemUncheckedCreateWithoutInvoiceInput> | InvoiceLineItemCreateWithoutInvoiceInput[] | InvoiceLineItemUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: InvoiceLineItemCreateOrConnectWithoutInvoiceInput | InvoiceLineItemCreateOrConnectWithoutInvoiceInput[]
+    upsert?: InvoiceLineItemUpsertWithWhereUniqueWithoutInvoiceInput | InvoiceLineItemUpsertWithWhereUniqueWithoutInvoiceInput[]
+    createMany?: InvoiceLineItemCreateManyInvoiceInputEnvelope
+    set?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+    disconnect?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+    delete?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+    connect?: InvoiceLineItemWhereUniqueInput | InvoiceLineItemWhereUniqueInput[]
+    update?: InvoiceLineItemUpdateWithWhereUniqueWithoutInvoiceInput | InvoiceLineItemUpdateWithWhereUniqueWithoutInvoiceInput[]
+    updateMany?: InvoiceLineItemUpdateManyWithWhereWithoutInvoiceInput | InvoiceLineItemUpdateManyWithWhereWithoutInvoiceInput[]
+    deleteMany?: InvoiceLineItemScalarWhereInput | InvoiceLineItemScalarWhereInput[]
+  }
+
+  export type PaymentUncheckedUpdateManyWithoutInvoiceNestedInput = {
+    create?: XOR<PaymentCreateWithoutInvoiceInput, PaymentUncheckedCreateWithoutInvoiceInput> | PaymentCreateWithoutInvoiceInput[] | PaymentUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutInvoiceInput | PaymentCreateOrConnectWithoutInvoiceInput[]
+    upsert?: PaymentUpsertWithWhereUniqueWithoutInvoiceInput | PaymentUpsertWithWhereUniqueWithoutInvoiceInput[]
+    createMany?: PaymentCreateManyInvoiceInputEnvelope
+    set?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    disconnect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    delete?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    update?: PaymentUpdateWithWhereUniqueWithoutInvoiceInput | PaymentUpdateWithWhereUniqueWithoutInvoiceInput[]
+    updateMany?: PaymentUpdateManyWithWhereWithoutInvoiceInput | PaymentUpdateManyWithWhereWithoutInvoiceInput[]
+    deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type InvoiceDeliveryUncheckedUpdateManyWithoutInvoiceNestedInput = {
+    create?: XOR<InvoiceDeliveryCreateWithoutInvoiceInput, InvoiceDeliveryUncheckedCreateWithoutInvoiceInput> | InvoiceDeliveryCreateWithoutInvoiceInput[] | InvoiceDeliveryUncheckedCreateWithoutInvoiceInput[]
+    connectOrCreate?: InvoiceDeliveryCreateOrConnectWithoutInvoiceInput | InvoiceDeliveryCreateOrConnectWithoutInvoiceInput[]
+    upsert?: InvoiceDeliveryUpsertWithWhereUniqueWithoutInvoiceInput | InvoiceDeliveryUpsertWithWhereUniqueWithoutInvoiceInput[]
+    createMany?: InvoiceDeliveryCreateManyInvoiceInputEnvelope
+    set?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+    disconnect?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+    delete?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+    connect?: InvoiceDeliveryWhereUniqueInput | InvoiceDeliveryWhereUniqueInput[]
+    update?: InvoiceDeliveryUpdateWithWhereUniqueWithoutInvoiceInput | InvoiceDeliveryUpdateWithWhereUniqueWithoutInvoiceInput[]
+    updateMany?: InvoiceDeliveryUpdateManyWithWhereWithoutInvoiceInput | InvoiceDeliveryUpdateManyWithWhereWithoutInvoiceInput[]
+    deleteMany?: InvoiceDeliveryScalarWhereInput | InvoiceDeliveryScalarWhereInput[]
+  }
+
+  export type InvoiceCreateNestedOneWithoutLineItemsInput = {
+    create?: XOR<InvoiceCreateWithoutLineItemsInput, InvoiceUncheckedCreateWithoutLineItemsInput>
+    connectOrCreate?: InvoiceCreateOrConnectWithoutLineItemsInput
+    connect?: InvoiceWhereUniqueInput
+  }
+
+  export type InvoiceUpdateOneRequiredWithoutLineItemsNestedInput = {
+    create?: XOR<InvoiceCreateWithoutLineItemsInput, InvoiceUncheckedCreateWithoutLineItemsInput>
+    connectOrCreate?: InvoiceCreateOrConnectWithoutLineItemsInput
+    upsert?: InvoiceUpsertWithoutLineItemsInput
+    connect?: InvoiceWhereUniqueInput
+    update?: XOR<XOR<InvoiceUpdateToOneWithWhereWithoutLineItemsInput, InvoiceUpdateWithoutLineItemsInput>, InvoiceUncheckedUpdateWithoutLineItemsInput>
+  }
+
+  export type OrganizationCreateNestedOneWithoutPaymentsInput = {
+    create?: XOR<OrganizationCreateWithoutPaymentsInput, OrganizationUncheckedCreateWithoutPaymentsInput>
+    connectOrCreate?: OrganizationCreateOrConnectWithoutPaymentsInput
+    connect?: OrganizationWhereUniqueInput
+  }
+
+  export type InvoiceCreateNestedOneWithoutPaymentsInput = {
+    create?: XOR<InvoiceCreateWithoutPaymentsInput, InvoiceUncheckedCreateWithoutPaymentsInput>
+    connectOrCreate?: InvoiceCreateOrConnectWithoutPaymentsInput
+    connect?: InvoiceWhereUniqueInput
+  }
+
+  export type EnumPaymentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.PaymentStatus
+  }
+
+  export type OrganizationUpdateOneRequiredWithoutPaymentsNestedInput = {
+    create?: XOR<OrganizationCreateWithoutPaymentsInput, OrganizationUncheckedCreateWithoutPaymentsInput>
+    connectOrCreate?: OrganizationCreateOrConnectWithoutPaymentsInput
+    upsert?: OrganizationUpsertWithoutPaymentsInput
+    connect?: OrganizationWhereUniqueInput
+    update?: XOR<XOR<OrganizationUpdateToOneWithWhereWithoutPaymentsInput, OrganizationUpdateWithoutPaymentsInput>, OrganizationUncheckedUpdateWithoutPaymentsInput>
+  }
+
+  export type InvoiceUpdateOneWithoutPaymentsNestedInput = {
+    create?: XOR<InvoiceCreateWithoutPaymentsInput, InvoiceUncheckedCreateWithoutPaymentsInput>
+    connectOrCreate?: InvoiceCreateOrConnectWithoutPaymentsInput
+    upsert?: InvoiceUpsertWithoutPaymentsInput
+    disconnect?: InvoiceWhereInput | boolean
+    delete?: InvoiceWhereInput | boolean
+    connect?: InvoiceWhereUniqueInput
+    update?: XOR<XOR<InvoiceUpdateToOneWithWhereWithoutPaymentsInput, InvoiceUpdateWithoutPaymentsInput>, InvoiceUncheckedUpdateWithoutPaymentsInput>
+  }
+
+  export type InvoiceCreateNestedOneWithoutDeliveriesInput = {
+    create?: XOR<InvoiceCreateWithoutDeliveriesInput, InvoiceUncheckedCreateWithoutDeliveriesInput>
+    connectOrCreate?: InvoiceCreateOrConnectWithoutDeliveriesInput
+    connect?: InvoiceWhereUniqueInput
+  }
+
+  export type EnumInvoiceDeliveryStatusFieldUpdateOperationsInput = {
+    set?: $Enums.InvoiceDeliveryStatus
+  }
+
+  export type InvoiceUpdateOneRequiredWithoutDeliveriesNestedInput = {
+    create?: XOR<InvoiceCreateWithoutDeliveriesInput, InvoiceUncheckedCreateWithoutDeliveriesInput>
+    connectOrCreate?: InvoiceCreateOrConnectWithoutDeliveriesInput
+    upsert?: InvoiceUpsertWithoutDeliveriesInput
+    connect?: InvoiceWhereUniqueInput
+    update?: XOR<XOR<InvoiceUpdateToOneWithWhereWithoutDeliveriesInput, InvoiceUpdateWithoutDeliveriesInput>, InvoiceUncheckedUpdateWithoutDeliveriesInput>
+  }
+
+  export type OrganizationCreateNestedOneWithoutBillingEventsInput = {
+    create?: XOR<OrganizationCreateWithoutBillingEventsInput, OrganizationUncheckedCreateWithoutBillingEventsInput>
+    connectOrCreate?: OrganizationCreateOrConnectWithoutBillingEventsInput
+    connect?: OrganizationWhereUniqueInput
+  }
+
+  export type OrganizationUpdateOneRequiredWithoutBillingEventsNestedInput = {
+    create?: XOR<OrganizationCreateWithoutBillingEventsInput, OrganizationUncheckedCreateWithoutBillingEventsInput>
+    connectOrCreate?: OrganizationCreateOrConnectWithoutBillingEventsInput
+    upsert?: OrganizationUpsertWithoutBillingEventsInput
+    connect?: OrganizationWhereUniqueInput
+    update?: XOR<XOR<OrganizationUpdateToOneWithWhereWithoutBillingEventsInput, OrganizationUpdateWithoutBillingEventsInput>, OrganizationUncheckedUpdateWithoutBillingEventsInput>
   }
 
   export type UserCreateNestedManyWithoutOrganizationInput = {
@@ -29185,6 +44049,40 @@ export namespace Prisma {
     connect?: OrganizationBillingWhereUniqueInput
   }
 
+  export type MomTemplateCreateNestedManyWithoutOrganizationInput = {
+    create?: XOR<MomTemplateCreateWithoutOrganizationInput, MomTemplateUncheckedCreateWithoutOrganizationInput> | MomTemplateCreateWithoutOrganizationInput[] | MomTemplateUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutOrganizationInput | MomTemplateCreateOrConnectWithoutOrganizationInput[]
+    createMany?: MomTemplateCreateManyOrganizationInputEnvelope
+    connect?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+  }
+
+  export type MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput = {
+    create?: XOR<MomTemplateCreateWithoutDefaultForOrganizationInput, MomTemplateUncheckedCreateWithoutDefaultForOrganizationInput>
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutDefaultForOrganizationInput
+    connect?: MomTemplateWhereUniqueInput
+  }
+
+  export type InvoiceCreateNestedManyWithoutOrganizationInput = {
+    create?: XOR<InvoiceCreateWithoutOrganizationInput, InvoiceUncheckedCreateWithoutOrganizationInput> | InvoiceCreateWithoutOrganizationInput[] | InvoiceUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrganizationInput | InvoiceCreateOrConnectWithoutOrganizationInput[]
+    createMany?: InvoiceCreateManyOrganizationInputEnvelope
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+  }
+
+  export type PaymentCreateNestedManyWithoutOrganizationInput = {
+    create?: XOR<PaymentCreateWithoutOrganizationInput, PaymentUncheckedCreateWithoutOrganizationInput> | PaymentCreateWithoutOrganizationInput[] | PaymentUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutOrganizationInput | PaymentCreateOrConnectWithoutOrganizationInput[]
+    createMany?: PaymentCreateManyOrganizationInputEnvelope
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+  }
+
+  export type BillingEventCreateNestedManyWithoutOrganizationInput = {
+    create?: XOR<BillingEventCreateWithoutOrganizationInput, BillingEventUncheckedCreateWithoutOrganizationInput> | BillingEventCreateWithoutOrganizationInput[] | BillingEventUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: BillingEventCreateOrConnectWithoutOrganizationInput | BillingEventCreateOrConnectWithoutOrganizationInput[]
+    createMany?: BillingEventCreateManyOrganizationInputEnvelope
+    connect?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutOrganizationInput = {
     create?: XOR<UserCreateWithoutOrganizationInput, UserUncheckedCreateWithoutOrganizationInput> | UserCreateWithoutOrganizationInput[] | UserUncheckedCreateWithoutOrganizationInput[]
     connectOrCreate?: UserCreateOrConnectWithoutOrganizationInput | UserCreateOrConnectWithoutOrganizationInput[]
@@ -29212,8 +44110,32 @@ export namespace Prisma {
     connect?: OrganizationBillingWhereUniqueInput
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
+  export type MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput = {
+    create?: XOR<MomTemplateCreateWithoutOrganizationInput, MomTemplateUncheckedCreateWithoutOrganizationInput> | MomTemplateCreateWithoutOrganizationInput[] | MomTemplateUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutOrganizationInput | MomTemplateCreateOrConnectWithoutOrganizationInput[]
+    createMany?: MomTemplateCreateManyOrganizationInputEnvelope
+    connect?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+  }
+
+  export type InvoiceUncheckedCreateNestedManyWithoutOrganizationInput = {
+    create?: XOR<InvoiceCreateWithoutOrganizationInput, InvoiceUncheckedCreateWithoutOrganizationInput> | InvoiceCreateWithoutOrganizationInput[] | InvoiceUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrganizationInput | InvoiceCreateOrConnectWithoutOrganizationInput[]
+    createMany?: InvoiceCreateManyOrganizationInputEnvelope
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+  }
+
+  export type PaymentUncheckedCreateNestedManyWithoutOrganizationInput = {
+    create?: XOR<PaymentCreateWithoutOrganizationInput, PaymentUncheckedCreateWithoutOrganizationInput> | PaymentCreateWithoutOrganizationInput[] | PaymentUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutOrganizationInput | PaymentCreateOrConnectWithoutOrganizationInput[]
+    createMany?: PaymentCreateManyOrganizationInputEnvelope
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+  }
+
+  export type BillingEventUncheckedCreateNestedManyWithoutOrganizationInput = {
+    create?: XOR<BillingEventCreateWithoutOrganizationInput, BillingEventUncheckedCreateWithoutOrganizationInput> | BillingEventCreateWithoutOrganizationInput[] | BillingEventUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: BillingEventCreateOrConnectWithoutOrganizationInput | BillingEventCreateOrConnectWithoutOrganizationInput[]
+    createMany?: BillingEventCreateManyOrganizationInputEnvelope
+    connect?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
   }
 
   export type EnumOrganizationStatusFieldUpdateOperationsInput = {
@@ -29276,6 +44198,72 @@ export namespace Prisma {
     update?: XOR<XOR<OrganizationBillingUpdateToOneWithWhereWithoutOrganizationInput, OrganizationBillingUpdateWithoutOrganizationInput>, OrganizationBillingUncheckedUpdateWithoutOrganizationInput>
   }
 
+  export type MomTemplateUpdateManyWithoutOrganizationNestedInput = {
+    create?: XOR<MomTemplateCreateWithoutOrganizationInput, MomTemplateUncheckedCreateWithoutOrganizationInput> | MomTemplateCreateWithoutOrganizationInput[] | MomTemplateUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutOrganizationInput | MomTemplateCreateOrConnectWithoutOrganizationInput[]
+    upsert?: MomTemplateUpsertWithWhereUniqueWithoutOrganizationInput | MomTemplateUpsertWithWhereUniqueWithoutOrganizationInput[]
+    createMany?: MomTemplateCreateManyOrganizationInputEnvelope
+    set?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+    disconnect?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+    delete?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+    connect?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+    update?: MomTemplateUpdateWithWhereUniqueWithoutOrganizationInput | MomTemplateUpdateWithWhereUniqueWithoutOrganizationInput[]
+    updateMany?: MomTemplateUpdateManyWithWhereWithoutOrganizationInput | MomTemplateUpdateManyWithWhereWithoutOrganizationInput[]
+    deleteMany?: MomTemplateScalarWhereInput | MomTemplateScalarWhereInput[]
+  }
+
+  export type MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput = {
+    create?: XOR<MomTemplateCreateWithoutDefaultForOrganizationInput, MomTemplateUncheckedCreateWithoutDefaultForOrganizationInput>
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutDefaultForOrganizationInput
+    upsert?: MomTemplateUpsertWithoutDefaultForOrganizationInput
+    disconnect?: MomTemplateWhereInput | boolean
+    delete?: MomTemplateWhereInput | boolean
+    connect?: MomTemplateWhereUniqueInput
+    update?: XOR<XOR<MomTemplateUpdateToOneWithWhereWithoutDefaultForOrganizationInput, MomTemplateUpdateWithoutDefaultForOrganizationInput>, MomTemplateUncheckedUpdateWithoutDefaultForOrganizationInput>
+  }
+
+  export type InvoiceUpdateManyWithoutOrganizationNestedInput = {
+    create?: XOR<InvoiceCreateWithoutOrganizationInput, InvoiceUncheckedCreateWithoutOrganizationInput> | InvoiceCreateWithoutOrganizationInput[] | InvoiceUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrganizationInput | InvoiceCreateOrConnectWithoutOrganizationInput[]
+    upsert?: InvoiceUpsertWithWhereUniqueWithoutOrganizationInput | InvoiceUpsertWithWhereUniqueWithoutOrganizationInput[]
+    createMany?: InvoiceCreateManyOrganizationInputEnvelope
+    set?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    disconnect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    delete?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    update?: InvoiceUpdateWithWhereUniqueWithoutOrganizationInput | InvoiceUpdateWithWhereUniqueWithoutOrganizationInput[]
+    updateMany?: InvoiceUpdateManyWithWhereWithoutOrganizationInput | InvoiceUpdateManyWithWhereWithoutOrganizationInput[]
+    deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
+  export type PaymentUpdateManyWithoutOrganizationNestedInput = {
+    create?: XOR<PaymentCreateWithoutOrganizationInput, PaymentUncheckedCreateWithoutOrganizationInput> | PaymentCreateWithoutOrganizationInput[] | PaymentUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutOrganizationInput | PaymentCreateOrConnectWithoutOrganizationInput[]
+    upsert?: PaymentUpsertWithWhereUniqueWithoutOrganizationInput | PaymentUpsertWithWhereUniqueWithoutOrganizationInput[]
+    createMany?: PaymentCreateManyOrganizationInputEnvelope
+    set?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    disconnect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    delete?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    update?: PaymentUpdateWithWhereUniqueWithoutOrganizationInput | PaymentUpdateWithWhereUniqueWithoutOrganizationInput[]
+    updateMany?: PaymentUpdateManyWithWhereWithoutOrganizationInput | PaymentUpdateManyWithWhereWithoutOrganizationInput[]
+    deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type BillingEventUpdateManyWithoutOrganizationNestedInput = {
+    create?: XOR<BillingEventCreateWithoutOrganizationInput, BillingEventUncheckedCreateWithoutOrganizationInput> | BillingEventCreateWithoutOrganizationInput[] | BillingEventUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: BillingEventCreateOrConnectWithoutOrganizationInput | BillingEventCreateOrConnectWithoutOrganizationInput[]
+    upsert?: BillingEventUpsertWithWhereUniqueWithoutOrganizationInput | BillingEventUpsertWithWhereUniqueWithoutOrganizationInput[]
+    createMany?: BillingEventCreateManyOrganizationInputEnvelope
+    set?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+    disconnect?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+    delete?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+    connect?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+    update?: BillingEventUpdateWithWhereUniqueWithoutOrganizationInput | BillingEventUpdateWithWhereUniqueWithoutOrganizationInput[]
+    updateMany?: BillingEventUpdateManyWithWhereWithoutOrganizationInput | BillingEventUpdateManyWithWhereWithoutOrganizationInput[]
+    deleteMany?: BillingEventScalarWhereInput | BillingEventScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutOrganizationNestedInput = {
     create?: XOR<UserCreateWithoutOrganizationInput, UserUncheckedCreateWithoutOrganizationInput> | UserCreateWithoutOrganizationInput[] | UserUncheckedCreateWithoutOrganizationInput[]
     connectOrCreate?: UserCreateOrConnectWithoutOrganizationInput | UserCreateOrConnectWithoutOrganizationInput[]
@@ -29326,6 +44314,62 @@ export namespace Prisma {
     delete?: OrganizationBillingWhereInput | boolean
     connect?: OrganizationBillingWhereUniqueInput
     update?: XOR<XOR<OrganizationBillingUpdateToOneWithWhereWithoutOrganizationInput, OrganizationBillingUpdateWithoutOrganizationInput>, OrganizationBillingUncheckedUpdateWithoutOrganizationInput>
+  }
+
+  export type MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput = {
+    create?: XOR<MomTemplateCreateWithoutOrganizationInput, MomTemplateUncheckedCreateWithoutOrganizationInput> | MomTemplateCreateWithoutOrganizationInput[] | MomTemplateUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutOrganizationInput | MomTemplateCreateOrConnectWithoutOrganizationInput[]
+    upsert?: MomTemplateUpsertWithWhereUniqueWithoutOrganizationInput | MomTemplateUpsertWithWhereUniqueWithoutOrganizationInput[]
+    createMany?: MomTemplateCreateManyOrganizationInputEnvelope
+    set?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+    disconnect?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+    delete?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+    connect?: MomTemplateWhereUniqueInput | MomTemplateWhereUniqueInput[]
+    update?: MomTemplateUpdateWithWhereUniqueWithoutOrganizationInput | MomTemplateUpdateWithWhereUniqueWithoutOrganizationInput[]
+    updateMany?: MomTemplateUpdateManyWithWhereWithoutOrganizationInput | MomTemplateUpdateManyWithWhereWithoutOrganizationInput[]
+    deleteMany?: MomTemplateScalarWhereInput | MomTemplateScalarWhereInput[]
+  }
+
+  export type InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput = {
+    create?: XOR<InvoiceCreateWithoutOrganizationInput, InvoiceUncheckedCreateWithoutOrganizationInput> | InvoiceCreateWithoutOrganizationInput[] | InvoiceUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrganizationInput | InvoiceCreateOrConnectWithoutOrganizationInput[]
+    upsert?: InvoiceUpsertWithWhereUniqueWithoutOrganizationInput | InvoiceUpsertWithWhereUniqueWithoutOrganizationInput[]
+    createMany?: InvoiceCreateManyOrganizationInputEnvelope
+    set?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    disconnect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    delete?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    update?: InvoiceUpdateWithWhereUniqueWithoutOrganizationInput | InvoiceUpdateWithWhereUniqueWithoutOrganizationInput[]
+    updateMany?: InvoiceUpdateManyWithWhereWithoutOrganizationInput | InvoiceUpdateManyWithWhereWithoutOrganizationInput[]
+    deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
+  export type PaymentUncheckedUpdateManyWithoutOrganizationNestedInput = {
+    create?: XOR<PaymentCreateWithoutOrganizationInput, PaymentUncheckedCreateWithoutOrganizationInput> | PaymentCreateWithoutOrganizationInput[] | PaymentUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutOrganizationInput | PaymentCreateOrConnectWithoutOrganizationInput[]
+    upsert?: PaymentUpsertWithWhereUniqueWithoutOrganizationInput | PaymentUpsertWithWhereUniqueWithoutOrganizationInput[]
+    createMany?: PaymentCreateManyOrganizationInputEnvelope
+    set?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    disconnect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    delete?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    update?: PaymentUpdateWithWhereUniqueWithoutOrganizationInput | PaymentUpdateWithWhereUniqueWithoutOrganizationInput[]
+    updateMany?: PaymentUpdateManyWithWhereWithoutOrganizationInput | PaymentUpdateManyWithWhereWithoutOrganizationInput[]
+    deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput = {
+    create?: XOR<BillingEventCreateWithoutOrganizationInput, BillingEventUncheckedCreateWithoutOrganizationInput> | BillingEventCreateWithoutOrganizationInput[] | BillingEventUncheckedCreateWithoutOrganizationInput[]
+    connectOrCreate?: BillingEventCreateOrConnectWithoutOrganizationInput | BillingEventCreateOrConnectWithoutOrganizationInput[]
+    upsert?: BillingEventUpsertWithWhereUniqueWithoutOrganizationInput | BillingEventUpsertWithWhereUniqueWithoutOrganizationInput[]
+    createMany?: BillingEventCreateManyOrganizationInputEnvelope
+    set?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+    disconnect?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+    delete?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+    connect?: BillingEventWhereUniqueInput | BillingEventWhereUniqueInput[]
+    update?: BillingEventUpdateWithWhereUniqueWithoutOrganizationInput | BillingEventUpdateWithWhereUniqueWithoutOrganizationInput[]
+    updateMany?: BillingEventUpdateManyWithWhereWithoutOrganizationInput | BillingEventUpdateManyWithWhereWithoutOrganizationInput[]
+    deleteMany?: BillingEventScalarWhereInput | BillingEventScalarWhereInput[]
   }
 
   export type OrganizationCreateNestedOneWithoutUsersInput = {
@@ -29664,6 +44708,12 @@ export namespace Prisma {
     connect?: OrganizationWhereUniqueInput
   }
 
+  export type MomTemplateCreateNestedOneWithoutMeetingsInput = {
+    create?: XOR<MomTemplateCreateWithoutMeetingsInput, MomTemplateUncheckedCreateWithoutMeetingsInput>
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutMeetingsInput
+    connect?: MomTemplateWhereUniqueInput
+  }
+
   export type UserCreateNestedOneWithoutOrganizedMeetingsInput = {
     create?: XOR<UserCreateWithoutOrganizedMeetingsInput, UserUncheckedCreateWithoutOrganizedMeetingsInput>
     connectOrCreate?: UserCreateOrConnectWithoutOrganizedMeetingsInput
@@ -29806,6 +44856,16 @@ export namespace Prisma {
     delete?: OrganizationWhereInput | boolean
     connect?: OrganizationWhereUniqueInput
     update?: XOR<XOR<OrganizationUpdateToOneWithWhereWithoutMeetingsInput, OrganizationUpdateWithoutMeetingsInput>, OrganizationUncheckedUpdateWithoutMeetingsInput>
+  }
+
+  export type MomTemplateUpdateOneWithoutMeetingsNestedInput = {
+    create?: XOR<MomTemplateCreateWithoutMeetingsInput, MomTemplateUncheckedCreateWithoutMeetingsInput>
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutMeetingsInput
+    upsert?: MomTemplateUpsertWithoutMeetingsInput
+    disconnect?: MomTemplateWhereInput | boolean
+    delete?: MomTemplateWhereInput | boolean
+    connect?: MomTemplateWhereUniqueInput
+    update?: XOR<XOR<MomTemplateUpdateToOneWithWhereWithoutMeetingsInput, MomTemplateUpdateWithoutMeetingsInput>, MomTemplateUncheckedUpdateWithoutMeetingsInput>
   }
 
   export type UserUpdateOneWithoutOrganizedMeetingsNestedInput = {
@@ -30044,6 +45104,218 @@ export namespace Prisma {
     update?: MeetingInviteUpdateWithWhereUniqueWithoutMeetingInput | MeetingInviteUpdateWithWhereUniqueWithoutMeetingInput[]
     updateMany?: MeetingInviteUpdateManyWithWhereWithoutMeetingInput | MeetingInviteUpdateManyWithWhereWithoutMeetingInput[]
     deleteMany?: MeetingInviteScalarWhereInput | MeetingInviteScalarWhereInput[]
+  }
+
+  export type OrganizationCreateNestedOneWithoutMomTemplatesInput = {
+    create?: XOR<OrganizationCreateWithoutMomTemplatesInput, OrganizationUncheckedCreateWithoutMomTemplatesInput>
+    connectOrCreate?: OrganizationCreateOrConnectWithoutMomTemplatesInput
+    connect?: OrganizationWhereUniqueInput
+  }
+
+  export type OrganizationCreateNestedManyWithoutDefaultMomTemplateInput = {
+    create?: XOR<OrganizationCreateWithoutDefaultMomTemplateInput, OrganizationUncheckedCreateWithoutDefaultMomTemplateInput> | OrganizationCreateWithoutDefaultMomTemplateInput[] | OrganizationUncheckedCreateWithoutDefaultMomTemplateInput[]
+    connectOrCreate?: OrganizationCreateOrConnectWithoutDefaultMomTemplateInput | OrganizationCreateOrConnectWithoutDefaultMomTemplateInput[]
+    createMany?: OrganizationCreateManyDefaultMomTemplateInputEnvelope
+    connect?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+  }
+
+  export type MomTemplateSectionCreateNestedManyWithoutTemplateInput = {
+    create?: XOR<MomTemplateSectionCreateWithoutTemplateInput, MomTemplateSectionUncheckedCreateWithoutTemplateInput> | MomTemplateSectionCreateWithoutTemplateInput[] | MomTemplateSectionUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: MomTemplateSectionCreateOrConnectWithoutTemplateInput | MomTemplateSectionCreateOrConnectWithoutTemplateInput[]
+    createMany?: MomTemplateSectionCreateManyTemplateInputEnvelope
+    connect?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+  }
+
+  export type MomTemplateUploadCreateNestedOneWithoutTemplateInput = {
+    create?: XOR<MomTemplateUploadCreateWithoutTemplateInput, MomTemplateUploadUncheckedCreateWithoutTemplateInput>
+    connectOrCreate?: MomTemplateUploadCreateOrConnectWithoutTemplateInput
+    connect?: MomTemplateUploadWhereUniqueInput
+  }
+
+  export type MeetingCreateNestedManyWithoutMomTemplateInput = {
+    create?: XOR<MeetingCreateWithoutMomTemplateInput, MeetingUncheckedCreateWithoutMomTemplateInput> | MeetingCreateWithoutMomTemplateInput[] | MeetingUncheckedCreateWithoutMomTemplateInput[]
+    connectOrCreate?: MeetingCreateOrConnectWithoutMomTemplateInput | MeetingCreateOrConnectWithoutMomTemplateInput[]
+    createMany?: MeetingCreateManyMomTemplateInputEnvelope
+    connect?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+  }
+
+  export type OrganizationUncheckedCreateNestedManyWithoutDefaultMomTemplateInput = {
+    create?: XOR<OrganizationCreateWithoutDefaultMomTemplateInput, OrganizationUncheckedCreateWithoutDefaultMomTemplateInput> | OrganizationCreateWithoutDefaultMomTemplateInput[] | OrganizationUncheckedCreateWithoutDefaultMomTemplateInput[]
+    connectOrCreate?: OrganizationCreateOrConnectWithoutDefaultMomTemplateInput | OrganizationCreateOrConnectWithoutDefaultMomTemplateInput[]
+    createMany?: OrganizationCreateManyDefaultMomTemplateInputEnvelope
+    connect?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+  }
+
+  export type MomTemplateSectionUncheckedCreateNestedManyWithoutTemplateInput = {
+    create?: XOR<MomTemplateSectionCreateWithoutTemplateInput, MomTemplateSectionUncheckedCreateWithoutTemplateInput> | MomTemplateSectionCreateWithoutTemplateInput[] | MomTemplateSectionUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: MomTemplateSectionCreateOrConnectWithoutTemplateInput | MomTemplateSectionCreateOrConnectWithoutTemplateInput[]
+    createMany?: MomTemplateSectionCreateManyTemplateInputEnvelope
+    connect?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+  }
+
+  export type MomTemplateUploadUncheckedCreateNestedOneWithoutTemplateInput = {
+    create?: XOR<MomTemplateUploadCreateWithoutTemplateInput, MomTemplateUploadUncheckedCreateWithoutTemplateInput>
+    connectOrCreate?: MomTemplateUploadCreateOrConnectWithoutTemplateInput
+    connect?: MomTemplateUploadWhereUniqueInput
+  }
+
+  export type MeetingUncheckedCreateNestedManyWithoutMomTemplateInput = {
+    create?: XOR<MeetingCreateWithoutMomTemplateInput, MeetingUncheckedCreateWithoutMomTemplateInput> | MeetingCreateWithoutMomTemplateInput[] | MeetingUncheckedCreateWithoutMomTemplateInput[]
+    connectOrCreate?: MeetingCreateOrConnectWithoutMomTemplateInput | MeetingCreateOrConnectWithoutMomTemplateInput[]
+    createMany?: MeetingCreateManyMomTemplateInputEnvelope
+    connect?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+  }
+
+  export type EnumMomTemplateCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.MomTemplateCategory
+  }
+
+  export type EnumMomTemplateSourceFieldUpdateOperationsInput = {
+    set?: $Enums.MomTemplateSource
+  }
+
+  export type OrganizationUpdateOneRequiredWithoutMomTemplatesNestedInput = {
+    create?: XOR<OrganizationCreateWithoutMomTemplatesInput, OrganizationUncheckedCreateWithoutMomTemplatesInput>
+    connectOrCreate?: OrganizationCreateOrConnectWithoutMomTemplatesInput
+    upsert?: OrganizationUpsertWithoutMomTemplatesInput
+    connect?: OrganizationWhereUniqueInput
+    update?: XOR<XOR<OrganizationUpdateToOneWithWhereWithoutMomTemplatesInput, OrganizationUpdateWithoutMomTemplatesInput>, OrganizationUncheckedUpdateWithoutMomTemplatesInput>
+  }
+
+  export type OrganizationUpdateManyWithoutDefaultMomTemplateNestedInput = {
+    create?: XOR<OrganizationCreateWithoutDefaultMomTemplateInput, OrganizationUncheckedCreateWithoutDefaultMomTemplateInput> | OrganizationCreateWithoutDefaultMomTemplateInput[] | OrganizationUncheckedCreateWithoutDefaultMomTemplateInput[]
+    connectOrCreate?: OrganizationCreateOrConnectWithoutDefaultMomTemplateInput | OrganizationCreateOrConnectWithoutDefaultMomTemplateInput[]
+    upsert?: OrganizationUpsertWithWhereUniqueWithoutDefaultMomTemplateInput | OrganizationUpsertWithWhereUniqueWithoutDefaultMomTemplateInput[]
+    createMany?: OrganizationCreateManyDefaultMomTemplateInputEnvelope
+    set?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+    disconnect?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+    delete?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+    connect?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+    update?: OrganizationUpdateWithWhereUniqueWithoutDefaultMomTemplateInput | OrganizationUpdateWithWhereUniqueWithoutDefaultMomTemplateInput[]
+    updateMany?: OrganizationUpdateManyWithWhereWithoutDefaultMomTemplateInput | OrganizationUpdateManyWithWhereWithoutDefaultMomTemplateInput[]
+    deleteMany?: OrganizationScalarWhereInput | OrganizationScalarWhereInput[]
+  }
+
+  export type MomTemplateSectionUpdateManyWithoutTemplateNestedInput = {
+    create?: XOR<MomTemplateSectionCreateWithoutTemplateInput, MomTemplateSectionUncheckedCreateWithoutTemplateInput> | MomTemplateSectionCreateWithoutTemplateInput[] | MomTemplateSectionUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: MomTemplateSectionCreateOrConnectWithoutTemplateInput | MomTemplateSectionCreateOrConnectWithoutTemplateInput[]
+    upsert?: MomTemplateSectionUpsertWithWhereUniqueWithoutTemplateInput | MomTemplateSectionUpsertWithWhereUniqueWithoutTemplateInput[]
+    createMany?: MomTemplateSectionCreateManyTemplateInputEnvelope
+    set?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+    disconnect?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+    delete?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+    connect?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+    update?: MomTemplateSectionUpdateWithWhereUniqueWithoutTemplateInput | MomTemplateSectionUpdateWithWhereUniqueWithoutTemplateInput[]
+    updateMany?: MomTemplateSectionUpdateManyWithWhereWithoutTemplateInput | MomTemplateSectionUpdateManyWithWhereWithoutTemplateInput[]
+    deleteMany?: MomTemplateSectionScalarWhereInput | MomTemplateSectionScalarWhereInput[]
+  }
+
+  export type MomTemplateUploadUpdateOneWithoutTemplateNestedInput = {
+    create?: XOR<MomTemplateUploadCreateWithoutTemplateInput, MomTemplateUploadUncheckedCreateWithoutTemplateInput>
+    connectOrCreate?: MomTemplateUploadCreateOrConnectWithoutTemplateInput
+    upsert?: MomTemplateUploadUpsertWithoutTemplateInput
+    disconnect?: MomTemplateUploadWhereInput | boolean
+    delete?: MomTemplateUploadWhereInput | boolean
+    connect?: MomTemplateUploadWhereUniqueInput
+    update?: XOR<XOR<MomTemplateUploadUpdateToOneWithWhereWithoutTemplateInput, MomTemplateUploadUpdateWithoutTemplateInput>, MomTemplateUploadUncheckedUpdateWithoutTemplateInput>
+  }
+
+  export type MeetingUpdateManyWithoutMomTemplateNestedInput = {
+    create?: XOR<MeetingCreateWithoutMomTemplateInput, MeetingUncheckedCreateWithoutMomTemplateInput> | MeetingCreateWithoutMomTemplateInput[] | MeetingUncheckedCreateWithoutMomTemplateInput[]
+    connectOrCreate?: MeetingCreateOrConnectWithoutMomTemplateInput | MeetingCreateOrConnectWithoutMomTemplateInput[]
+    upsert?: MeetingUpsertWithWhereUniqueWithoutMomTemplateInput | MeetingUpsertWithWhereUniqueWithoutMomTemplateInput[]
+    createMany?: MeetingCreateManyMomTemplateInputEnvelope
+    set?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+    disconnect?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+    delete?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+    connect?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+    update?: MeetingUpdateWithWhereUniqueWithoutMomTemplateInput | MeetingUpdateWithWhereUniqueWithoutMomTemplateInput[]
+    updateMany?: MeetingUpdateManyWithWhereWithoutMomTemplateInput | MeetingUpdateManyWithWhereWithoutMomTemplateInput[]
+    deleteMany?: MeetingScalarWhereInput | MeetingScalarWhereInput[]
+  }
+
+  export type OrganizationUncheckedUpdateManyWithoutDefaultMomTemplateNestedInput = {
+    create?: XOR<OrganizationCreateWithoutDefaultMomTemplateInput, OrganizationUncheckedCreateWithoutDefaultMomTemplateInput> | OrganizationCreateWithoutDefaultMomTemplateInput[] | OrganizationUncheckedCreateWithoutDefaultMomTemplateInput[]
+    connectOrCreate?: OrganizationCreateOrConnectWithoutDefaultMomTemplateInput | OrganizationCreateOrConnectWithoutDefaultMomTemplateInput[]
+    upsert?: OrganizationUpsertWithWhereUniqueWithoutDefaultMomTemplateInput | OrganizationUpsertWithWhereUniqueWithoutDefaultMomTemplateInput[]
+    createMany?: OrganizationCreateManyDefaultMomTemplateInputEnvelope
+    set?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+    disconnect?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+    delete?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+    connect?: OrganizationWhereUniqueInput | OrganizationWhereUniqueInput[]
+    update?: OrganizationUpdateWithWhereUniqueWithoutDefaultMomTemplateInput | OrganizationUpdateWithWhereUniqueWithoutDefaultMomTemplateInput[]
+    updateMany?: OrganizationUpdateManyWithWhereWithoutDefaultMomTemplateInput | OrganizationUpdateManyWithWhereWithoutDefaultMomTemplateInput[]
+    deleteMany?: OrganizationScalarWhereInput | OrganizationScalarWhereInput[]
+  }
+
+  export type MomTemplateSectionUncheckedUpdateManyWithoutTemplateNestedInput = {
+    create?: XOR<MomTemplateSectionCreateWithoutTemplateInput, MomTemplateSectionUncheckedCreateWithoutTemplateInput> | MomTemplateSectionCreateWithoutTemplateInput[] | MomTemplateSectionUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: MomTemplateSectionCreateOrConnectWithoutTemplateInput | MomTemplateSectionCreateOrConnectWithoutTemplateInput[]
+    upsert?: MomTemplateSectionUpsertWithWhereUniqueWithoutTemplateInput | MomTemplateSectionUpsertWithWhereUniqueWithoutTemplateInput[]
+    createMany?: MomTemplateSectionCreateManyTemplateInputEnvelope
+    set?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+    disconnect?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+    delete?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+    connect?: MomTemplateSectionWhereUniqueInput | MomTemplateSectionWhereUniqueInput[]
+    update?: MomTemplateSectionUpdateWithWhereUniqueWithoutTemplateInput | MomTemplateSectionUpdateWithWhereUniqueWithoutTemplateInput[]
+    updateMany?: MomTemplateSectionUpdateManyWithWhereWithoutTemplateInput | MomTemplateSectionUpdateManyWithWhereWithoutTemplateInput[]
+    deleteMany?: MomTemplateSectionScalarWhereInput | MomTemplateSectionScalarWhereInput[]
+  }
+
+  export type MomTemplateUploadUncheckedUpdateOneWithoutTemplateNestedInput = {
+    create?: XOR<MomTemplateUploadCreateWithoutTemplateInput, MomTemplateUploadUncheckedCreateWithoutTemplateInput>
+    connectOrCreate?: MomTemplateUploadCreateOrConnectWithoutTemplateInput
+    upsert?: MomTemplateUploadUpsertWithoutTemplateInput
+    disconnect?: MomTemplateUploadWhereInput | boolean
+    delete?: MomTemplateUploadWhereInput | boolean
+    connect?: MomTemplateUploadWhereUniqueInput
+    update?: XOR<XOR<MomTemplateUploadUpdateToOneWithWhereWithoutTemplateInput, MomTemplateUploadUpdateWithoutTemplateInput>, MomTemplateUploadUncheckedUpdateWithoutTemplateInput>
+  }
+
+  export type MeetingUncheckedUpdateManyWithoutMomTemplateNestedInput = {
+    create?: XOR<MeetingCreateWithoutMomTemplateInput, MeetingUncheckedCreateWithoutMomTemplateInput> | MeetingCreateWithoutMomTemplateInput[] | MeetingUncheckedCreateWithoutMomTemplateInput[]
+    connectOrCreate?: MeetingCreateOrConnectWithoutMomTemplateInput | MeetingCreateOrConnectWithoutMomTemplateInput[]
+    upsert?: MeetingUpsertWithWhereUniqueWithoutMomTemplateInput | MeetingUpsertWithWhereUniqueWithoutMomTemplateInput[]
+    createMany?: MeetingCreateManyMomTemplateInputEnvelope
+    set?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+    disconnect?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+    delete?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+    connect?: MeetingWhereUniqueInput | MeetingWhereUniqueInput[]
+    update?: MeetingUpdateWithWhereUniqueWithoutMomTemplateInput | MeetingUpdateWithWhereUniqueWithoutMomTemplateInput[]
+    updateMany?: MeetingUpdateManyWithWhereWithoutMomTemplateInput | MeetingUpdateManyWithWhereWithoutMomTemplateInput[]
+    deleteMany?: MeetingScalarWhereInput | MeetingScalarWhereInput[]
+  }
+
+  export type MomTemplateCreateNestedOneWithoutSectionsInput = {
+    create?: XOR<MomTemplateCreateWithoutSectionsInput, MomTemplateUncheckedCreateWithoutSectionsInput>
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutSectionsInput
+    connect?: MomTemplateWhereUniqueInput
+  }
+
+  export type MomTemplateUpdateOneRequiredWithoutSectionsNestedInput = {
+    create?: XOR<MomTemplateCreateWithoutSectionsInput, MomTemplateUncheckedCreateWithoutSectionsInput>
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutSectionsInput
+    upsert?: MomTemplateUpsertWithoutSectionsInput
+    connect?: MomTemplateWhereUniqueInput
+    update?: XOR<XOR<MomTemplateUpdateToOneWithWhereWithoutSectionsInput, MomTemplateUpdateWithoutSectionsInput>, MomTemplateUncheckedUpdateWithoutSectionsInput>
+  }
+
+  export type MomTemplateCreateNestedOneWithoutUploadInput = {
+    create?: XOR<MomTemplateCreateWithoutUploadInput, MomTemplateUncheckedCreateWithoutUploadInput>
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutUploadInput
+    connect?: MomTemplateWhereUniqueInput
+  }
+
+  export type EnumTemplateFileStorageBackendFieldUpdateOperationsInput = {
+    set?: $Enums.TemplateFileStorageBackend
+  }
+
+  export type MomTemplateUpdateOneRequiredWithoutUploadNestedInput = {
+    create?: XOR<MomTemplateCreateWithoutUploadInput, MomTemplateUncheckedCreateWithoutUploadInput>
+    connectOrCreate?: MomTemplateCreateOrConnectWithoutUploadInput
+    upsert?: MomTemplateUpsertWithoutUploadInput
+    connect?: MomTemplateWhereUniqueInput
+    update?: XOR<XOR<MomTemplateUpdateToOneWithWhereWithoutUploadInput, MomTemplateUpdateWithoutUploadInput>, MomTemplateUncheckedUpdateWithoutUploadInput>
   }
 
   export type MeetingCreateNestedOneWithoutInvitesInput = {
@@ -30437,6 +45709,20 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedEnumBillingStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.BillingStatus | EnumBillingStatusFieldRefInput<$PrismaModel>
     in?: $Enums.BillingStatus[] | ListEnumBillingStatusFieldRefInput<$PrismaModel>
@@ -30472,34 +45758,6 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedEnumOrganizationStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.OrganizationStatus | EnumOrganizationStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.OrganizationStatus[] | ListEnumOrganizationStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.OrganizationStatus[] | ListEnumOrganizationStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumOrganizationStatusFilter<$PrismaModel> | $Enums.OrganizationStatus
-  }
-
-  export type NestedEnumSubscriptionPlanFilter<$PrismaModel = never> = {
-    equals?: $Enums.SubscriptionPlan | EnumSubscriptionPlanFieldRefInput<$PrismaModel>
-    in?: $Enums.SubscriptionPlan[] | ListEnumSubscriptionPlanFieldRefInput<$PrismaModel>
-    notIn?: $Enums.SubscriptionPlan[] | ListEnumSubscriptionPlanFieldRefInput<$PrismaModel>
-    not?: NestedEnumSubscriptionPlanFilter<$PrismaModel> | $Enums.SubscriptionPlan
-  }
-
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -30515,6 +45773,134 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumInvoiceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceStatus | EnumInvoiceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceStatusFilter<$PrismaModel> | $Enums.InvoiceStatus
+  }
+
+  export type NestedEnumTemplateFileStorageBackendNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateFileStorageBackend | EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    in?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumTemplateFileStorageBackendNullableFilter<$PrismaModel> | $Enums.TemplateFileStorageBackend | null
+  }
+
+  export type NestedEnumInvoiceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceStatus | EnumInvoiceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceStatusWithAggregatesFilter<$PrismaModel> | $Enums.InvoiceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInvoiceStatusFilter<$PrismaModel>
+    _max?: NestedEnumInvoiceStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTemplateFileStorageBackendNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateFileStorageBackend | EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    in?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumTemplateFileStorageBackendNullableWithAggregatesFilter<$PrismaModel> | $Enums.TemplateFileStorageBackend | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumTemplateFileStorageBackendNullableFilter<$PrismaModel>
+    _max?: NestedEnumTemplateFileStorageBackendNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPaymentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
+  }
+
+  export type NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PaymentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
+    _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumInvoiceDeliveryStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceDeliveryStatus | EnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceDeliveryStatus[] | ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceDeliveryStatus[] | ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceDeliveryStatusFilter<$PrismaModel> | $Enums.InvoiceDeliveryStatus
+  }
+
+  export type NestedEnumInvoiceDeliveryStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceDeliveryStatus | EnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceDeliveryStatus[] | ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceDeliveryStatus[] | ListEnumInvoiceDeliveryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceDeliveryStatusWithAggregatesFilter<$PrismaModel> | $Enums.InvoiceDeliveryStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInvoiceDeliveryStatusFilter<$PrismaModel>
+    _max?: NestedEnumInvoiceDeliveryStatusFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumOrganizationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrganizationStatus | EnumOrganizationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OrganizationStatus[] | ListEnumOrganizationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OrganizationStatus[] | ListEnumOrganizationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOrganizationStatusFilter<$PrismaModel> | $Enums.OrganizationStatus
+  }
+
+  export type NestedEnumSubscriptionPlanFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubscriptionPlan | EnumSubscriptionPlanFieldRefInput<$PrismaModel>
+    in?: $Enums.SubscriptionPlan[] | ListEnumSubscriptionPlanFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubscriptionPlan[] | ListEnumSubscriptionPlanFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubscriptionPlanFilter<$PrismaModel> | $Enums.SubscriptionPlan
   }
 
   export type NestedEnumOrganizationStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -30583,29 +45969,6 @@ export namespace Prisma {
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
   }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type NestedEnumMeetingStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.MeetingStatus | EnumMeetingStatusFieldRefInput<$PrismaModel>
@@ -30639,6 +46002,57 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMeetingTagFilter<$PrismaModel>
     _max?: NestedEnumMeetingTagFilter<$PrismaModel>
+  }
+
+  export type NestedEnumMomTemplateCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.MomTemplateCategory | EnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.MomTemplateCategory[] | ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MomTemplateCategory[] | ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumMomTemplateCategoryFilter<$PrismaModel> | $Enums.MomTemplateCategory
+  }
+
+  export type NestedEnumMomTemplateSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.MomTemplateSource | EnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.MomTemplateSource[] | ListEnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MomTemplateSource[] | ListEnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMomTemplateSourceFilter<$PrismaModel> | $Enums.MomTemplateSource
+  }
+
+  export type NestedEnumMomTemplateCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MomTemplateCategory | EnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.MomTemplateCategory[] | ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MomTemplateCategory[] | ListEnumMomTemplateCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumMomTemplateCategoryWithAggregatesFilter<$PrismaModel> | $Enums.MomTemplateCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMomTemplateCategoryFilter<$PrismaModel>
+    _max?: NestedEnumMomTemplateCategoryFilter<$PrismaModel>
+  }
+
+  export type NestedEnumMomTemplateSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MomTemplateSource | EnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.MomTemplateSource[] | ListEnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MomTemplateSource[] | ListEnumMomTemplateSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMomTemplateSourceWithAggregatesFilter<$PrismaModel> | $Enums.MomTemplateSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMomTemplateSourceFilter<$PrismaModel>
+    _max?: NestedEnumMomTemplateSourceFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTemplateFileStorageBackendFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateFileStorageBackend | EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateFileStorageBackendFilter<$PrismaModel> | $Enums.TemplateFileStorageBackend
+  }
+
+  export type NestedEnumTemplateFileStorageBackendWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TemplateFileStorageBackend | EnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    in?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TemplateFileStorageBackend[] | ListEnumTemplateFileStorageBackendFieldRefInput<$PrismaModel>
+    not?: NestedEnumTemplateFileStorageBackendWithAggregatesFilter<$PrismaModel> | $Enums.TemplateFileStorageBackend
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTemplateFileStorageBackendFilter<$PrismaModel>
+    _max?: NestedEnumTemplateFileStorageBackendFilter<$PrismaModel>
   }
 
   export type NestedEnumInviteStatusFilter<$PrismaModel = never> = {
@@ -30716,29 +46130,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumTaskPriorityFilter<$PrismaModel = never> = {
@@ -30818,6 +46209,11 @@ export namespace Prisma {
     users?: UserCreateNestedManyWithoutOrganizationInput
     meetings?: MeetingCreateNestedManyWithoutOrganizationInput
     auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationUncheckedCreateWithoutBillingProfileInput = {
@@ -30843,9 +46239,14 @@ export namespace Prisma {
     subscriptionPlan?: $Enums.SubscriptionPlan
     createdAt?: Date | string
     updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
     users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
     meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
     auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationCreateOrConnectWithoutBillingProfileInput = {
@@ -30890,6 +46291,11 @@ export namespace Prisma {
     users?: UserUpdateManyWithoutOrganizationNestedInput
     meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
     auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
   }
 
   export type OrganizationUncheckedUpdateWithoutBillingProfileInput = {
@@ -30915,9 +46321,1052 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
     meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
     auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type OrganizationCreateWithoutInvoicesInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationUncheckedCreateWithoutInvoicesInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
+    users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationCreateOrConnectWithoutInvoicesInput = {
+    where: OrganizationWhereUniqueInput
+    create: XOR<OrganizationCreateWithoutInvoicesInput, OrganizationUncheckedCreateWithoutInvoicesInput>
+  }
+
+  export type InvoiceLineItemCreateWithoutInvoiceInput = {
+    id?: string
+    description: string
+    quantity: number
+    unitPriceInr: number
+    amountInr: number
+    sortOrder: number
+  }
+
+  export type InvoiceLineItemUncheckedCreateWithoutInvoiceInput = {
+    id?: string
+    description: string
+    quantity: number
+    unitPriceInr: number
+    amountInr: number
+    sortOrder: number
+  }
+
+  export type InvoiceLineItemCreateOrConnectWithoutInvoiceInput = {
+    where: InvoiceLineItemWhereUniqueInput
+    create: XOR<InvoiceLineItemCreateWithoutInvoiceInput, InvoiceLineItemUncheckedCreateWithoutInvoiceInput>
+  }
+
+  export type InvoiceLineItemCreateManyInvoiceInputEnvelope = {
+    data: InvoiceLineItemCreateManyInvoiceInput | InvoiceLineItemCreateManyInvoiceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PaymentCreateWithoutInvoiceInput = {
+    id?: string
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutPaymentsInput
+  }
+
+  export type PaymentUncheckedCreateWithoutInvoiceInput = {
+    id?: string
+    organizationId: string
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PaymentCreateOrConnectWithoutInvoiceInput = {
+    where: PaymentWhereUniqueInput
+    create: XOR<PaymentCreateWithoutInvoiceInput, PaymentUncheckedCreateWithoutInvoiceInput>
+  }
+
+  export type PaymentCreateManyInvoiceInputEnvelope = {
+    data: PaymentCreateManyInvoiceInput | PaymentCreateManyInvoiceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type InvoiceDeliveryCreateWithoutInvoiceInput = {
+    id?: string
+    organizationId: string
+    recipientEmail: string
+    status?: $Enums.InvoiceDeliveryStatus
+    error?: string | null
+    sentAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type InvoiceDeliveryUncheckedCreateWithoutInvoiceInput = {
+    id?: string
+    organizationId: string
+    recipientEmail: string
+    status?: $Enums.InvoiceDeliveryStatus
+    error?: string | null
+    sentAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type InvoiceDeliveryCreateOrConnectWithoutInvoiceInput = {
+    where: InvoiceDeliveryWhereUniqueInput
+    create: XOR<InvoiceDeliveryCreateWithoutInvoiceInput, InvoiceDeliveryUncheckedCreateWithoutInvoiceInput>
+  }
+
+  export type InvoiceDeliveryCreateManyInvoiceInputEnvelope = {
+    data: InvoiceDeliveryCreateManyInvoiceInput | InvoiceDeliveryCreateManyInvoiceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrganizationUpsertWithoutInvoicesInput = {
+    update: XOR<OrganizationUpdateWithoutInvoicesInput, OrganizationUncheckedUpdateWithoutInvoicesInput>
+    create: XOR<OrganizationCreateWithoutInvoicesInput, OrganizationUncheckedCreateWithoutInvoicesInput>
+    where?: OrganizationWhereInput
+  }
+
+  export type OrganizationUpdateToOneWithWhereWithoutInvoicesInput = {
+    where?: OrganizationWhereInput
+    data: XOR<OrganizationUpdateWithoutInvoicesInput, OrganizationUncheckedUpdateWithoutInvoicesInput>
+  }
+
+  export type OrganizationUpdateWithoutInvoicesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type OrganizationUncheckedUpdateWithoutInvoicesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
+    users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type InvoiceLineItemUpsertWithWhereUniqueWithoutInvoiceInput = {
+    where: InvoiceLineItemWhereUniqueInput
+    update: XOR<InvoiceLineItemUpdateWithoutInvoiceInput, InvoiceLineItemUncheckedUpdateWithoutInvoiceInput>
+    create: XOR<InvoiceLineItemCreateWithoutInvoiceInput, InvoiceLineItemUncheckedCreateWithoutInvoiceInput>
+  }
+
+  export type InvoiceLineItemUpdateWithWhereUniqueWithoutInvoiceInput = {
+    where: InvoiceLineItemWhereUniqueInput
+    data: XOR<InvoiceLineItemUpdateWithoutInvoiceInput, InvoiceLineItemUncheckedUpdateWithoutInvoiceInput>
+  }
+
+  export type InvoiceLineItemUpdateManyWithWhereWithoutInvoiceInput = {
+    where: InvoiceLineItemScalarWhereInput
+    data: XOR<InvoiceLineItemUpdateManyMutationInput, InvoiceLineItemUncheckedUpdateManyWithoutInvoiceInput>
+  }
+
+  export type InvoiceLineItemScalarWhereInput = {
+    AND?: InvoiceLineItemScalarWhereInput | InvoiceLineItemScalarWhereInput[]
+    OR?: InvoiceLineItemScalarWhereInput[]
+    NOT?: InvoiceLineItemScalarWhereInput | InvoiceLineItemScalarWhereInput[]
+    id?: StringFilter<"InvoiceLineItem"> | string
+    invoiceId?: StringFilter<"InvoiceLineItem"> | string
+    description?: StringFilter<"InvoiceLineItem"> | string
+    quantity?: IntFilter<"InvoiceLineItem"> | number
+    unitPriceInr?: IntFilter<"InvoiceLineItem"> | number
+    amountInr?: IntFilter<"InvoiceLineItem"> | number
+    sortOrder?: IntFilter<"InvoiceLineItem"> | number
+  }
+
+  export type PaymentUpsertWithWhereUniqueWithoutInvoiceInput = {
+    where: PaymentWhereUniqueInput
+    update: XOR<PaymentUpdateWithoutInvoiceInput, PaymentUncheckedUpdateWithoutInvoiceInput>
+    create: XOR<PaymentCreateWithoutInvoiceInput, PaymentUncheckedCreateWithoutInvoiceInput>
+  }
+
+  export type PaymentUpdateWithWhereUniqueWithoutInvoiceInput = {
+    where: PaymentWhereUniqueInput
+    data: XOR<PaymentUpdateWithoutInvoiceInput, PaymentUncheckedUpdateWithoutInvoiceInput>
+  }
+
+  export type PaymentUpdateManyWithWhereWithoutInvoiceInput = {
+    where: PaymentScalarWhereInput
+    data: XOR<PaymentUpdateManyMutationInput, PaymentUncheckedUpdateManyWithoutInvoiceInput>
+  }
+
+  export type PaymentScalarWhereInput = {
+    AND?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+    OR?: PaymentScalarWhereInput[]
+    NOT?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+    id?: StringFilter<"Payment"> | string
+    organizationId?: StringFilter<"Payment"> | string
+    invoiceId?: StringNullableFilter<"Payment"> | string | null
+    amountInr?: IntFilter<"Payment"> | number
+    status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    method?: StringNullableFilter<"Payment"> | string | null
+    reference?: StringNullableFilter<"Payment"> | string | null
+    notes?: StringNullableFilter<"Payment"> | string | null
+    recordedById?: StringNullableFilter<"Payment"> | string | null
+    paidAt?: DateTimeFilter<"Payment"> | Date | string
+    createdAt?: DateTimeFilter<"Payment"> | Date | string
+  }
+
+  export type InvoiceDeliveryUpsertWithWhereUniqueWithoutInvoiceInput = {
+    where: InvoiceDeliveryWhereUniqueInput
+    update: XOR<InvoiceDeliveryUpdateWithoutInvoiceInput, InvoiceDeliveryUncheckedUpdateWithoutInvoiceInput>
+    create: XOR<InvoiceDeliveryCreateWithoutInvoiceInput, InvoiceDeliveryUncheckedCreateWithoutInvoiceInput>
+  }
+
+  export type InvoiceDeliveryUpdateWithWhereUniqueWithoutInvoiceInput = {
+    where: InvoiceDeliveryWhereUniqueInput
+    data: XOR<InvoiceDeliveryUpdateWithoutInvoiceInput, InvoiceDeliveryUncheckedUpdateWithoutInvoiceInput>
+  }
+
+  export type InvoiceDeliveryUpdateManyWithWhereWithoutInvoiceInput = {
+    where: InvoiceDeliveryScalarWhereInput
+    data: XOR<InvoiceDeliveryUpdateManyMutationInput, InvoiceDeliveryUncheckedUpdateManyWithoutInvoiceInput>
+  }
+
+  export type InvoiceDeliveryScalarWhereInput = {
+    AND?: InvoiceDeliveryScalarWhereInput | InvoiceDeliveryScalarWhereInput[]
+    OR?: InvoiceDeliveryScalarWhereInput[]
+    NOT?: InvoiceDeliveryScalarWhereInput | InvoiceDeliveryScalarWhereInput[]
+    id?: StringFilter<"InvoiceDelivery"> | string
+    invoiceId?: StringFilter<"InvoiceDelivery"> | string
+    organizationId?: StringFilter<"InvoiceDelivery"> | string
+    recipientEmail?: StringFilter<"InvoiceDelivery"> | string
+    status?: EnumInvoiceDeliveryStatusFilter<"InvoiceDelivery"> | $Enums.InvoiceDeliveryStatus
+    error?: StringNullableFilter<"InvoiceDelivery"> | string | null
+    sentAt?: DateTimeNullableFilter<"InvoiceDelivery"> | Date | string | null
+    createdAt?: DateTimeFilter<"InvoiceDelivery"> | Date | string
+  }
+
+  export type InvoiceCreateWithoutLineItemsInput = {
+    id?: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutInvoicesInput
+    payments?: PaymentCreateNestedManyWithoutInvoiceInput
+    deliveries?: InvoiceDeliveryCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceUncheckedCreateWithoutLineItemsInput = {
+    id?: string
+    organizationId: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
+    deliveries?: InvoiceDeliveryUncheckedCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceCreateOrConnectWithoutLineItemsInput = {
+    where: InvoiceWhereUniqueInput
+    create: XOR<InvoiceCreateWithoutLineItemsInput, InvoiceUncheckedCreateWithoutLineItemsInput>
+  }
+
+  export type InvoiceUpsertWithoutLineItemsInput = {
+    update: XOR<InvoiceUpdateWithoutLineItemsInput, InvoiceUncheckedUpdateWithoutLineItemsInput>
+    create: XOR<InvoiceCreateWithoutLineItemsInput, InvoiceUncheckedCreateWithoutLineItemsInput>
+    where?: InvoiceWhereInput
+  }
+
+  export type InvoiceUpdateToOneWithWhereWithoutLineItemsInput = {
+    where?: InvoiceWhereInput
+    data: XOR<InvoiceUpdateWithoutLineItemsInput, InvoiceUncheckedUpdateWithoutLineItemsInput>
+  }
+
+  export type InvoiceUpdateWithoutLineItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutInvoicesNestedInput
+    payments?: PaymentUpdateManyWithoutInvoiceNestedInput
+    deliveries?: InvoiceDeliveryUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type InvoiceUncheckedUpdateWithoutLineItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
+    deliveries?: InvoiceDeliveryUncheckedUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type OrganizationCreateWithoutPaymentsInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationUncheckedCreateWithoutPaymentsInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
+    users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationCreateOrConnectWithoutPaymentsInput = {
+    where: OrganizationWhereUniqueInput
+    create: XOR<OrganizationCreateWithoutPaymentsInput, OrganizationUncheckedCreateWithoutPaymentsInput>
+  }
+
+  export type InvoiceCreateWithoutPaymentsInput = {
+    id?: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutInvoicesInput
+    lineItems?: InvoiceLineItemCreateNestedManyWithoutInvoiceInput
+    deliveries?: InvoiceDeliveryCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceUncheckedCreateWithoutPaymentsInput = {
+    id?: string
+    organizationId: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lineItems?: InvoiceLineItemUncheckedCreateNestedManyWithoutInvoiceInput
+    deliveries?: InvoiceDeliveryUncheckedCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceCreateOrConnectWithoutPaymentsInput = {
+    where: InvoiceWhereUniqueInput
+    create: XOR<InvoiceCreateWithoutPaymentsInput, InvoiceUncheckedCreateWithoutPaymentsInput>
+  }
+
+  export type OrganizationUpsertWithoutPaymentsInput = {
+    update: XOR<OrganizationUpdateWithoutPaymentsInput, OrganizationUncheckedUpdateWithoutPaymentsInput>
+    create: XOR<OrganizationCreateWithoutPaymentsInput, OrganizationUncheckedCreateWithoutPaymentsInput>
+    where?: OrganizationWhereInput
+  }
+
+  export type OrganizationUpdateToOneWithWhereWithoutPaymentsInput = {
+    where?: OrganizationWhereInput
+    data: XOR<OrganizationUpdateWithoutPaymentsInput, OrganizationUncheckedUpdateWithoutPaymentsInput>
+  }
+
+  export type OrganizationUpdateWithoutPaymentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type OrganizationUncheckedUpdateWithoutPaymentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
+    users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type InvoiceUpsertWithoutPaymentsInput = {
+    update: XOR<InvoiceUpdateWithoutPaymentsInput, InvoiceUncheckedUpdateWithoutPaymentsInput>
+    create: XOR<InvoiceCreateWithoutPaymentsInput, InvoiceUncheckedCreateWithoutPaymentsInput>
+    where?: InvoiceWhereInput
+  }
+
+  export type InvoiceUpdateToOneWithWhereWithoutPaymentsInput = {
+    where?: InvoiceWhereInput
+    data: XOR<InvoiceUpdateWithoutPaymentsInput, InvoiceUncheckedUpdateWithoutPaymentsInput>
+  }
+
+  export type InvoiceUpdateWithoutPaymentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutInvoicesNestedInput
+    lineItems?: InvoiceLineItemUpdateManyWithoutInvoiceNestedInput
+    deliveries?: InvoiceDeliveryUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type InvoiceUncheckedUpdateWithoutPaymentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lineItems?: InvoiceLineItemUncheckedUpdateManyWithoutInvoiceNestedInput
+    deliveries?: InvoiceDeliveryUncheckedUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type InvoiceCreateWithoutDeliveriesInput = {
+    id?: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutInvoicesInput
+    lineItems?: InvoiceLineItemCreateNestedManyWithoutInvoiceInput
+    payments?: PaymentCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceUncheckedCreateWithoutDeliveriesInput = {
+    id?: string
+    organizationId: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lineItems?: InvoiceLineItemUncheckedCreateNestedManyWithoutInvoiceInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceCreateOrConnectWithoutDeliveriesInput = {
+    where: InvoiceWhereUniqueInput
+    create: XOR<InvoiceCreateWithoutDeliveriesInput, InvoiceUncheckedCreateWithoutDeliveriesInput>
+  }
+
+  export type InvoiceUpsertWithoutDeliveriesInput = {
+    update: XOR<InvoiceUpdateWithoutDeliveriesInput, InvoiceUncheckedUpdateWithoutDeliveriesInput>
+    create: XOR<InvoiceCreateWithoutDeliveriesInput, InvoiceUncheckedCreateWithoutDeliveriesInput>
+    where?: InvoiceWhereInput
+  }
+
+  export type InvoiceUpdateToOneWithWhereWithoutDeliveriesInput = {
+    where?: InvoiceWhereInput
+    data: XOR<InvoiceUpdateWithoutDeliveriesInput, InvoiceUncheckedUpdateWithoutDeliveriesInput>
+  }
+
+  export type InvoiceUpdateWithoutDeliveriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutInvoicesNestedInput
+    lineItems?: InvoiceLineItemUpdateManyWithoutInvoiceNestedInput
+    payments?: PaymentUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type InvoiceUncheckedUpdateWithoutDeliveriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lineItems?: InvoiceLineItemUncheckedUpdateManyWithoutInvoiceNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type OrganizationCreateWithoutBillingEventsInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationUncheckedCreateWithoutBillingEventsInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
+    users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationCreateOrConnectWithoutBillingEventsInput = {
+    where: OrganizationWhereUniqueInput
+    create: XOR<OrganizationCreateWithoutBillingEventsInput, OrganizationUncheckedCreateWithoutBillingEventsInput>
+  }
+
+  export type OrganizationUpsertWithoutBillingEventsInput = {
+    update: XOR<OrganizationUpdateWithoutBillingEventsInput, OrganizationUncheckedUpdateWithoutBillingEventsInput>
+    create: XOR<OrganizationCreateWithoutBillingEventsInput, OrganizationUncheckedCreateWithoutBillingEventsInput>
+    where?: OrganizationWhereInput
+  }
+
+  export type OrganizationUpdateToOneWithWhereWithoutBillingEventsInput = {
+    where?: OrganizationWhereInput
+    data: XOR<OrganizationUpdateWithoutBillingEventsInput, OrganizationUncheckedUpdateWithoutBillingEventsInput>
+  }
+
+  export type OrganizationUpdateWithoutBillingEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type OrganizationUncheckedUpdateWithoutBillingEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
+    users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
   }
 
   export type UserCreateWithoutOrganizationInput = {
@@ -30992,6 +47441,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -31023,6 +47473,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -31075,6 +47526,14 @@ export namespace Prisma {
     billingStatus?: $Enums.BillingStatus
     billingCycle?: string
     nextBillingDate?: Date | string | null
+    trialStartedAt?: Date | string | null
+    trialEndsAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    discountPercent?: Decimal | DecimalJsLike | number | string
+    billingEmail?: string | null
+    createdAt?: Date | string
     updatedAt?: Date | string
   }
 
@@ -31083,12 +47542,235 @@ export namespace Prisma {
     billingStatus?: $Enums.BillingStatus
     billingCycle?: string
     nextBillingDate?: Date | string | null
+    trialStartedAt?: Date | string | null
+    trialEndsAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    discountPercent?: Decimal | DecimalJsLike | number | string
+    billingEmail?: string | null
+    createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type OrganizationBillingCreateOrConnectWithoutOrganizationInput = {
     where: OrganizationBillingWhereUniqueInput
     create: XOR<OrganizationBillingCreateWithoutOrganizationInput, OrganizationBillingUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type MomTemplateCreateWithoutOrganizationInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultForOrganization?: OrganizationCreateNestedManyWithoutDefaultMomTemplateInput
+    sections?: MomTemplateSectionCreateNestedManyWithoutTemplateInput
+    upload?: MomTemplateUploadCreateNestedOneWithoutTemplateInput
+    meetings?: MeetingCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateUncheckedCreateWithoutOrganizationInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultForOrganization?: OrganizationUncheckedCreateNestedManyWithoutDefaultMomTemplateInput
+    sections?: MomTemplateSectionUncheckedCreateNestedManyWithoutTemplateInput
+    upload?: MomTemplateUploadUncheckedCreateNestedOneWithoutTemplateInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateCreateOrConnectWithoutOrganizationInput = {
+    where: MomTemplateWhereUniqueInput
+    create: XOR<MomTemplateCreateWithoutOrganizationInput, MomTemplateUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type MomTemplateCreateManyOrganizationInputEnvelope = {
+    data: MomTemplateCreateManyOrganizationInput | MomTemplateCreateManyOrganizationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MomTemplateCreateWithoutDefaultForOrganizationInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutMomTemplatesInput
+    sections?: MomTemplateSectionCreateNestedManyWithoutTemplateInput
+    upload?: MomTemplateUploadCreateNestedOneWithoutTemplateInput
+    meetings?: MeetingCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateUncheckedCreateWithoutDefaultForOrganizationInput = {
+    id?: string
+    organizationId: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sections?: MomTemplateSectionUncheckedCreateNestedManyWithoutTemplateInput
+    upload?: MomTemplateUploadUncheckedCreateNestedOneWithoutTemplateInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateCreateOrConnectWithoutDefaultForOrganizationInput = {
+    where: MomTemplateWhereUniqueInput
+    create: XOR<MomTemplateCreateWithoutDefaultForOrganizationInput, MomTemplateUncheckedCreateWithoutDefaultForOrganizationInput>
+  }
+
+  export type InvoiceCreateWithoutOrganizationInput = {
+    id?: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lineItems?: InvoiceLineItemCreateNestedManyWithoutInvoiceInput
+    payments?: PaymentCreateNestedManyWithoutInvoiceInput
+    deliveries?: InvoiceDeliveryCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceUncheckedCreateWithoutOrganizationInput = {
+    id?: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lineItems?: InvoiceLineItemUncheckedCreateNestedManyWithoutInvoiceInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
+    deliveries?: InvoiceDeliveryUncheckedCreateNestedManyWithoutInvoiceInput
+  }
+
+  export type InvoiceCreateOrConnectWithoutOrganizationInput = {
+    where: InvoiceWhereUniqueInput
+    create: XOR<InvoiceCreateWithoutOrganizationInput, InvoiceUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type InvoiceCreateManyOrganizationInputEnvelope = {
+    data: InvoiceCreateManyOrganizationInput | InvoiceCreateManyOrganizationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PaymentCreateWithoutOrganizationInput = {
+    id?: string
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+    invoice?: InvoiceCreateNestedOneWithoutPaymentsInput
+  }
+
+  export type PaymentUncheckedCreateWithoutOrganizationInput = {
+    id?: string
+    invoiceId?: string | null
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PaymentCreateOrConnectWithoutOrganizationInput = {
+    where: PaymentWhereUniqueInput
+    create: XOR<PaymentCreateWithoutOrganizationInput, PaymentUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type PaymentCreateManyOrganizationInputEnvelope = {
+    data: PaymentCreateManyOrganizationInput | PaymentCreateManyOrganizationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BillingEventCreateWithoutOrganizationInput = {
+    id?: string
+    type: string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type BillingEventUncheckedCreateWithoutOrganizationInput = {
+    id?: string
+    type: string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type BillingEventCreateOrConnectWithoutOrganizationInput = {
+    where: BillingEventWhereUniqueInput
+    create: XOR<BillingEventCreateWithoutOrganizationInput, BillingEventUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type BillingEventCreateManyOrganizationInputEnvelope = {
+    data: BillingEventCreateManyOrganizationInput | BillingEventCreateManyOrganizationInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithWhereUniqueWithoutOrganizationInput = {
@@ -31166,6 +47848,7 @@ export namespace Prisma {
     liveEndedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     createdAt?: DateTimeFilter<"Meeting"> | Date | string
     updatedAt?: DateTimeFilter<"Meeting"> | Date | string
+    momTemplateId?: StringNullableFilter<"Meeting"> | string | null
   }
 
   export type TenantAuditLogUpsertWithWhereUniqueWithoutOrganizationInput = {
@@ -31212,6 +47895,14 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
     billingCycle?: StringFieldUpdateOperationsInput | string
     nextBillingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    discountPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -31220,7 +47911,184 @@ export namespace Prisma {
     billingStatus?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
     billingCycle?: StringFieldUpdateOperationsInput | string
     nextBillingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    discountPercent?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateUpsertWithWhereUniqueWithoutOrganizationInput = {
+    where: MomTemplateWhereUniqueInput
+    update: XOR<MomTemplateUpdateWithoutOrganizationInput, MomTemplateUncheckedUpdateWithoutOrganizationInput>
+    create: XOR<MomTemplateCreateWithoutOrganizationInput, MomTemplateUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type MomTemplateUpdateWithWhereUniqueWithoutOrganizationInput = {
+    where: MomTemplateWhereUniqueInput
+    data: XOR<MomTemplateUpdateWithoutOrganizationInput, MomTemplateUncheckedUpdateWithoutOrganizationInput>
+  }
+
+  export type MomTemplateUpdateManyWithWhereWithoutOrganizationInput = {
+    where: MomTemplateScalarWhereInput
+    data: XOR<MomTemplateUpdateManyMutationInput, MomTemplateUncheckedUpdateManyWithoutOrganizationInput>
+  }
+
+  export type MomTemplateScalarWhereInput = {
+    AND?: MomTemplateScalarWhereInput | MomTemplateScalarWhereInput[]
+    OR?: MomTemplateScalarWhereInput[]
+    NOT?: MomTemplateScalarWhereInput | MomTemplateScalarWhereInput[]
+    id?: StringFilter<"MomTemplate"> | string
+    organizationId?: StringFilter<"MomTemplate"> | string
+    name?: StringFilter<"MomTemplate"> | string
+    description?: StringNullableFilter<"MomTemplate"> | string | null
+    category?: EnumMomTemplateCategoryFilter<"MomTemplate"> | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFilter<"MomTemplate"> | $Enums.MomTemplateSource
+    isDefault?: BoolFilter<"MomTemplate"> | boolean
+    isArchived?: BoolFilter<"MomTemplate"> | boolean
+    metadata?: JsonNullableFilter<"MomTemplate">
+    createdAt?: DateTimeFilter<"MomTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"MomTemplate"> | Date | string
+  }
+
+  export type MomTemplateUpsertWithoutDefaultForOrganizationInput = {
+    update: XOR<MomTemplateUpdateWithoutDefaultForOrganizationInput, MomTemplateUncheckedUpdateWithoutDefaultForOrganizationInput>
+    create: XOR<MomTemplateCreateWithoutDefaultForOrganizationInput, MomTemplateUncheckedCreateWithoutDefaultForOrganizationInput>
+    where?: MomTemplateWhereInput
+  }
+
+  export type MomTemplateUpdateToOneWithWhereWithoutDefaultForOrganizationInput = {
+    where?: MomTemplateWhereInput
+    data: XOR<MomTemplateUpdateWithoutDefaultForOrganizationInput, MomTemplateUncheckedUpdateWithoutDefaultForOrganizationInput>
+  }
+
+  export type MomTemplateUpdateWithoutDefaultForOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutMomTemplatesNestedInput
+    sections?: MomTemplateSectionUpdateManyWithoutTemplateNestedInput
+    upload?: MomTemplateUploadUpdateOneWithoutTemplateNestedInput
+    meetings?: MeetingUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type MomTemplateUncheckedUpdateWithoutDefaultForOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sections?: MomTemplateSectionUncheckedUpdateManyWithoutTemplateNestedInput
+    upload?: MomTemplateUploadUncheckedUpdateOneWithoutTemplateNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type InvoiceUpsertWithWhereUniqueWithoutOrganizationInput = {
+    where: InvoiceWhereUniqueInput
+    update: XOR<InvoiceUpdateWithoutOrganizationInput, InvoiceUncheckedUpdateWithoutOrganizationInput>
+    create: XOR<InvoiceCreateWithoutOrganizationInput, InvoiceUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type InvoiceUpdateWithWhereUniqueWithoutOrganizationInput = {
+    where: InvoiceWhereUniqueInput
+    data: XOR<InvoiceUpdateWithoutOrganizationInput, InvoiceUncheckedUpdateWithoutOrganizationInput>
+  }
+
+  export type InvoiceUpdateManyWithWhereWithoutOrganizationInput = {
+    where: InvoiceScalarWhereInput
+    data: XOR<InvoiceUpdateManyMutationInput, InvoiceUncheckedUpdateManyWithoutOrganizationInput>
+  }
+
+  export type InvoiceScalarWhereInput = {
+    AND?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+    OR?: InvoiceScalarWhereInput[]
+    NOT?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+    id?: StringFilter<"Invoice"> | string
+    organizationId?: StringFilter<"Invoice"> | string
+    invoiceNumber?: StringFilter<"Invoice"> | string
+    status?: EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
+    planName?: StringFilter<"Invoice"> | string
+    billingCycle?: StringFilter<"Invoice"> | string
+    periodStart?: DateTimeFilter<"Invoice"> | Date | string
+    periodEnd?: DateTimeFilter<"Invoice"> | Date | string
+    includedSeats?: IntFilter<"Invoice"> | number
+    activeSeats?: IntFilter<"Invoice"> | number
+    additionalSeats?: IntFilter<"Invoice"> | number
+    includedLocations?: IntFilter<"Invoice"> | number
+    activeLocations?: IntFilter<"Invoice"> | number
+    subtotalInr?: IntFilter<"Invoice"> | number
+    discountInr?: IntFilter<"Invoice"> | number
+    gstInr?: IntFilter<"Invoice"> | number
+    totalInr?: IntFilter<"Invoice"> | number
+    billingAddress?: StringNullableFilter<"Invoice"> | string | null
+    storageKey?: StringNullableFilter<"Invoice"> | string | null
+    storageBackend?: EnumTemplateFileStorageBackendNullableFilter<"Invoice"> | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    dueAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    paidAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+    createdAt?: DateTimeFilter<"Invoice"> | Date | string
+    updatedAt?: DateTimeFilter<"Invoice"> | Date | string
+  }
+
+  export type PaymentUpsertWithWhereUniqueWithoutOrganizationInput = {
+    where: PaymentWhereUniqueInput
+    update: XOR<PaymentUpdateWithoutOrganizationInput, PaymentUncheckedUpdateWithoutOrganizationInput>
+    create: XOR<PaymentCreateWithoutOrganizationInput, PaymentUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type PaymentUpdateWithWhereUniqueWithoutOrganizationInput = {
+    where: PaymentWhereUniqueInput
+    data: XOR<PaymentUpdateWithoutOrganizationInput, PaymentUncheckedUpdateWithoutOrganizationInput>
+  }
+
+  export type PaymentUpdateManyWithWhereWithoutOrganizationInput = {
+    where: PaymentScalarWhereInput
+    data: XOR<PaymentUpdateManyMutationInput, PaymentUncheckedUpdateManyWithoutOrganizationInput>
+  }
+
+  export type BillingEventUpsertWithWhereUniqueWithoutOrganizationInput = {
+    where: BillingEventWhereUniqueInput
+    update: XOR<BillingEventUpdateWithoutOrganizationInput, BillingEventUncheckedUpdateWithoutOrganizationInput>
+    create: XOR<BillingEventCreateWithoutOrganizationInput, BillingEventUncheckedCreateWithoutOrganizationInput>
+  }
+
+  export type BillingEventUpdateWithWhereUniqueWithoutOrganizationInput = {
+    where: BillingEventWhereUniqueInput
+    data: XOR<BillingEventUpdateWithoutOrganizationInput, BillingEventUncheckedUpdateWithoutOrganizationInput>
+  }
+
+  export type BillingEventUpdateManyWithWhereWithoutOrganizationInput = {
+    where: BillingEventScalarWhereInput
+    data: XOR<BillingEventUpdateManyMutationInput, BillingEventUncheckedUpdateManyWithoutOrganizationInput>
+  }
+
+  export type BillingEventScalarWhereInput = {
+    AND?: BillingEventScalarWhereInput | BillingEventScalarWhereInput[]
+    OR?: BillingEventScalarWhereInput[]
+    NOT?: BillingEventScalarWhereInput | BillingEventScalarWhereInput[]
+    id?: StringFilter<"BillingEvent"> | string
+    organizationId?: StringFilter<"BillingEvent"> | string
+    type?: StringFilter<"BillingEvent"> | string
+    metadata?: JsonNullableFilter<"BillingEvent">
+    actorId?: StringNullableFilter<"BillingEvent"> | string | null
+    createdAt?: DateTimeFilter<"BillingEvent"> | Date | string
   }
 
   export type OrganizationCreateWithoutUsersInput = {
@@ -31249,6 +48117,11 @@ export namespace Prisma {
     meetings?: MeetingCreateNestedManyWithoutOrganizationInput
     auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
     billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationUncheckedCreateWithoutUsersInput = {
@@ -31274,9 +48147,14 @@ export namespace Prisma {
     subscriptionPlan?: $Enums.SubscriptionPlan
     createdAt?: Date | string
     updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
     meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
     auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
     billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationCreateOrConnectWithoutUsersInput = {
@@ -31328,6 +48206,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptCreateNestedOneWithoutMeetingInput
@@ -31358,6 +48237,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -31536,6 +48416,11 @@ export namespace Prisma {
     meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
     auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
     billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
   }
 
   export type OrganizationUncheckedUpdateWithoutUsersInput = {
@@ -31561,9 +48446,14 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
     auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
     billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
   }
 
   export type EmployeeProfileUpsertWithoutUserInput = {
@@ -31851,6 +48741,11 @@ export namespace Prisma {
     users?: UserCreateNestedManyWithoutOrganizationInput
     meetings?: MeetingCreateNestedManyWithoutOrganizationInput
     billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationUncheckedCreateWithoutAuditEventsInput = {
@@ -31876,9 +48771,14 @@ export namespace Prisma {
     subscriptionPlan?: $Enums.SubscriptionPlan
     createdAt?: Date | string
     updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
     users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
     meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
     billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationCreateOrConnectWithoutAuditEventsInput = {
@@ -31972,6 +48872,11 @@ export namespace Prisma {
     users?: UserUpdateManyWithoutOrganizationNestedInput
     meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
     billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
   }
 
   export type OrganizationUncheckedUpdateWithoutAuditEventsInput = {
@@ -31997,9 +48902,14 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
     meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
     billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
   }
 
   export type UserUpsertWithoutTenantAuditLogsInput = {
@@ -32187,6 +49097,11 @@ export namespace Prisma {
     users?: UserCreateNestedManyWithoutOrganizationInput
     auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
     billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationUncheckedCreateWithoutMeetingsInput = {
@@ -32212,14 +49127,58 @@ export namespace Prisma {
     subscriptionPlan?: $Enums.SubscriptionPlan
     createdAt?: Date | string
     updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
     users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
     auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
     billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
   }
 
   export type OrganizationCreateOrConnectWithoutMeetingsInput = {
     where: OrganizationWhereUniqueInput
     create: XOR<OrganizationCreateWithoutMeetingsInput, OrganizationUncheckedCreateWithoutMeetingsInput>
+  }
+
+  export type MomTemplateCreateWithoutMeetingsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutMomTemplatesInput
+    defaultForOrganization?: OrganizationCreateNestedManyWithoutDefaultMomTemplateInput
+    sections?: MomTemplateSectionCreateNestedManyWithoutTemplateInput
+    upload?: MomTemplateUploadCreateNestedOneWithoutTemplateInput
+  }
+
+  export type MomTemplateUncheckedCreateWithoutMeetingsInput = {
+    id?: string
+    organizationId: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultForOrganization?: OrganizationUncheckedCreateNestedManyWithoutDefaultMomTemplateInput
+    sections?: MomTemplateSectionUncheckedCreateNestedManyWithoutTemplateInput
+    upload?: MomTemplateUploadUncheckedCreateNestedOneWithoutTemplateInput
+  }
+
+  export type MomTemplateCreateOrConnectWithoutMeetingsInput = {
+    where: MomTemplateWhereUniqueInput
+    create: XOR<MomTemplateCreateWithoutMeetingsInput, MomTemplateUncheckedCreateWithoutMeetingsInput>
   }
 
   export type UserCreateWithoutOrganizedMeetingsInput = {
@@ -32350,11 +49309,13 @@ export namespace Prisma {
 
   export type MomCreateWithoutMeetingInput = {
     id?: string
+    templateId?: string | null
     title: string
     dateTime: string
     participants: JsonNullValueInput | InputJsonValue
     keyPoints: JsonNullValueInput | InputJsonValue
     actionItems: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: boolean
     approvedBy?: string | null
     approvedAt?: Date | string | null
@@ -32366,11 +49327,13 @@ export namespace Prisma {
 
   export type MomUncheckedCreateWithoutMeetingInput = {
     id?: string
+    templateId?: string | null
     title: string
     dateTime: string
     participants: JsonNullValueInput | InputJsonValue
     keyPoints: JsonNullValueInput | InputJsonValue
     actionItems: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: boolean
     approvedBy?: string | null
     approvedAt?: Date | string | null
@@ -32563,6 +49526,11 @@ export namespace Prisma {
     users?: UserUpdateManyWithoutOrganizationNestedInput
     auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
     billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
   }
 
   export type OrganizationUncheckedUpdateWithoutMeetingsInput = {
@@ -32588,9 +49556,59 @@ export namespace Prisma {
     subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
     auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
     billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type MomTemplateUpsertWithoutMeetingsInput = {
+    update: XOR<MomTemplateUpdateWithoutMeetingsInput, MomTemplateUncheckedUpdateWithoutMeetingsInput>
+    create: XOR<MomTemplateCreateWithoutMeetingsInput, MomTemplateUncheckedCreateWithoutMeetingsInput>
+    where?: MomTemplateWhereInput
+  }
+
+  export type MomTemplateUpdateToOneWithWhereWithoutMeetingsInput = {
+    where?: MomTemplateWhereInput
+    data: XOR<MomTemplateUpdateWithoutMeetingsInput, MomTemplateUncheckedUpdateWithoutMeetingsInput>
+  }
+
+  export type MomTemplateUpdateWithoutMeetingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutMomTemplatesNestedInput
+    defaultForOrganization?: OrganizationUpdateManyWithoutDefaultMomTemplateNestedInput
+    sections?: MomTemplateSectionUpdateManyWithoutTemplateNestedInput
+    upload?: MomTemplateUploadUpdateOneWithoutTemplateNestedInput
+  }
+
+  export type MomTemplateUncheckedUpdateWithoutMeetingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultForOrganization?: OrganizationUncheckedUpdateManyWithoutDefaultMomTemplateNestedInput
+    sections?: MomTemplateSectionUncheckedUpdateManyWithoutTemplateNestedInput
+    upload?: MomTemplateUploadUncheckedUpdateOneWithoutTemplateNestedInput
   }
 
   export type UserUpsertWithoutOrganizedMeetingsInput = {
@@ -32748,11 +49766,13 @@ export namespace Prisma {
 
   export type MomUpdateWithoutMeetingInput = {
     id?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     dateTime?: StringFieldUpdateOperationsInput | string
     participants?: JsonNullValueInput | InputJsonValue
     keyPoints?: JsonNullValueInput | InputJsonValue
     actionItems?: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: BoolFieldUpdateOperationsInput | boolean
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32764,11 +49784,13 @@ export namespace Prisma {
 
   export type MomUncheckedUpdateWithoutMeetingInput = {
     id?: StringFieldUpdateOperationsInput | string
+    templateId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     dateTime?: StringFieldUpdateOperationsInput | string
     participants?: JsonNullValueInput | InputJsonValue
     keyPoints?: JsonNullValueInput | InputJsonValue
     actionItems?: JsonNullValueInput | InputJsonValue
+    sections?: NullableJsonNullValueInput | InputJsonValue
     approved?: BoolFieldUpdateOperationsInput | boolean
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32893,6 +49915,658 @@ export namespace Prisma {
     sentAt?: DateTimeFilter<"MeetingInvite"> | Date | string
   }
 
+  export type OrganizationCreateWithoutMomTemplatesInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    defaultMomTemplate?: MomTemplateCreateNestedOneWithoutDefaultForOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationUncheckedCreateWithoutMomTemplatesInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultMomTemplateId?: string | null
+    users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationCreateOrConnectWithoutMomTemplatesInput = {
+    where: OrganizationWhereUniqueInput
+    create: XOR<OrganizationCreateWithoutMomTemplatesInput, OrganizationUncheckedCreateWithoutMomTemplatesInput>
+  }
+
+  export type OrganizationCreateWithoutDefaultMomTemplateInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationUncheckedCreateWithoutDefaultMomTemplateInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutOrganizationInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutOrganizationInput
+    auditEvents?: TenantAuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+    billingProfile?: OrganizationBillingUncheckedCreateNestedOneWithoutOrganizationInput
+    momTemplates?: MomTemplateUncheckedCreateNestedManyWithoutOrganizationInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrganizationInput
+    billingEvents?: BillingEventUncheckedCreateNestedManyWithoutOrganizationInput
+  }
+
+  export type OrganizationCreateOrConnectWithoutDefaultMomTemplateInput = {
+    where: OrganizationWhereUniqueInput
+    create: XOR<OrganizationCreateWithoutDefaultMomTemplateInput, OrganizationUncheckedCreateWithoutDefaultMomTemplateInput>
+  }
+
+  export type OrganizationCreateManyDefaultMomTemplateInputEnvelope = {
+    data: OrganizationCreateManyDefaultMomTemplateInput | OrganizationCreateManyDefaultMomTemplateInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MomTemplateSectionCreateWithoutTemplateInput = {
+    id?: string
+    title: string
+    description?: string | null
+    aiInstructions: string
+    isRequired?: boolean
+    sortOrder: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MomTemplateSectionUncheckedCreateWithoutTemplateInput = {
+    id?: string
+    title: string
+    description?: string | null
+    aiInstructions: string
+    isRequired?: boolean
+    sortOrder: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MomTemplateSectionCreateOrConnectWithoutTemplateInput = {
+    where: MomTemplateSectionWhereUniqueInput
+    create: XOR<MomTemplateSectionCreateWithoutTemplateInput, MomTemplateSectionUncheckedCreateWithoutTemplateInput>
+  }
+
+  export type MomTemplateSectionCreateManyTemplateInputEnvelope = {
+    data: MomTemplateSectionCreateManyTemplateInput | MomTemplateSectionCreateManyTemplateInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MomTemplateUploadCreateWithoutTemplateInput = {
+    id?: string
+    organizationId: string
+    fileName: string
+    mimeType: string
+    storageKey: string
+    storageBackend?: $Enums.TemplateFileStorageBackend
+    sizeBytes: number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type MomTemplateUploadUncheckedCreateWithoutTemplateInput = {
+    id?: string
+    organizationId: string
+    fileName: string
+    mimeType: string
+    storageKey: string
+    storageBackend?: $Enums.TemplateFileStorageBackend
+    sizeBytes: number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type MomTemplateUploadCreateOrConnectWithoutTemplateInput = {
+    where: MomTemplateUploadWhereUniqueInput
+    create: XOR<MomTemplateUploadCreateWithoutTemplateInput, MomTemplateUploadUncheckedCreateWithoutTemplateInput>
+  }
+
+  export type MeetingCreateWithoutMomTemplateInput = {
+    id?: string
+    title: string
+    description?: string
+    scheduledAt: Date | string
+    durationMinutes?: number
+    status?: $Enums.MeetingStatus
+    tag?: $Enums.MeetingTag
+    notes?: string
+    calendarEventId?: string | null
+    recordingUrl?: string | null
+    livekitRoomId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
+    participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
+    audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
+    transcript?: TranscriptCreateNestedOneWithoutMeetingInput
+    mom?: MomCreateNestedOneWithoutMeetingInput
+    actionItems?: ActionItemCreateNestedManyWithoutMeetingInput
+    decisions?: DecisionCreateNestedManyWithoutMeetingInput
+    summary?: SummaryCreateNestedOneWithoutMeetingInput
+    auditLogs?: AuditLogCreateNestedManyWithoutMeetingInput
+    invites?: MeetingInviteCreateNestedManyWithoutMeetingInput
+  }
+
+  export type MeetingUncheckedCreateWithoutMomTemplateInput = {
+    id?: string
+    organizationId?: string | null
+    title: string
+    description?: string
+    scheduledAt: Date | string
+    durationMinutes?: number
+    status?: $Enums.MeetingStatus
+    tag?: $Enums.MeetingTag
+    notes?: string
+    calendarEventId?: string | null
+    recordingUrl?: string | null
+    organizerId?: string | null
+    livekitRoomId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
+    audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
+    transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
+    mom?: MomUncheckedCreateNestedOneWithoutMeetingInput
+    actionItems?: ActionItemUncheckedCreateNestedManyWithoutMeetingInput
+    decisions?: DecisionUncheckedCreateNestedManyWithoutMeetingInput
+    summary?: SummaryUncheckedCreateNestedOneWithoutMeetingInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutMeetingInput
+    invites?: MeetingInviteUncheckedCreateNestedManyWithoutMeetingInput
+  }
+
+  export type MeetingCreateOrConnectWithoutMomTemplateInput = {
+    where: MeetingWhereUniqueInput
+    create: XOR<MeetingCreateWithoutMomTemplateInput, MeetingUncheckedCreateWithoutMomTemplateInput>
+  }
+
+  export type MeetingCreateManyMomTemplateInputEnvelope = {
+    data: MeetingCreateManyMomTemplateInput | MeetingCreateManyMomTemplateInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrganizationUpsertWithoutMomTemplatesInput = {
+    update: XOR<OrganizationUpdateWithoutMomTemplatesInput, OrganizationUncheckedUpdateWithoutMomTemplatesInput>
+    create: XOR<OrganizationCreateWithoutMomTemplatesInput, OrganizationUncheckedCreateWithoutMomTemplatesInput>
+    where?: OrganizationWhereInput
+  }
+
+  export type OrganizationUpdateToOneWithWhereWithoutMomTemplatesInput = {
+    where?: OrganizationWhereInput
+    data: XOR<OrganizationUpdateWithoutMomTemplatesInput, OrganizationUncheckedUpdateWithoutMomTemplatesInput>
+  }
+
+  export type OrganizationUpdateWithoutMomTemplatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    defaultMomTemplate?: MomTemplateUpdateOneWithoutDefaultForOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type OrganizationUncheckedUpdateWithoutMomTemplatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultMomTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
+    users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type OrganizationUpsertWithWhereUniqueWithoutDefaultMomTemplateInput = {
+    where: OrganizationWhereUniqueInput
+    update: XOR<OrganizationUpdateWithoutDefaultMomTemplateInput, OrganizationUncheckedUpdateWithoutDefaultMomTemplateInput>
+    create: XOR<OrganizationCreateWithoutDefaultMomTemplateInput, OrganizationUncheckedCreateWithoutDefaultMomTemplateInput>
+  }
+
+  export type OrganizationUpdateWithWhereUniqueWithoutDefaultMomTemplateInput = {
+    where: OrganizationWhereUniqueInput
+    data: XOR<OrganizationUpdateWithoutDefaultMomTemplateInput, OrganizationUncheckedUpdateWithoutDefaultMomTemplateInput>
+  }
+
+  export type OrganizationUpdateManyWithWhereWithoutDefaultMomTemplateInput = {
+    where: OrganizationScalarWhereInput
+    data: XOR<OrganizationUpdateManyMutationInput, OrganizationUncheckedUpdateManyWithoutDefaultMomTemplateInput>
+  }
+
+  export type OrganizationScalarWhereInput = {
+    AND?: OrganizationScalarWhereInput | OrganizationScalarWhereInput[]
+    OR?: OrganizationScalarWhereInput[]
+    NOT?: OrganizationScalarWhereInput | OrganizationScalarWhereInput[]
+    id?: StringFilter<"Organization"> | string
+    name?: StringFilter<"Organization"> | string
+    code?: StringNullableFilter<"Organization"> | string | null
+    slug?: StringFilter<"Organization"> | string
+    legalName?: StringNullableFilter<"Organization"> | string | null
+    primaryContactName?: StringNullableFilter<"Organization"> | string | null
+    industry?: StringNullableFilter<"Organization"> | string | null
+    email?: StringFilter<"Organization"> | string
+    phone?: StringNullableFilter<"Organization"> | string | null
+    website?: StringNullableFilter<"Organization"> | string | null
+    companySize?: StringNullableFilter<"Organization"> | string | null
+    country?: StringNullableFilter<"Organization"> | string | null
+    state?: StringNullableFilter<"Organization"> | string | null
+    city?: StringNullableFilter<"Organization"> | string | null
+    logoUrl?: StringNullableFilter<"Organization"> | string | null
+    address?: StringNullableFilter<"Organization"> | string | null
+    timezone?: StringFilter<"Organization"> | string
+    meetingDefaultDurationMinutes?: IntFilter<"Organization"> | number
+    status?: EnumOrganizationStatusFilter<"Organization"> | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFilter<"Organization"> | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFilter<"Organization"> | Date | string
+    updatedAt?: DateTimeFilter<"Organization"> | Date | string
+    defaultMomTemplateId?: StringNullableFilter<"Organization"> | string | null
+  }
+
+  export type MomTemplateSectionUpsertWithWhereUniqueWithoutTemplateInput = {
+    where: MomTemplateSectionWhereUniqueInput
+    update: XOR<MomTemplateSectionUpdateWithoutTemplateInput, MomTemplateSectionUncheckedUpdateWithoutTemplateInput>
+    create: XOR<MomTemplateSectionCreateWithoutTemplateInput, MomTemplateSectionUncheckedCreateWithoutTemplateInput>
+  }
+
+  export type MomTemplateSectionUpdateWithWhereUniqueWithoutTemplateInput = {
+    where: MomTemplateSectionWhereUniqueInput
+    data: XOR<MomTemplateSectionUpdateWithoutTemplateInput, MomTemplateSectionUncheckedUpdateWithoutTemplateInput>
+  }
+
+  export type MomTemplateSectionUpdateManyWithWhereWithoutTemplateInput = {
+    where: MomTemplateSectionScalarWhereInput
+    data: XOR<MomTemplateSectionUpdateManyMutationInput, MomTemplateSectionUncheckedUpdateManyWithoutTemplateInput>
+  }
+
+  export type MomTemplateSectionScalarWhereInput = {
+    AND?: MomTemplateSectionScalarWhereInput | MomTemplateSectionScalarWhereInput[]
+    OR?: MomTemplateSectionScalarWhereInput[]
+    NOT?: MomTemplateSectionScalarWhereInput | MomTemplateSectionScalarWhereInput[]
+    id?: StringFilter<"MomTemplateSection"> | string
+    templateId?: StringFilter<"MomTemplateSection"> | string
+    title?: StringFilter<"MomTemplateSection"> | string
+    description?: StringNullableFilter<"MomTemplateSection"> | string | null
+    aiInstructions?: StringFilter<"MomTemplateSection"> | string
+    isRequired?: BoolFilter<"MomTemplateSection"> | boolean
+    sortOrder?: IntFilter<"MomTemplateSection"> | number
+    createdAt?: DateTimeFilter<"MomTemplateSection"> | Date | string
+    updatedAt?: DateTimeFilter<"MomTemplateSection"> | Date | string
+  }
+
+  export type MomTemplateUploadUpsertWithoutTemplateInput = {
+    update: XOR<MomTemplateUploadUpdateWithoutTemplateInput, MomTemplateUploadUncheckedUpdateWithoutTemplateInput>
+    create: XOR<MomTemplateUploadCreateWithoutTemplateInput, MomTemplateUploadUncheckedCreateWithoutTemplateInput>
+    where?: MomTemplateUploadWhereInput
+  }
+
+  export type MomTemplateUploadUpdateToOneWithWhereWithoutTemplateInput = {
+    where?: MomTemplateUploadWhereInput
+    data: XOR<MomTemplateUploadUpdateWithoutTemplateInput, MomTemplateUploadUncheckedUpdateWithoutTemplateInput>
+  }
+
+  export type MomTemplateUploadUpdateWithoutTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateUploadUncheckedUpdateWithoutTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    storageKey?: StringFieldUpdateOperationsInput | string
+    storageBackend?: EnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    extractedHeadings?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MeetingUpsertWithWhereUniqueWithoutMomTemplateInput = {
+    where: MeetingWhereUniqueInput
+    update: XOR<MeetingUpdateWithoutMomTemplateInput, MeetingUncheckedUpdateWithoutMomTemplateInput>
+    create: XOR<MeetingCreateWithoutMomTemplateInput, MeetingUncheckedCreateWithoutMomTemplateInput>
+  }
+
+  export type MeetingUpdateWithWhereUniqueWithoutMomTemplateInput = {
+    where: MeetingWhereUniqueInput
+    data: XOR<MeetingUpdateWithoutMomTemplateInput, MeetingUncheckedUpdateWithoutMomTemplateInput>
+  }
+
+  export type MeetingUpdateManyWithWhereWithoutMomTemplateInput = {
+    where: MeetingScalarWhereInput
+    data: XOR<MeetingUpdateManyMutationInput, MeetingUncheckedUpdateManyWithoutMomTemplateInput>
+  }
+
+  export type MomTemplateCreateWithoutSectionsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutMomTemplatesInput
+    defaultForOrganization?: OrganizationCreateNestedManyWithoutDefaultMomTemplateInput
+    upload?: MomTemplateUploadCreateNestedOneWithoutTemplateInput
+    meetings?: MeetingCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateUncheckedCreateWithoutSectionsInput = {
+    id?: string
+    organizationId: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultForOrganization?: OrganizationUncheckedCreateNestedManyWithoutDefaultMomTemplateInput
+    upload?: MomTemplateUploadUncheckedCreateNestedOneWithoutTemplateInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateCreateOrConnectWithoutSectionsInput = {
+    where: MomTemplateWhereUniqueInput
+    create: XOR<MomTemplateCreateWithoutSectionsInput, MomTemplateUncheckedCreateWithoutSectionsInput>
+  }
+
+  export type MomTemplateUpsertWithoutSectionsInput = {
+    update: XOR<MomTemplateUpdateWithoutSectionsInput, MomTemplateUncheckedUpdateWithoutSectionsInput>
+    create: XOR<MomTemplateCreateWithoutSectionsInput, MomTemplateUncheckedCreateWithoutSectionsInput>
+    where?: MomTemplateWhereInput
+  }
+
+  export type MomTemplateUpdateToOneWithWhereWithoutSectionsInput = {
+    where?: MomTemplateWhereInput
+    data: XOR<MomTemplateUpdateWithoutSectionsInput, MomTemplateUncheckedUpdateWithoutSectionsInput>
+  }
+
+  export type MomTemplateUpdateWithoutSectionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutMomTemplatesNestedInput
+    defaultForOrganization?: OrganizationUpdateManyWithoutDefaultMomTemplateNestedInput
+    upload?: MomTemplateUploadUpdateOneWithoutTemplateNestedInput
+    meetings?: MeetingUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type MomTemplateUncheckedUpdateWithoutSectionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultForOrganization?: OrganizationUncheckedUpdateManyWithoutDefaultMomTemplateNestedInput
+    upload?: MomTemplateUploadUncheckedUpdateOneWithoutTemplateNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type MomTemplateCreateWithoutUploadInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization: OrganizationCreateNestedOneWithoutMomTemplatesInput
+    defaultForOrganization?: OrganizationCreateNestedManyWithoutDefaultMomTemplateInput
+    sections?: MomTemplateSectionCreateNestedManyWithoutTemplateInput
+    meetings?: MeetingCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateUncheckedCreateWithoutUploadInput = {
+    id?: string
+    organizationId: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    defaultForOrganization?: OrganizationUncheckedCreateNestedManyWithoutDefaultMomTemplateInput
+    sections?: MomTemplateSectionUncheckedCreateNestedManyWithoutTemplateInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutMomTemplateInput
+  }
+
+  export type MomTemplateCreateOrConnectWithoutUploadInput = {
+    where: MomTemplateWhereUniqueInput
+    create: XOR<MomTemplateCreateWithoutUploadInput, MomTemplateUncheckedCreateWithoutUploadInput>
+  }
+
+  export type MomTemplateUpsertWithoutUploadInput = {
+    update: XOR<MomTemplateUpdateWithoutUploadInput, MomTemplateUncheckedUpdateWithoutUploadInput>
+    create: XOR<MomTemplateCreateWithoutUploadInput, MomTemplateUncheckedCreateWithoutUploadInput>
+    where?: MomTemplateWhereInput
+  }
+
+  export type MomTemplateUpdateToOneWithWhereWithoutUploadInput = {
+    where?: MomTemplateWhereInput
+    data: XOR<MomTemplateUpdateWithoutUploadInput, MomTemplateUncheckedUpdateWithoutUploadInput>
+  }
+
+  export type MomTemplateUpdateWithoutUploadInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutMomTemplatesNestedInput
+    defaultForOrganization?: OrganizationUpdateManyWithoutDefaultMomTemplateNestedInput
+    sections?: MomTemplateSectionUpdateManyWithoutTemplateNestedInput
+    meetings?: MeetingUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type MomTemplateUncheckedUpdateWithoutUploadInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultForOrganization?: OrganizationUncheckedUpdateManyWithoutDefaultMomTemplateNestedInput
+    sections?: MomTemplateSectionUncheckedUpdateManyWithoutTemplateNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutMomTemplateNestedInput
+  }
+
   export type MeetingCreateWithoutInvitesInput = {
     id?: string
     title: string
@@ -32912,6 +50586,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -32943,6 +50618,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -32988,6 +50664,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -33019,6 +50696,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -33048,6 +50726,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptCreateNestedOneWithoutMeetingInput
@@ -33079,6 +50758,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
     mom?: MomUncheckedCreateNestedOneWithoutMeetingInput
@@ -33124,6 +50804,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUpdateOneWithoutMeetingNestedInput
@@ -33155,6 +50836,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
     mom?: MomUncheckedUpdateOneWithoutMeetingNestedInput
@@ -33184,6 +50866,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptCreateNestedOneWithoutMeetingInput
@@ -33215,6 +50898,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
     mom?: MomUncheckedCreateNestedOneWithoutMeetingInput
@@ -33260,6 +50944,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUpdateOneWithoutMeetingNestedInput
@@ -33291,6 +50976,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
     mom?: MomUncheckedUpdateOneWithoutMeetingNestedInput
@@ -33320,6 +51006,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -33351,6 +51038,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     mom?: MomUncheckedCreateNestedOneWithoutMeetingInput
@@ -33424,6 +51112,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -33455,6 +51144,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     mom?: MomUncheckedUpdateOneWithoutMeetingNestedInput
@@ -33569,6 +51259,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -33600,6 +51291,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -33645,6 +51337,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -33676,6 +51369,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -33705,6 +51399,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -33736,6 +51431,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -33830,6 +51526,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -33861,6 +51558,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -33945,6 +51643,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -33976,6 +51675,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -34021,6 +51721,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -34052,6 +51753,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -34081,6 +51783,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -34112,6 +51815,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -34157,6 +51861,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -34188,6 +51893,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -34217,6 +51923,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organization?: OrganizationCreateNestedOneWithoutMeetingsInput
+    momTemplate?: MomTemplateCreateNestedOneWithoutMeetingsInput
     organizer?: UserCreateNestedOneWithoutOrganizedMeetingsInput
     participants?: MeetingParticipantCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileCreateNestedManyWithoutMeetingInput
@@ -34248,6 +51955,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
     participants?: MeetingParticipantUncheckedCreateNestedManyWithoutMeetingInput
     audioFiles?: AudioFileUncheckedCreateNestedManyWithoutMeetingInput
     transcript?: TranscriptUncheckedCreateNestedOneWithoutMeetingInput
@@ -34342,6 +52050,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -34373,6 +52082,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -34438,6 +52148,134 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type InvoiceLineItemCreateManyInvoiceInput = {
+    id?: string
+    description: string
+    quantity: number
+    unitPriceInr: number
+    amountInr: number
+    sortOrder: number
+  }
+
+  export type PaymentCreateManyInvoiceInput = {
+    id?: string
+    organizationId: string
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type InvoiceDeliveryCreateManyInvoiceInput = {
+    id?: string
+    organizationId: string
+    recipientEmail: string
+    status?: $Enums.InvoiceDeliveryStatus
+    error?: string | null
+    sentAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type InvoiceLineItemUpdateWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPriceInr?: IntFieldUpdateOperationsInput | number
+    amountInr?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InvoiceLineItemUncheckedUpdateWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPriceInr?: IntFieldUpdateOperationsInput | number
+    amountInr?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InvoiceLineItemUncheckedUpdateManyWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPriceInr?: IntFieldUpdateOperationsInput | number
+    amountInr?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type PaymentUpdateWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneRequiredWithoutPaymentsNestedInput
+  }
+
+  export type PaymentUncheckedUpdateWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PaymentUncheckedUpdateManyWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceDeliveryUpdateWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    recipientEmail?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceDeliveryStatusFieldUpdateOperationsInput | $Enums.InvoiceDeliveryStatus
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceDeliveryUncheckedUpdateWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    recipientEmail?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceDeliveryStatusFieldUpdateOperationsInput | $Enums.InvoiceDeliveryStatus
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceDeliveryUncheckedUpdateManyWithoutInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: StringFieldUpdateOperationsInput | string
+    recipientEmail?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceDeliveryStatusFieldUpdateOperationsInput | $Enums.InvoiceDeliveryStatus
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateManyOrganizationInput = {
     id?: string
     firstName?: string
@@ -34473,6 +52311,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
   }
 
   export type TenantAuditLogCreateManyOrganizationInput = {
@@ -34480,6 +52319,67 @@ export namespace Prisma {
     userId?: string | null
     action: string
     metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type MomTemplateCreateManyOrganizationInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: $Enums.MomTemplateCategory
+    source?: $Enums.MomTemplateSource
+    isDefault?: boolean
+    isArchived?: boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type InvoiceCreateManyOrganizationInput = {
+    id?: string
+    invoiceNumber: string
+    status?: $Enums.InvoiceStatus
+    planName: string
+    billingCycle: string
+    periodStart: Date | string
+    periodEnd: Date | string
+    includedSeats: number
+    activeSeats: number
+    additionalSeats: number
+    includedLocations: number
+    activeLocations: number
+    subtotalInr: number
+    discountInr?: number
+    gstInr: number
+    totalInr: number
+    billingAddress?: string | null
+    storageKey?: string | null
+    storageBackend?: $Enums.TemplateFileStorageBackend | null
+    issuedAt?: Date | string | null
+    dueAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PaymentCreateManyOrganizationInput = {
+    id?: string
+    invoiceId?: string | null
+    amountInr: number
+    status?: $Enums.PaymentStatus
+    method?: string | null
+    reference?: string | null
+    notes?: string | null
+    recordedById?: string | null
+    paidAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type BillingEventCreateManyOrganizationInput = {
+    id?: string
+    type: string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: string | null
     createdAt?: Date | string
   }
 
@@ -34561,6 +52461,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
@@ -34592,6 +52493,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -34622,6 +52524,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TenantAuditLogUpdateWithoutOrganizationInput = {
@@ -34648,6 +52551,203 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MomTemplateUpdateWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultForOrganization?: OrganizationUpdateManyWithoutDefaultMomTemplateNestedInput
+    sections?: MomTemplateSectionUpdateManyWithoutTemplateNestedInput
+    upload?: MomTemplateUploadUpdateOneWithoutTemplateNestedInput
+    meetings?: MeetingUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type MomTemplateUncheckedUpdateWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    defaultForOrganization?: OrganizationUncheckedUpdateManyWithoutDefaultMomTemplateNestedInput
+    sections?: MomTemplateSectionUncheckedUpdateManyWithoutTemplateNestedInput
+    upload?: MomTemplateUploadUncheckedUpdateOneWithoutTemplateNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutMomTemplateNestedInput
+  }
+
+  export type MomTemplateUncheckedUpdateManyWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumMomTemplateCategoryFieldUpdateOperationsInput | $Enums.MomTemplateCategory
+    source?: EnumMomTemplateSourceFieldUpdateOperationsInput | $Enums.MomTemplateSource
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    isArchived?: BoolFieldUpdateOperationsInput | boolean
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InvoiceUpdateWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lineItems?: InvoiceLineItemUpdateManyWithoutInvoiceNestedInput
+    payments?: PaymentUpdateManyWithoutInvoiceNestedInput
+    deliveries?: InvoiceDeliveryUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type InvoiceUncheckedUpdateWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lineItems?: InvoiceLineItemUncheckedUpdateManyWithoutInvoiceNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
+    deliveries?: InvoiceDeliveryUncheckedUpdateManyWithoutInvoiceNestedInput
+  }
+
+  export type InvoiceUncheckedUpdateManyWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    planName?: StringFieldUpdateOperationsInput | string
+    billingCycle?: StringFieldUpdateOperationsInput | string
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    periodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    includedSeats?: IntFieldUpdateOperationsInput | number
+    activeSeats?: IntFieldUpdateOperationsInput | number
+    additionalSeats?: IntFieldUpdateOperationsInput | number
+    includedLocations?: IntFieldUpdateOperationsInput | number
+    activeLocations?: IntFieldUpdateOperationsInput | number
+    subtotalInr?: IntFieldUpdateOperationsInput | number
+    discountInr?: IntFieldUpdateOperationsInput | number
+    gstInr?: IntFieldUpdateOperationsInput | number
+    totalInr?: IntFieldUpdateOperationsInput | number
+    billingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    storageBackend?: NullableEnumTemplateFileStorageBackendFieldUpdateOperationsInput | $Enums.TemplateFileStorageBackend | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dueAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PaymentUpdateWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invoice?: InvoiceUpdateOneWithoutPaymentsNestedInput
+  }
+
+  export type PaymentUncheckedUpdateWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PaymentUncheckedUpdateManyWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    amountInr?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    method?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    recordedById?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingEventUpdateWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingEventUncheckedUpdateWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingEventUncheckedUpdateManyWithoutOrganizationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    actorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MeetingCreateManyOrganizerInput = {
     id?: string
     organizationId?: string | null
@@ -34667,6 +52767,7 @@ export namespace Prisma {
     liveEndedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    momTemplateId?: string | null
   }
 
   export type ActionItemCreateManyOwnerInput = {
@@ -34728,6 +52829,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    momTemplate?: MomTemplateUpdateOneWithoutMeetingsNestedInput
     participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUpdateOneWithoutMeetingNestedInput
@@ -34758,6 +52860,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
     participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
     audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
     transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
@@ -34788,6 +52891,7 @@ export namespace Prisma {
     liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    momTemplateId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ActionItemUpdateWithoutOwnerInput = {
@@ -35132,6 +53236,272 @@ export namespace Prisma {
     status?: EnumInviteStatusFieldUpdateOperationsInput | $Enums.InviteStatus
     error?: NullableStringFieldUpdateOperationsInput | string | null
     sentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrganizationCreateManyDefaultMomTemplateInput = {
+    id?: string
+    name: string
+    code?: string | null
+    slug: string
+    legalName?: string | null
+    primaryContactName?: string | null
+    industry?: string | null
+    email: string
+    phone?: string | null
+    website?: string | null
+    companySize?: string | null
+    country?: string | null
+    state?: string | null
+    city?: string | null
+    logoUrl?: string | null
+    address?: string | null
+    timezone?: string
+    meetingDefaultDurationMinutes?: number
+    status?: $Enums.OrganizationStatus
+    subscriptionPlan?: $Enums.SubscriptionPlan
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MomTemplateSectionCreateManyTemplateInput = {
+    id?: string
+    title: string
+    description?: string | null
+    aiInstructions: string
+    isRequired?: boolean
+    sortOrder: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MeetingCreateManyMomTemplateInput = {
+    id?: string
+    organizationId?: string | null
+    title: string
+    description?: string
+    scheduledAt: Date | string
+    durationMinutes?: number
+    status?: $Enums.MeetingStatus
+    tag?: $Enums.MeetingTag
+    notes?: string
+    calendarEventId?: string | null
+    recordingUrl?: string | null
+    organizerId?: string | null
+    livekitRoomId?: string | null
+    joinSlug?: string | null
+    liveStartedAt?: Date | string | null
+    liveBroadcastAt?: Date | string | null
+    liveEndedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OrganizationUpdateWithoutDefaultMomTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type OrganizationUncheckedUpdateWithoutDefaultMomTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutOrganizationNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutOrganizationNestedInput
+    auditEvents?: TenantAuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingProfile?: OrganizationBillingUncheckedUpdateOneWithoutOrganizationNestedInput
+    momTemplates?: MomTemplateUncheckedUpdateManyWithoutOrganizationNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+    billingEvents?: BillingEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  }
+
+  export type OrganizationUncheckedUpdateManyWithoutDefaultMomTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    legalName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: StringFieldUpdateOperationsInput | string
+    meetingDefaultDurationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumOrganizationStatusFieldUpdateOperationsInput | $Enums.OrganizationStatus
+    subscriptionPlan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateSectionUpdateWithoutTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    aiInstructions?: StringFieldUpdateOperationsInput | string
+    isRequired?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateSectionUncheckedUpdateWithoutTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    aiInstructions?: StringFieldUpdateOperationsInput | string
+    isRequired?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MomTemplateSectionUncheckedUpdateManyWithoutTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    aiInstructions?: StringFieldUpdateOperationsInput | string
+    isRequired?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MeetingUpdateWithoutMomTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
+    tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
+    notes?: StringFieldUpdateOperationsInput | string
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneWithoutMeetingsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedMeetingsNestedInput
+    participants?: MeetingParticipantUpdateManyWithoutMeetingNestedInput
+    audioFiles?: AudioFileUpdateManyWithoutMeetingNestedInput
+    transcript?: TranscriptUpdateOneWithoutMeetingNestedInput
+    mom?: MomUpdateOneWithoutMeetingNestedInput
+    actionItems?: ActionItemUpdateManyWithoutMeetingNestedInput
+    decisions?: DecisionUpdateManyWithoutMeetingNestedInput
+    summary?: SummaryUpdateOneWithoutMeetingNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutMeetingNestedInput
+    invites?: MeetingInviteUpdateManyWithoutMeetingNestedInput
+  }
+
+  export type MeetingUncheckedUpdateWithoutMomTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
+    tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
+    notes?: StringFieldUpdateOperationsInput | string
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    participants?: MeetingParticipantUncheckedUpdateManyWithoutMeetingNestedInput
+    audioFiles?: AudioFileUncheckedUpdateManyWithoutMeetingNestedInput
+    transcript?: TranscriptUncheckedUpdateOneWithoutMeetingNestedInput
+    mom?: MomUncheckedUpdateOneWithoutMeetingNestedInput
+    actionItems?: ActionItemUncheckedUpdateManyWithoutMeetingNestedInput
+    decisions?: DecisionUncheckedUpdateManyWithoutMeetingNestedInput
+    summary?: SummaryUncheckedUpdateOneWithoutMeetingNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutMeetingNestedInput
+    invites?: MeetingInviteUncheckedUpdateManyWithoutMeetingNestedInput
+  }
+
+  export type MeetingUncheckedUpdateManyWithoutMomTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
+    tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
+    notes?: StringFieldUpdateOperationsInput | string
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    liveStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveBroadcastAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    liveEndedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TranscriptSegmentCreateManyTranscriptInput = {
