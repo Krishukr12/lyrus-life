@@ -60,15 +60,21 @@ export default function OrgSettingsPage() {
   });
 
   if (isLoading) {
-    return <div className="text-muted-foreground">Loading settings…</div>;
+    return (
+      <div className="max-w-2xl space-y-4">
+        <div className="h-8 w-64 rounded-lg bg-muted animate-pulse" />
+        <div className="h-96 rounded-xl bg-muted animate-pulse" />
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-7">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <Settings className="h-6 w-6 text-primary" />
-          Organization settings
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Organization</p>
+        <h1 className="text-[26px] leading-tight font-heading font-bold mt-1">
+          <span className="text-gradient">Organization Settings</span>
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
           Manage branding and defaults for your organization.
@@ -76,12 +82,18 @@ export default function OrgSettingsPage() {
       </div>
 
       <form
-        className="space-y-4 rounded-md border bg-card p-6"
+        className="space-y-5 rounded-xl border border-border/60 bg-card p-6 shadow-soft animate-fade-in-up"
         onSubmit={(e) => {
           e.preventDefault();
           save.mutate();
         }}
       >
+        <h2 className="text-base font-heading font-semibold flex items-center gap-2 pb-1">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+            <Settings className="h-3.5 w-3.5" />
+          </span>
+          Branding & defaults
+        </h2>
         <div className="space-y-1">
           <Label>Organization name</Label>
           <Input
@@ -147,9 +159,11 @@ export default function OrgSettingsPage() {
             />
           </div>
         </div>
-        <Button type="submit" disabled={save.isPending}>
-          {save.isPending ? "Saving…" : "Save settings"}
-        </Button>
+        <div className="pt-2 border-t border-border/50">
+          <Button type="submit" variant="secondary" className="shine" disabled={save.isPending}>
+            {save.isPending ? "Saving…" : "Save settings"}
+          </Button>
+        </div>
       </form>
     </div>
   );

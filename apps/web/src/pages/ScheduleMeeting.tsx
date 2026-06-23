@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createMeeting } from "@/lib/api";
+import { createMeeting, getPeopleSuggestions, type PersonSuggestion } from "@/lib/api";
 import { MeetingTag, Stakeholder } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Plus, ArrowLeft } from "lucide-react";
+import { X, Plus, ArrowLeft, Users } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ScheduleMeeting() {
@@ -24,11 +24,64 @@ export default function ScheduleMeeting() {
   const [sEmail, setSEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // People autocomplete (like Google Meet) — suggests team members and people
+  // you've invited to past meetings.
+  const [suggestions, setSuggestions] = useState<PersonSuggestion[]>([]);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [peopleQuery, setPeopleQuery] = useState("");
+  const suggestTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!suggestionsOpen) return;
+    if (suggestTimer.current) clearTimeout(suggestTimer.current);
+    suggestTimer.current = setTimeout(() => {
+      void getPeopleSuggestions(peopleQuery.trim())
+        .then(setSuggestions)
+        .catch(() => setSuggestions([]));
+    }, 200);
+    return () => {
+      if (suggestTimer.current) clearTimeout(suggestTimer.current);
+    };
+  }, [peopleQuery, suggestionsOpen]);
+
+  const visibleSuggestions = suggestions.filter(
+    (sg) => !stakeholders.some((s) => s.email.toLowerCase() === sg.email.toLowerCase()),
+  );
+
+  const openSuggestions = (query: string) => {
+    setPeopleQuery(query);
+    setSuggestionsOpen(true);
+  };
+
+  const handlePeopleBlur = () => {
+    blurTimer.current = setTimeout(() => setSuggestionsOpen(false), 150);
+  };
+
+  const handlePeopleFocus = (query: string) => {
+    if (blurTimer.current) clearTimeout(blurTimer.current);
+    openSuggestions(query);
+  };
+
+  const pickSuggestion = (person: PersonSuggestion) => {
+    if (blurTimer.current) clearTimeout(blurTimer.current);
+    setStakeholders((prev) =>
+      prev.some((s) => s.email.toLowerCase() === person.email.toLowerCase())
+        ? prev
+        : [...prev, { name: person.name, email: person.email }],
+    );
+    setSName("");
+    setSEmail("");
+    setPeopleQuery("");
+    setSuggestionsOpen(false);
+  };
+
   const addStakeholder = () => {
     if (!sName.trim() || !sEmail.trim()) return;
     setStakeholders([...stakeholders, { name: sName.trim(), email: sEmail.trim() }]);
     setSName("");
     setSEmail("");
+    setSuggestionsOpen(false);
   };
 
   const removeStakeholder = (i: number) => {
@@ -108,12 +161,12 @@ export default function ScheduleMeeting() {
         <ArrowLeft className="h-4 w-4" /> Back
       </Button>
 
-      <div>
-        <h1 className="text-2xl font-heading font-bold">Schedule Meeting</h1>
+      <div className="aurora-panel rounded-2xl border border-border/60 p-6 shadow-soft">
+        <h1 className="text-2xl font-heading font-bold text-gradient">Schedule Meeting</h1>
         <p className="text-muted-foreground text-sm mt-1">Create a new meeting with stakeholders</p>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-6 animate-fade-in-up">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="title">Meeting Title *</Label>
@@ -166,10 +219,67 @@ export default function ScheduleMeeting() {
             <p className="text-muted-foreground text-xs">
               Each stakeholder receives a calendar invite (.ics) and email with a link to join the meeting in Lyrus Life.
             </p>
-            <div className="flex gap-2">
-              <Input placeholder="Name" value={sName} onChange={(e) => setSName(e.target.value)} className="flex-1" />
-              <Input placeholder="Email" value={sEmail} onChange={(e) => setSEmail(e.target.value)} className="flex-1" />
-              <Button type="button" variant="outline" size="icon" onClick={addStakeholder}><Plus className="h-4 w-4" /></Button>
+            <div className="relative">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Name"
+                  value={sName}
+                  onChange={(e) => {
+                    setSName(e.target.value);
+                    openSuggestions(e.target.value);
+                  }}
+                  onFocus={() => handlePeopleFocus(sName)}
+                  onBlur={handlePeopleBlur}
+                  className="flex-1"
+                  autoComplete="off"
+                />
+                <Input
+                  placeholder="Email"
+                  value={sEmail}
+                  onChange={(e) => {
+                    setSEmail(e.target.value);
+                    openSuggestions(e.target.value);
+                  }}
+                  onFocus={() => handlePeopleFocus(sEmail)}
+                  onBlur={handlePeopleBlur}
+                  className="flex-1"
+                  autoComplete="off"
+                />
+                <Button type="button" variant="outline" size="icon" onClick={addStakeholder}><Plus className="h-4 w-4" /></Button>
+              </div>
+
+              {suggestionsOpen && visibleSuggestions.length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-xl border border-border/60 bg-card shadow-lifted overflow-hidden animate-scale-in">
+                  <p className="px-3 pt-2.5 pb-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
+                    <Users className="h-3 w-3" /> Suggestions
+                  </p>
+                  <ul className="max-h-56 overflow-auto py-1">
+                    {visibleSuggestions.map((person) => (
+                      <li key={person.email}>
+                        <button
+                          type="button"
+                          className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-muted/50"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            pickSuggestion(person);
+                          }}
+                        >
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                            {person.name.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase()}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-sm font-medium truncate">{person.name}</span>
+                            <span className="block text-xs text-muted-foreground truncate">{person.email}</span>
+                          </span>
+                          <span className="shrink-0 rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground">
+                            {person.source === "team" ? "Team" : "Recent"}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
             {stakeholders.length > 0 && (
               <div className="flex flex-wrap gap-2">

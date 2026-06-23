@@ -72,7 +72,14 @@ const App = () => (
                       <Route path="/schedule" element={<ScheduleMeeting />} />
                       <Route path="/tasks" element={<Tasks />} />
                       <Route path="/calendar" element={<CalendarView />} />
-                      <Route path="/insights" element={<PlatformInsights />} />
+                      <Route
+                        path="/insights"
+                        element={
+                          <RequireRole allowed={["ORG_ADMIN"]}>
+                            <PlatformInsights />
+                          </RequireRole>
+                        }
+                      />
                       <Route
                         path="/organization"
                         element={

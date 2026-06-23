@@ -5,8 +5,10 @@ import { createLiveKitToken, resolveLiveKitClientUrl } from "../lib/livekit.js";
 import {
   assertCanJoinMeeting,
   ensureMeetingJoinSlug,
+  isEmailInvitedToMeeting,
   loadMeetingJoinContextById,
   loadMeetingJoinContextBySlug,
+  normalizeEmail,
 } from "../lib/meeting-join-access.js";
 import { asyncHandler, handleJoinAuthError } from "../lib/http.js";
 import { requireRouteParam } from "../lib/route-params.js";
@@ -101,6 +103,88 @@ export function createLiveRouter(): Router {
       } catch (err) {
         handleJoinAuthError(res, err);
       }
+    }),
+  );
+
+  // Public: lightweight meeting preview for the join page (no login required).
+  router.get(
+    "/meetings/join/:slug/preview",
+    asyncHandler(async (req, res) => {
+      const meeting = await loadMeetingJoinContextBySlug(requireRouteParam(req.params.slug, "slug")!);
+      if (!meeting) {
+        res.status(404).json({ error: "not_found", message: "Meeting not found" });
+        return;
+      }
+
+      res.json({
+        meetingId: meeting.id,
+        title: meeting.title,
+        status: meeting.status,
+        isLive: isMeetingBroadcasting(meeting),
+        canJoin: canEnterWaitingRoom(meeting),
+      });
+    }),
+  );
+
+  // Public: guest join for invited people without a platform account.
+  // The email must be on the meeting's invite list — nobody else can get a token.
+  router.post(
+    "/meetings/join/:slug/guest",
+    asyncHandler(async (req, res) => {
+      const body = (req.body ?? {}) as { name?: unknown; email?: unknown };
+      const name = typeof body.name === "string" ? body.name.trim() : "";
+      const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
+
+      if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        res.status(400).json({
+          error: "invalid_request",
+          message: "Enter your name and the email address that received the invite.",
+        });
+        return;
+      }
+
+      const meeting = await loadMeetingJoinContextBySlug(requireRouteParam(req.params.slug, "slug")!);
+      if (!meeting) {
+        res.status(404).json({ error: "not_found", message: "Meeting not found" });
+        return;
+      }
+
+      if (!isEmailInvitedToMeeting(meeting, email)) {
+        res.status(403).json({
+          error: "not_invited",
+          message: "This email is not on the invite list for this meeting. Ask the host to add you.",
+        });
+        return;
+      }
+
+      if (!canEnterWaitingRoom(meeting)) {
+        res.status(400).json({
+          error: "not_available",
+          message: "This meeting is no longer available to join.",
+        });
+        return;
+      }
+
+      await openWaitingRoom(meeting.id);
+      const refreshed = await loadMeetingJoinContextBySlug(requireRouteParam(req.params.slug, "slug")!);
+      const ctx = refreshed ?? meeting;
+
+      const token = await createLiveKitToken({
+        roomName: ctx.id,
+        participantName: name,
+        participantIdentity: `guest:${email}`,
+        canEndMeeting: false,
+      });
+
+      res.json({
+        meetingId: ctx.id,
+        title: ctx.title,
+        livekitUrl: resolveLiveKitClientUrl(req.headers.host),
+        token,
+        roomName: ctx.id,
+        isLive: isMeetingBroadcasting(ctx),
+        sessionStartedAt: ctx.liveStartedAt?.toISOString() ?? new Date().toISOString(),
+      });
     }),
   );
 

@@ -315,10 +315,10 @@ export default function MeetingDetail() {
         </Button>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="p-6 space-y-6">
+          <Card className="aurora-panel p-6 space-y-6">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-xl font-heading font-bold">{meeting.title}</h1>
+                <h1 className="text-xl font-heading font-bold text-gradient">{meeting.title}</h1>
                 <p className="text-muted-foreground text-sm mt-1">{meeting.description}</p>
               </div>
               <div className="flex flex-col items-end gap-2">
@@ -379,7 +379,7 @@ export default function MeetingDetail() {
 
             <div className="flex gap-2 flex-wrap">
               {meeting.status !== "completed" && (
-                <Button onClick={handleJoin} className="gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/90" size="sm">
+                <Button onClick={handleJoin} variant="secondary" className="gap-2 shine" size="sm">
                   <Video className="h-3.5 w-3.5" /> Join Meeting
                 </Button>
               )}

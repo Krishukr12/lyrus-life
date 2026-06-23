@@ -36,7 +36,8 @@ export function MeetingLobbyBanner({
         <Button
           type="button"
           size="sm"
-          className="shrink-0 gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90 h-8"
+          variant="secondary"
+          className="shrink-0 gap-1.5 h-8 shine"
           disabled={starting}
           onClick={onStartMeeting}
         >

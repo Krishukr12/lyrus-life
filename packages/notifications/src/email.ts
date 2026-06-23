@@ -25,13 +25,17 @@ export interface SendMeetingInvitesInput {
   attendees: Array<{ name: string; email: string }>;
 }
 
-function getMeetingJoinUrl(joinSlug: string): string {
+function getMeetingJoinUrl(joinSlug: string, attendeeEmail?: string): string {
   const base = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
-  return `${base}/join/${joinSlug}`;
+  const url = `${base}/join/${joinSlug}`;
+  return attendeeEmail ? `${url}?email=${encodeURIComponent(attendeeEmail)}` : url;
 }
 
-function buildInviteHtml(input: SendMeetingInvitesInput): string {
-  const joinUrl = getMeetingJoinUrl(input.joinSlug);
+function buildInviteHtml(
+  input: SendMeetingInvitesInput,
+  attendee: { name: string; email: string },
+): string {
+  const joinUrl = getMeetingJoinUrl(input.joinSlug, attendee.email);
   const when = input.scheduledAt.toLocaleString(undefined, {
     weekday: "long",
     year: "numeric",
@@ -53,11 +57,28 @@ function buildInviteHtml(input: SendMeetingInvitesInput): string {
         </a>
       </p>
       <p style="color: #666; font-size: 13px; margin-top: 24px;">
-        Sign in with your work email to join. Only invited colleagues on your organization domain can enter.
-        A calendar invite (.ics) is attached.
+        This invite was sent to ${attendee.email}. If you have an account, sign in to join.
+        Otherwise just open the link and join as a guest with this email address —
+        only invited people can enter. A calendar invite (.ics) is attached.
       </p>
     </div>
   `.trim();
+}
+
+function buildInviteText(
+  input: SendMeetingInvitesInput,
+  attendee: { name: string; email: string },
+): string {
+  const joinUrl = getMeetingJoinUrl(input.joinSlug, attendee.email);
+  return [
+    `You're invited to: ${input.title}`,
+    `When: ${input.scheduledAt.toLocaleString()} (${input.durationMinutes} min)`,
+    input.description ? `Agenda: ${input.description}` : "",
+    `Join: ${joinUrl}`,
+    `This invite was sent to ${attendee.email}. Open the link and join as a guest with this email if you don't have an account.`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 async function logInviteToFile(
@@ -97,15 +118,6 @@ export async function sendMeetingInvites(
   };
 
   const ics = buildMeetingIcs(calendarBase);
-  const html = buildInviteHtml(input);
-  const text = [
-    `You're invited to: ${input.title}`,
-    `When: ${input.scheduledAt.toLocaleString()} (${input.durationMinutes} min)`,
-    input.description ? `Agenda: ${input.description}` : "",
-    `Join: ${joinUrl}`,
-  ]
-    .filter(Boolean)
-    .join("\n\n");
 
   const results: InviteResult[] = [];
   const smtp = getSmtpConfig(input.organizerEmail);
@@ -119,8 +131,8 @@ export async function sendMeetingInvites(
           from: smtp.from,
           to: `"${attendee.name}" <${attendee.email}>`,
           subject: `Meeting invite: ${input.title}`,
-          text,
-          html,
+          text: buildInviteText(input, attendee),
+          html: buildInviteHtml(input, attendee),
           icalEvent: {
             method: "REQUEST",
             content: ics,
@@ -156,7 +168,7 @@ export async function sendMeetingInvites(
 
   for (const attendee of input.attendees) {
     try {
-      await logInviteToFile(input.meetingId, attendee, ics, html);
+      await logInviteToFile(input.meetingId, attendee, ics, buildInviteHtml(input, attendee));
       console.log(`  ✓ Logged invite for ${attendee.name} <${attendee.email}>`);
       results.push({ email: attendee.email, name: attendee.name, status: "logged" });
     } catch (err) {

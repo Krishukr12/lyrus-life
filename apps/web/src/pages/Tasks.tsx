@@ -101,13 +101,22 @@ export default function Tasks() {
     if (newStatus === "in_progress") toast.info(`Started working on "${task.task}"`);
   };
 
+  const accentByStatus: Record<string, string> = {
+    pending: "before:bg-warning",
+    in_progress: "before:bg-secondary",
+    completed: "before:bg-success",
+    overdue: "before:bg-destructive",
+  };
+
   const TaskCard = ({ task }: { task: UserTask }) => {
     const config = statusConfig[task.status] ?? statusConfig.pending;
     const Icon = config.icon;
     return (
       <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-        <Card className="glass-card hover:shadow-md transition-all">
-          <CardContent className="p-4">
+        <Card
+          className={`relative overflow-hidden hover-lift before:absolute before:inset-y-0 before:left-0 before:w-1 ${accentByStatus[task.status] ?? "before:bg-warning"}`}
+        >
+          <CardContent className="p-4 pl-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <p className="font-heading font-semibold text-foreground leading-snug">{task.task}</p>
@@ -133,7 +142,7 @@ export default function Tasks() {
                     <Play className="h-3 w-3" /> Start
                   </Button>
                 )}
-                <Button size="sm" className="gap-1.5 text-xs bg-success hover:bg-success/90 text-success-foreground" onClick={() => handleStatusChange(task, "completed")}>
+                <Button size="sm" className="gap-1.5 text-xs bg-success hover:bg-success/90 text-success-foreground shadow-sm shadow-success/25" onClick={() => handleStatusChange(task, "completed")}>
                   <CheckCircle2 className="h-3 w-3" /> Complete
                 </Button>
               </div>
@@ -168,89 +177,116 @@ export default function Tasks() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="rounded-2xl border bg-gradient-to-r from-secondary/15 via-secondary/5 to-transparent p-6">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <h1 className="font-heading text-2xl font-bold text-foreground flex items-center gap-2">
-              <ListChecks className="h-6 w-6 text-secondary" /> My Tasks
-            </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Action items assigned from meeting MOMs with execution tracking</p>
-          </div>
-          <div className="flex gap-2">
-            <Button className="gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90" onClick={() => {
-              setRemindersShown(false);
-              toast.info("Checking for reminders...");
-            }}>
-              <Bell className="h-3.5 w-3.5" /> Check Reminders
-            </Button>
-            <Button variant="outline" className="gap-1.5" onClick={() => navigate("/meetings")}>
-              <CalendarClock className="h-3.5 w-3.5" /> Open Meetings
-            </Button>
-          </div>
+    <div className="p-6 max-w-4xl mx-auto space-y-7">
+      {/* Header */}
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Execution</p>
+          <h1 className="text-[26px] leading-tight font-heading font-bold mt-1">
+            <span className="text-gradient">My Tasks</span>
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Action items assigned from meeting MOMs with execution tracking</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-          <div className="rounded-lg border bg-background/70 p-3">
-            <p className="text-xs text-muted-foreground">Task Completion</p>
-            <p className="text-xl font-heading font-semibold mt-1">{completionRate}%</p>
-          </div>
-          <div className="rounded-lg border bg-background/70 p-3">
-            <p className="text-xs text-muted-foreground">Due Today</p>
-            <p className="text-xl font-heading font-semibold mt-1">{dueToday.length}</p>
-          </div>
-          <div className="rounded-lg border bg-background/70 p-3">
-            <p className="text-xs text-muted-foreground">Overdue</p>
-            <p className="text-xl font-heading font-semibold mt-1">{overdue.length}</p>
-          </div>
-          <div className="rounded-lg border bg-background/70 p-3">
-            <p className="text-xs text-muted-foreground">In Progress</p>
-            <p className="text-xl font-heading font-semibold mt-1">{inProgress.length}</p>
-          </div>
+        <div className="flex gap-2">
+          <Button variant="secondary" className="gap-1.5 shine" onClick={() => {
+            setRemindersShown(false);
+            toast.info("Checking for reminders...");
+          }}>
+            <Bell className="h-3.5 w-3.5" /> Check Reminders
+          </Button>
+          <Button variant="outline" className="gap-1.5" onClick={() => navigate("/meetings")}>
+            <CalendarClock className="h-3.5 w-3.5" /> Open Meetings
+          </Button>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {/* KPI strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Total", value: tasks.length, color: "text-foreground" },
-          { label: "Pending", value: pending.length, color: "text-warning" },
-          { label: "In Progress", value: inProgress.length, color: "text-secondary" },
-          { label: "Completed", value: completed.length, color: "text-success" },
-        ].map((s) => (
-          <div key={s.label} className="stat-card text-center">
-            <p className={`text-2xl font-heading font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
-          </div>
+          { label: "Total", value: tasks.length, icon: ListChecks, iconBg: "bg-primary/10 text-primary", hint: "All tracked actions" },
+          { label: "Pending", value: pending.length, icon: Clock, iconBg: "bg-warning/10 text-warning", hint: `${overdue.length} overdue` },
+          { label: "In Progress", value: inProgress.length, icon: Play, iconBg: "bg-secondary/10 text-secondary", hint: "Currently moving" },
+          { label: "Completed", value: completed.length, icon: CheckCircle2, iconBg: "bg-success/10 text-success", hint: `${completionRate}% completion` },
+        ].map((s, i) => (
+          <motion.div
+            key={s.label}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.07, duration: 0.4, ease: [0.21, 0.6, 0.35, 1] }}
+          >
+            <Card className="stat-card h-full">
+              <div className="flex items-start justify-between">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">{s.label}</p>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${s.iconBg}`}>
+                  <s.icon className="h-[18px] w-[18px]" />
+                </div>
+              </div>
+              <p className="text-3xl font-heading font-bold tabular-nums mt-2">{s.value}</p>
+              <p className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border/50">{s.hint}</p>
+            </Card>
+          </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <Card className="p-4 lg:col-span-2">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-base font-heading font-semibold flex items-center gap-2"><TrendingUp className="h-4 w-4 text-secondary" /> Execution Snapshot</h2>
-            <span className="text-xs text-muted-foreground">Live operational overview</span>
+      {/* Performance strip */}
+      <Card className="px-6 py-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:divide-x md:divide-border/60">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">Task Completion</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{completionRate}%</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-            <div className="rounded-lg border p-3 bg-muted/20">
-              <p className="text-xs text-muted-foreground">Active Pipeline</p>
-              <p className="text-lg font-heading font-semibold mt-1">{pending.length + inProgress.length}</p>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">Due Today</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{dueToday.length}</p>
+          </div>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">Overdue</p>
+            <p className={`text-lg font-heading font-semibold tabular-nums mt-1 ${overdue.length > 0 ? "text-destructive" : ""}`}>{overdue.length}</p>
+          </div>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">In Progress</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{inProgress.length}</p>
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="p-6 lg:col-span-2">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-base font-heading font-semibold flex items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+                <TrendingUp className="h-3.5 w-3.5" />
+              </span>
+              Execution Snapshot
+            </h2>
+            <span className="text-xs text-muted-foreground rounded-full border border-border/60 px-2.5 py-1">Live</span>
+          </div>
+          <div className="mt-4 grid grid-cols-3 divide-x divide-border/60 rounded-xl border border-border/60 bg-muted/20">
+            <div className="px-4 py-3.5">
+              <p className="text-[11px] text-muted-foreground">Active Pipeline</p>
+              <p className="text-2xl font-heading font-semibold tabular-nums mt-0.5">{pending.length + inProgress.length}</p>
             </div>
-            <div className="rounded-lg border p-3 bg-muted/20">
-              <p className="text-xs text-muted-foreground">High Risk (Overdue)</p>
-              <p className="text-lg font-heading font-semibold mt-1">{overdue.length}</p>
+            <div className="px-4 py-3.5">
+              <p className="text-[11px] text-muted-foreground">High Risk (Overdue)</p>
+              <p className="text-2xl font-heading font-semibold tabular-nums mt-0.5">{overdue.length}</p>
             </div>
-            <div className="rounded-lg border p-3 bg-muted/20">
-              <p className="text-xs text-muted-foreground">Due in 24 Hours</p>
-              <p className="text-lg font-heading font-semibold mt-1">{dueToday.length}</p>
+            <div className="px-4 py-3.5">
+              <p className="text-[11px] text-muted-foreground">Due in 24 Hours</p>
+              <p className="text-2xl font-heading font-semibold tabular-nums mt-0.5">{dueToday.length}</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4">
-          <h2 className="text-base font-heading font-semibold flex items-center gap-2"><Target className="h-4 w-4 text-secondary" /> Focus Tip</h2>
-          <p className="text-sm text-muted-foreground mt-2">
+        <Card className="p-6">
+          <h2 className="text-base font-heading font-semibold flex items-center gap-2">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <Target className="h-3.5 w-3.5" />
+            </span>
+            Focus Tip
+          </h2>
+          <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
             Prioritize overdue tasks first, then close all "Due Today" items before starting new work.
           </p>
-          <p className="text-xs text-muted-foreground mt-3">
+          <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
             Keeping overdue near zero improves delivery confidence for meeting commitments.
           </p>
         </Card>

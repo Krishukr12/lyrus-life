@@ -267,18 +267,21 @@ export default function UserManagementPage() {
   const billingBlocked = planUsage && !planUsage.canAddUser;
 
   return (
-    <div className="space-y-6 max-w-6xl">
-      <div className="flex items-center justify-between gap-4">
+    <div className="space-y-7 max-w-6xl">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Organization</p>
+          <h1 className="text-[26px] leading-tight font-heading font-bold mt-1">
+            <span className="text-gradient">User Management</span>
+          </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Invite team members, manage roles, and monitor seat usage.
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button disabled={billingBlocked}>
-              <Plus className="h-4 w-4 mr-2" />
+            <Button variant="secondary" className="gap-1.5 shine" disabled={billingBlocked}>
+              <Plus className="h-4 w-4" />
               Add user
             </Button>
           </DialogTrigger>
@@ -400,7 +403,7 @@ export default function UserManagementPage() {
       {planUsage ? <SeatUsageDashboard usage={planUsage} /> : null}
 
       {billingBlocked ? (
-        <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md px-3 py-2">
+        <p className="text-sm text-destructive bg-destructive/[0.07] border border-destructive/20 rounded-xl px-4 py-3">
           Billing is inactive. Resolve billing issues before adding users.
         </p>
       ) : null}
@@ -416,7 +419,7 @@ export default function UserManagementPage() {
         </TabsList>
 
         <TabsContent value="users" className="mt-4">
-          <div className="rounded-md border bg-card">
+          <div className="rounded-xl border border-border/60 bg-card shadow-soft overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -437,13 +440,20 @@ export default function UserManagementPage() {
                   </TableRow>
                 ) : (
                   data?.items.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
+                    <TableRow key={user.id} className="hover:bg-muted/30 transition-colors">
+                      <TableCell className="font-medium">
+                        <span className="flex items-center gap-2.5">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
+                            {user.name.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase()}
+                          </span>
+                          {user.name}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{user.email}</TableCell>
                       <TableCell>{user.profile?.department ?? "—"}</TableCell>
                       <TableCell>{ROLE_LABELS[user.role] ?? user.role}</TableCell>
                       <TableCell>
-                        <Badge variant={user.status === "ACTIVE" ? "default" : "secondary"}>
+                        <Badge variant={user.status === "ACTIVE" ? "success" : "secondary"}>
                           {user.status}
                         </Badge>
                       </TableCell>
@@ -489,7 +499,7 @@ export default function UserManagementPage() {
         </TabsContent>
 
         <TabsContent value="invitations" className="mt-4">
-          <div className="rounded-md border bg-card">
+          <div className="rounded-xl border border-border/60 bg-card shadow-soft overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>

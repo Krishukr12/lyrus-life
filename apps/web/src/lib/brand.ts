@@ -1,4 +1,4 @@
-export const APP_NAME = "Meeting Desk AI";
+export const APP_NAME = import.meta.env.VITE_COMPANY_NAME ?? "Meeting Desk AI";
 export const APP_TAGLINE = "Where Meetings Become Decisions.";
 
 /** Optimized icon for UI + favicon (fast load, no flash). */
@@ -8,8 +8,3 @@ export const APP_OG_IMAGE_SRC = "/meeting_desk_ai_logo.png?v=2";
 
 /** @deprecated Use APP_ICON_SRC */
 export const APP_LOGO_SRC = APP_ICON_SRC;
-
-/** @deprecated Use APP_NAME */
-export const PORTAL_NAME = APP_NAME;
-/** @deprecated Use APP_TAGLINE */
-export const PORTAL_TAGLINE = APP_TAGLINE;

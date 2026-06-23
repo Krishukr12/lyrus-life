@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { BarChart3, Lock, Mail, Shield, Target, Users } from "lucide-react";
+import { BarChart3, Lock, Mail, Target, Users } from "lucide-react";
 import { toast } from "sonner";
+import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/admin/FormFields";
 import { useAuth } from "@/contexts/AuthContext";
 import { loginSchema, type LoginFormValues } from "@/lib/schemas";
-import { PORTAL_NAME, PORTAL_TAGLINE } from "@/lib/brand";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1920&q=80";
@@ -67,19 +67,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(99,102,241,0.12),transparent_50%)]" />
 
         <div className="relative z-10 flex w-full flex-col justify-between p-12 xl:p-14 text-white">
-          <div className="flex items-center gap-3.5 animate-in fade-in slide-in-from-left-4 duration-700">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 shadow-lg shadow-black/20 ring-1 ring-white/20 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:ring-white/30">
-              <Shield className="h-5 w-5 text-blue-300" />
-            </div>
-            <div>
-              <span className="text-lg font-bold tracking-tight">
-                {PORTAL_NAME}
-              </span>
-              <p className="text-[11px] font-medium tracking-wide text-blue-200/70">
-                {PORTAL_TAGLINE}
-              </p>
-            </div>
-          </div>
+          <BrandMark variant="dark" iconSize={40} className="animate-in fade-in slide-in-from-left-4 duration-700" />
 
           <div className="max-w-xl animate-in fade-in slide-in-from-left-6 duration-700 delay-150 fill-mode-both">
             <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/80">
@@ -132,15 +120,7 @@ export default function LoginPage() {
         />
 
         <div className="relative w-full max-w-[440px] animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#08142e] shadow-md">
-              <Shield className="h-4 w-4 text-blue-300" />
-            </div>
-            <div>
-              <span className="font-semibold text-[#08142e]">{PORTAL_NAME}</span>
-              <p className="text-[10px] text-slate-500">{PORTAL_TAGLINE}</p>
-            </div>
-          </div>
+          <BrandMark variant="light" className="mb-8 lg:hidden" />
 
           <div
             className="rounded-[24px] border border-white/60 bg-white/65 p-8 text-[#08142e] shadow-[0_8px_40px_rgba(8,20,46,0.08),0_2px_12px_rgba(8,20,46,0.04)] backdrop-blur-2xl transition-all duration-500 hover:border-white/80 hover:shadow-[0_16px_48px_rgba(8,20,46,0.12),0_4px_16px_rgba(8,20,46,0.06)] sm:p-9"
@@ -149,6 +129,8 @@ export default function LoginPage() {
                 "linear-gradient(145deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
             }}
           >
+            <BrandMark variant="light" iconSize={40} className="mb-6 justify-center" showTagline />
+
             <div className="mb-8">
               <h2 className="text-2xl font-bold tracking-tight text-[#08142e]">
                 Sign in

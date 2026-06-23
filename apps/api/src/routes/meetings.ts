@@ -6,12 +6,15 @@ import {
   MeetingTag,
   PipelineStep,
   TaskStatus,
+  UserRole,
+  UserStatus,
   prisma,
 } from "@lyrus/db";
 import { assertMeetingAccess, meetingsListWhere } from "../lib/meeting-access.js";
 import { assertOrganizationCanCreateMeeting, PlanLimitError } from "../lib/plan-limits.js";
 import { generateJoinSlug } from "../lib/join-slug.js";
 import { requireAuthUser } from "../middleware/authenticate.js";
+import { authorize } from "../middleware/authorize.js";
 import { extractMeetingInsights } from "@lyrus/nlu";
 import { createMeetingSchema, editMomSchema, updateMeetingSchema } from "@lyrus/shared";
 import type { Prisma } from "@lyrus/db";
@@ -75,6 +78,59 @@ export function createMeetingsRouter(): Router {
       orderBy: { scheduledAt: "desc" },
     });
     res.json(meetings.map(mapMeeting));
+  }));
+
+  router.get("/people/suggestions", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
+    const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+
+    const textFilter = q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" as const } },
+            { email: { contains: q, mode: "insensitive" as const } },
+          ],
+        }
+      : {};
+
+    const [orgUsers, pastParticipants] = await Promise.all([
+      user.organizationId
+        ? prisma.user.findMany({
+            where: {
+              organizationId: user.organizationId,
+              status: UserStatus.ACTIVE,
+              ...textFilter,
+            },
+            select: { name: true, email: true },
+            orderBy: { name: "asc" },
+            take: 50,
+          })
+        : Promise.resolve([] as Array<{ name: string; email: string }>),
+      prisma.meetingParticipant.findMany({
+        where: { meeting: meetingsListWhere(user), ...textFilter },
+        select: { name: true, email: true },
+        orderBy: { id: "desc" },
+        take: 200,
+      }),
+    ]);
+
+    const seen = new Set<string>([user.email.toLowerCase()]);
+    const suggestions: Array<{ name: string; email: string; source: "team" | "recent" }> = [];
+
+    for (const member of orgUsers) {
+      const key = member.email.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      suggestions.push({ name: member.name, email: member.email, source: "team" });
+    }
+    for (const person of pastParticipants) {
+      const key = person.email.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      suggestions.push({ name: person.name, email: person.email, source: "recent" });
+    }
+
+    res.json(suggestions.slice(0, 8));
   }));
 
   router.get("/meetings/:id", asyncHandler(async (req, res) => {
@@ -753,7 +809,7 @@ export function createMeetingsRouter(): Router {
     res.json(mapActionItemToTask(updated, updated.meeting.title));
   }));
 
-  router.get("/insights", asyncHandler(async (req, res) => {
+  router.get("/insights", authorize([UserRole.ORG_ADMIN]), asyncHandler(async (req, res) => {
     const user = requireAuthUser(req);
     const meetingFilter = meetingsListWhere(user);
     const [meetingCount, taskCount, completedTasks, overdueTasks, recentMeetings] =

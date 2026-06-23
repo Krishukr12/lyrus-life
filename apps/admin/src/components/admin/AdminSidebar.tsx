@@ -9,15 +9,14 @@ import {
   IndianRupee,
   LayoutDashboard,
   Settings,
-  Shield,
   Users,
   Video,
   type LucideIcon,
 } from "lucide-react";
+import { BrandMark } from "@/components/BrandMark";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { Button } from "@/components/ui/button";
-import { PORTAL_NAME, PORTAL_TAGLINE } from "@/lib/brand";
 
 type NavItem = { href: string; label: string; icon: LucideIcon; end?: boolean };
 
@@ -66,17 +65,11 @@ export function AdminSidebar() {
           collapsed ? "justify-center" : "gap-3 px-4",
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-900/30">
-          <Shield className="h-4 w-4 text-white" strokeWidth={2} />
-        </div>
-        {!collapsed ? (
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold tracking-tight text-white leading-tight">{PORTAL_NAME}</p>
-            <p className="text-[10px] text-slate-400 mt-0.5 leading-tight truncate">
-              {PORTAL_TAGLINE}
-            </p>
-          </div>
-        ) : null}
+        {collapsed ? (
+          <BrandMark variant="dark" iconOnly iconSize={36} />
+        ) : (
+          <BrandMark variant="dark" className="min-w-0 flex-1" />
+        )}
       </div>
 
       <nav className="flex flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden p-3 pt-4">

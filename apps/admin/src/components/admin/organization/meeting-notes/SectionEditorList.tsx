@@ -101,12 +101,14 @@ function SortableSectionCard({
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold text-slate-700">AI instructions</Label>
+          <Label className="text-xs font-semibold text-slate-700">
+            What should AI write here?
+          </Label>
           <textarea
             value={section.aiInstructions}
             onChange={(e) => onChange({ ...section, aiInstructions: e.target.value })}
-            className="mt-1 min-h-[72px] w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30"
-            placeholder="How AI should generate this section"
+            className="mt-1 min-h-[60px] w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30"
+            placeholder="e.g. List decisions with owners and deadlines"
           />
         </div>
       </div>

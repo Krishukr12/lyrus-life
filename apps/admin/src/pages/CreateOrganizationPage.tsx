@@ -3,25 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  ArrowLeft,
-  Building2,
-  CreditCard,
-  Globe,
-  MapPin,
-  FileText,
-  Shield,
-  Sparkles,
-  User,
-} from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { PageContainer } from "@/components/admin/PageContainer";
 import { OnboardingStepper } from "@/components/admin/OnboardingStepper";
-import { FormSection } from "@/components/admin/FormSection";
+import {
+  FormSubsection,
+  OnboardingStepShell,
+} from "@/components/admin/organization/OnboardingStepShell";
 import { MeetingNotesConfigStep } from "@/components/admin/organization/meeting-notes/MeetingNotesConfigStep";
 import { OnboardingPlanCards } from "@/components/admin/organization/OnboardingPlanCards";
-import { OnboardingPreviewPanel } from "@/components/admin/organization/OnboardingPreviewPanel";
+import { OnboardingReviewSection } from "@/components/admin/organization/OnboardingReviewSection";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { cn } from "@/lib/utils";
 import { FormGrid, FormGridFull, FormInput, FormSelect } from "@/components/admin/FormFields";
@@ -37,6 +30,8 @@ import {
 import type { OnboardingMomTemplateDraft } from "@/lib/mom-template-types";
 import { validateTemplateDraft } from "@/lib/mom-template-utils";
 import { toCreateOrganizationPayload } from "@/lib/onboarding";
+
+const TOTAL_STEPS = 6;
 
 const COMPANY_SIZE_OPTIONS = [
   { value: "1-10", label: "1–10 employees" },
@@ -71,15 +66,23 @@ const STATUS_OPTIONS = [
   { value: "PENDING_SETUP", label: "Pending setup" },
 ];
 
-const SECTION_IDS = [
-  "step-company",
-  "step-business",
-  "step-subscription",
-  "step-meeting-notes",
-  "step-admin",
-] as const;
+const STEP_FIELDS: Partial<Record<number, (keyof OnboardingFormValues)[]>> = {
+  1: ["name", "code", "slug", "industry", "companySize"],
+  2: ["country", "timezone", "primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+  3: ["subscriptionPlan"],
+  5: ["adminFirstName", "adminLastName", "adminEmail"],
+};
 
-function computeCompletion(values: OnboardingFormValues): number {
+const SECTION_IDS: Record<number, string> = {
+  1: "step-company",
+  2: "step-business",
+  3: "step-subscription",
+  4: "step-meeting-notes",
+  5: "step-admin",
+  6: "step-review",
+};
+
+function computeCompletion(values: OnboardingFormValues, momTemplates: OnboardingMomTemplateDraft[]): number {
   const checks = [
     values.name,
     values.code,
@@ -92,6 +95,7 @@ function computeCompletion(values: OnboardingFormValues): number {
     values.primaryContactEmail,
     values.primaryContactPhone,
     values.subscriptionPlan,
+    momTemplates.length > 0 ? "yes" : "",
     values.adminFirstName,
     values.adminLastName,
     values.adminEmail,
@@ -104,7 +108,7 @@ export default function CreateOrganizationPage() {
   const navigate = useNavigate();
   const { collapsed } = useSidebar();
   const slugTouched = useRef(false);
-  const [activeStep, setActiveStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(1);
   const [momTemplates, setMomTemplates] = useState<OnboardingMomTemplateDraft[]>([]);
 
   const form = useForm<OnboardingFormValues>({
@@ -115,7 +119,7 @@ export default function CreateOrganizationPage() {
 
   const formValues = form.watch();
   const nameValue = form.watch("name");
-  const completionPercent = computeCompletion(formValues);
+  const completionPercent = computeCompletion(formValues, momTemplates);
 
   const { data: pricingData } = useQuery({
     queryKey: ["admin", "billing", "pricing"],
@@ -127,31 +131,6 @@ export default function CreateOrganizationPage() {
       form.setValue("slug", slugifyOrganizationName(nameValue), { shouldValidate: false });
     }
   }, [nameValue, form]);
-
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-
-    SECTION_IDS.forEach((id, index) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              setActiveStep(index + 1);
-            }
-          }
-        },
-        { rootMargin: "-20% 0px -55% 0px", threshold: 0 },
-      );
-
-      observer.observe(el);
-      observers.push(observer);
-    });
-
-    return () => observers.forEach((o) => o.disconnect());
-  }, []);
 
   const create = useMutation({
     mutationFn: async (payload: Record<string, unknown>) => {
@@ -182,9 +161,56 @@ export default function CreateOrganizationPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  function scrollToSection(sectionId: string) {
+    const stepMap: Record<string, number> = {
+      "step-company": 1,
+      "step-business": 2,
+      "step-subscription": 3,
+      "step-meeting-notes": 4,
+      "step-admin": 5,
+    };
+    const step = stepMap[sectionId];
+    if (step) setCurrentStep(step);
+  }
+
+  async function validateCurrentStep(): Promise<boolean> {
+    if (currentStep === 4) {
+      if (momTemplates.length === 0) {
+        toast.error("Choose at least one meeting notes template");
+        return false;
+      }
+      for (const template of momTemplates) {
+        const error = validateTemplateDraft(template);
+        if (error) {
+          toast.error(error);
+          return false;
+        }
+      }
+      if (!momTemplates.some((t) => t.isDefault)) {
+        toast.error("Mark one template as the default");
+        return false;
+      }
+      return true;
+    }
+
+    const fields = STEP_FIELDS[currentStep];
+    if (!fields?.length) return true;
+    return form.trigger(fields);
+  }
+
+  async function handleNext() {
+    const valid = await validateCurrentStep();
+    if (!valid) return;
+    setCurrentStep((s) => Math.min(s + 1, TOTAL_STEPS));
+  }
+
+  function handleBack() {
+    setCurrentStep((s) => Math.max(s - 1, 1));
+  }
+
   function onSubmit(values: OnboardingFormValues) {
     if (momTemplates.length === 0) {
-      toast.error("Configure at least one meeting notes template");
+      toast.error("Choose at least one meeting notes template");
       return;
     }
 
@@ -197,15 +223,17 @@ export default function CreateOrganizationPage() {
     }
 
     if (!momTemplates.some((t) => t.isDefault)) {
-      toast.error("Select a default meeting notes template");
+      toast.error("Mark one template as the default");
       return;
     }
 
     create.mutate(toCreateOrganizationPayload(values, momTemplates));
   }
 
+  const labelClass = "text-sm font-medium text-slate-700";
+
   return (
-    <PageContainer>
+    <PageContainer narrow>
       <Button variant="ghost" size="sm" className="mb-4 -ml-2 text-slate-600" asChild>
         <Link to="/organizations">
           <ArrowLeft className="mr-1.5 h-4 w-4" />
@@ -216,322 +244,336 @@ export default function CreateOrganizationPage() {
       <PageHeader
         eyebrow="Onboarding"
         title="Onboard organization"
-        description="Provision a new tenant with company profile, subscription plan, and admin credentials."
+        description="Set up a new tenant in a few guided steps."
       />
 
-      <OnboardingStepper activeStep={activeStep} completionPercent={completionPercent} />
+      <OnboardingStepper
+        currentStep={currentStep}
+        completionPercent={completionPercent}
+        onStepClick={(step) => step < currentStep && setCurrentStep(step)}
+      />
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="pb-28" noValidate>
-          <div className="grid gap-8 xl:grid-cols-[1fr_320px]">
-            <div className="space-y-6">
-              {/* Step 1 — Company Identity */}
-              <div id="step-company">
-                <FormSection
-                  step={1}
-                  title="Company Identity"
-                  description="Core organization details and business profile."
-                  icon={Building2}
-                >
-                  <FormGrid>
-                    <FormGridFull>
+          <div id={SECTION_IDS[currentStep]} className="mx-auto max-w-3xl">
+            {currentStep === 1 && (
+              <OnboardingStepShell
+                step={1}
+                title="Company identity"
+                description="Basic details about the organization."
+              >
+                <FormGrid>
+                  <FormGridFull>
+                    <FormInput
+                      control={form.control}
+                      name="name"
+                      label="Organization name *"
+                      placeholder="Reliance Industries Ltd"
+                      labelClassName={labelClass}
+                    />
+                  </FormGridFull>
+                  <FormInput
+                    control={form.control}
+                    name="code"
+                    label="Organization code *"
+                    placeholder="REL001"
+                    inputClassName="font-mono uppercase"
+                    labelClassName={labelClass}
+                  />
+                  <FormInput
+                    control={form.control}
+                    name="slug"
+                    label="URL slug *"
+                    inputClassName="font-mono"
+                    placeholder="reliance-industries"
+                    labelClassName={labelClass}
+                    onFocus={() => {
+                      slugTouched.current = true;
+                    }}
+                  />
+                  <FormGridFull>
+                    <FormInput
+                      control={form.control}
+                      name="legalBusinessName"
+                      label="Legal business name"
+                      labelClassName={labelClass}
+                    />
+                  </FormGridFull>
+                  <FormInput
+                    control={form.control}
+                    name="industry"
+                    label="Industry *"
+                    placeholder="Manufacturing, Technology, etc."
+                    labelClassName={labelClass}
+                  />
+                  <FormSelect
+                    control={form.control}
+                    name="companySize"
+                    label="Company size *"
+                    placeholder="Select company size"
+                    options={COMPANY_SIZE_OPTIONS}
+                  />
+                </FormGrid>
+              </OnboardingStepShell>
+            )}
+
+            {currentStep === 2 && (
+              <OnboardingStepShell
+                step={2}
+                title="Business details"
+                description="Location, website, and primary contact."
+              >
+                <div className="space-y-8">
+                  <FormSubsection title="Location">
+                    <FormGrid>
                       <FormInput
                         control={form.control}
-                        name="name"
-                        label="Organization name *"
-                        placeholder="Reliance Industries Ltd"
-                        labelClassName="text-sm font-semibold text-slate-800"
+                        name="country"
+                        label="Country *"
+                        labelClassName={labelClass}
                       />
-                    </FormGridFull>
-                    <FormInput
-                      control={form.control}
-                      name="code"
-                      label="Organization code *"
-                      placeholder="REL001"
-                      inputClassName="font-mono uppercase rounded-xl"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="slug"
-                      label="Organization slug *"
-                      inputClassName="font-mono rounded-xl"
-                      placeholder="acme-corp"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                      onFocus={() => {
-                        slugTouched.current = true;
-                      }}
-                    />
-                    <FormGridFull>
                       <FormInput
                         control={form.control}
-                        name="legalBusinessName"
-                        label="Legal business name"
-                        labelClassName="text-sm font-semibold text-slate-800"
+                        name="state"
+                        label="State / Province"
+                        labelClassName={labelClass}
                       />
-                    </FormGridFull>
-                    <FormInput
-                      control={form.control}
-                      name="industry"
-                      label="Industry *"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormGridFull>
+                      <FormInput
+                        control={form.control}
+                        name="city"
+                        label="City"
+                        labelClassName={labelClass}
+                      />
                       <FormSelect
                         control={form.control}
-                        name="companySize"
-                        label="Company size *"
-                        placeholder="Select company size"
-                        options={COMPANY_SIZE_OPTIONS}
+                        name="timezone"
+                        label="Timezone *"
+                        options={TIMEZONE_OPTIONS}
                       />
-                    </FormGridFull>
-                  </FormGrid>
-                </FormSection>
-              </div>
+                    </FormGrid>
+                  </FormSubsection>
 
-              {/* Step 2 — Business Details */}
-              <div id="step-business" className="space-y-6">
-                <FormSection
-                  title="Location"
-                  description="Regional settings and headquarters location."
-                  icon={MapPin}
-                >
-                  <FormGrid>
+                  <FormSubsection title="Website">
                     <FormInput
                       control={form.control}
-                      name="country"
-                      label="Country *"
-                      labelClassName="text-sm font-semibold text-slate-800"
+                      name="website"
+                      label="Website"
+                      type="url"
+                      placeholder="https://example.com"
+                      labelClassName={labelClass}
                     />
-                    <FormInput
-                      control={form.control}
-                      name="state"
-                      label="State / Province"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="city"
-                      label="City"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormSelect
-                      control={form.control}
-                      name="timezone"
-                      label="Timezone *"
-                      options={TIMEZONE_OPTIONS}
-                    />
-                  </FormGrid>
-                </FormSection>
+                  </FormSubsection>
 
-                <FormSection
-                  title="Digital Presence"
-                  description="Public-facing company information."
-                  icon={Globe}
-                >
-                  <FormGrid>
-                    <FormGridFull>
+                  <FormSubsection title="Primary contact">
+                    <FormGrid>
+                      <FormGridFull>
+                        <FormInput
+                          control={form.control}
+                          name="primaryContactName"
+                          label="Contact name *"
+                          labelClassName={labelClass}
+                        />
+                      </FormGridFull>
                       <FormInput
                         control={form.control}
-                        name="website"
-                        label="Website"
-                        type="url"
-                        placeholder="https://example.com"
-                        labelClassName="text-sm font-semibold text-slate-800"
+                        name="primaryContactEmail"
+                        label="Email *"
+                        type="email"
+                        autoComplete="email"
+                        labelClassName={labelClass}
                       />
-                    </FormGridFull>
-                  </FormGrid>
-                </FormSection>
-
-                <FormSection
-                  step={2}
-                  title="Contact Information"
-                  description="Primary billing and operations contact."
-                  icon={User}
-                >
-                  <FormGrid>
-                    <FormGridFull>
                       <FormInput
                         control={form.control}
-                        name="primaryContactName"
-                        label="Primary contact name *"
-                        labelClassName="text-sm font-semibold text-slate-800"
+                        name="primaryContactPhone"
+                        label="Phone *"
+                        type="tel"
+                        placeholder="+91 98765 43210"
+                        labelClassName={labelClass}
                       />
-                    </FormGridFull>
-                    <FormInput
-                      control={form.control}
-                      name="primaryContactEmail"
-                      label="Primary contact email *"
-                      type="email"
-                      autoComplete="email"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="primaryContactPhone"
-                      label="Primary contact phone *"
-                      type="tel"
-                      placeholder="+91 98765 43210"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                  </FormGrid>
-                </FormSection>
-              </div>
+                    </FormGrid>
+                  </FormSubsection>
+                </div>
+              </OnboardingStepShell>
+            )}
 
-              {/* Step 3 — Subscription */}
-              <div id="step-subscription">
-                <FormSection
-                  step={3}
-                  title="Subscription Plan"
-                  description="Choose a plan and configure limits for this tenant."
-                  icon={CreditCard}
-                >
-                  <div className="mb-6">
-                    <p className="mb-3 text-sm font-semibold text-slate-800">Select plan *</p>
-                    <OnboardingPlanCards
-                      value={formValues.subscriptionPlan}
-                      onChange={(plan) =>
-                        form.setValue("subscriptionPlan", plan, { shouldValidate: true })
-                      }
-                      pricing={pricingData?.pricing}
-                    />
-                  </div>
+            {currentStep === 3 && (
+              <OnboardingStepShell
+                step={3}
+                title="Subscription plan"
+                description="Choose a plan for this tenant."
+              >
+                <div className="space-y-6">
+                  <OnboardingPlanCards
+                    value={formValues.subscriptionPlan}
+                    onChange={(plan) =>
+                      form.setValue("subscriptionPlan", plan, { shouldValidate: true })
+                    }
+                    pricing={pricingData?.pricing}
+                  />
 
-                  <FormGrid>
+                  <details className="group rounded-xl border border-slate-200/80 bg-slate-50/50">
+                    <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-slate-700 marker:content-none [&::-webkit-details-marker]:hidden">
+                      <span className="flex items-center justify-between">
+                        Customize limits & billing
+                        <ChevronRight className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-90" />
+                      </span>
+                    </summary>
+                    <div className="border-t border-slate-200/80 px-4 pb-4 pt-2">
+                      <FormGrid>
+                        <FormSelect
+                          control={form.control}
+                          name="billingCycle"
+                          label="Billing cycle"
+                          options={BILLING_OPTIONS}
+                        />
+                        <FormInput
+                          control={form.control}
+                          name="trialDays"
+                          label="Trial days"
+                          type="number"
+                          labelClassName={labelClass}
+                        />
+                        <FormInput
+                          control={form.control}
+                          name="maxEmployees"
+                          label="Max employees"
+                          type="number"
+                          labelClassName={labelClass}
+                        />
+                        <FormInput
+                          control={form.control}
+                          name="maxMeetingRooms"
+                          label="Max meeting rooms"
+                          type="number"
+                          labelClassName={labelClass}
+                        />
+                        <FormInput
+                          control={form.control}
+                          name="storageLimitGb"
+                          label="Storage limit (GB)"
+                          type="number"
+                          labelClassName={labelClass}
+                        />
+                      </FormGrid>
+                    </div>
+                  </details>
+                </div>
+              </OnboardingStepShell>
+            )}
+
+            {currentStep === 4 && (
+              <OnboardingStepShell
+                step={4}
+                title="Meeting notes template"
+                description="Pick how AI-generated minutes are structured."
+              >
+                <MeetingNotesConfigStep templates={momTemplates} onChange={setMomTemplates} />
+              </OnboardingStepShell>
+            )}
+
+            {currentStep === 5 && (
+              <OnboardingStepShell
+                step={5}
+                title="Admin account"
+                description="Credentials for the tenant administrator."
+              >
+                <FormGrid>
+                  <FormInput
+                    control={form.control}
+                    name="adminFirstName"
+                    label="First name *"
+                    labelClassName={labelClass}
+                  />
+                  <FormInput
+                    control={form.control}
+                    name="adminLastName"
+                    label="Last name *"
+                    labelClassName={labelClass}
+                  />
+                  <FormInput
+                    control={form.control}
+                    name="adminEmail"
+                    label="Email *"
+                    type="email"
+                    autoComplete="email"
+                    labelClassName={labelClass}
+                  />
+                  <FormInput
+                    control={form.control}
+                    name="adminPhone"
+                    label="Phone"
+                    type="tel"
+                    placeholder="+91 98765 43210"
+                    labelClassName={labelClass}
+                  />
+                  <FormGridFull>
                     <FormSelect
                       control={form.control}
-                      name="billingCycle"
-                      label="Billing cycle"
-                      options={BILLING_OPTIONS}
+                      name="onboardingStatus"
+                      label="Initial status"
+                      options={STATUS_OPTIONS}
                     />
-                    <FormInput
-                      control={form.control}
-                      name="trialDays"
-                      label="Trial days"
-                      type="number"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="maxEmployees"
-                      label="Max employees"
-                      type="number"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="maxMeetingRooms"
-                      label="Max meeting rooms"
-                      type="number"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="storageLimitGb"
-                      label="Storage limit (GB)"
-                      type="number"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                  </FormGrid>
-                </FormSection>
-              </div>
+                  </FormGridFull>
+                </FormGrid>
+              </OnboardingStepShell>
+            )}
 
-              {/* Step 4 — Meeting Notes */}
-              <div id="step-meeting-notes">
-                <FormSection
-                  step={4}
-                  title="Meeting Notes Configuration"
-                  description="Define how meeting minutes and MOM documents are generated for this organization."
-                  icon={FileText}
-                >
-                  <MeetingNotesConfigStep templates={momTemplates} onChange={setMomTemplates} />
-                </FormSection>
-              </div>
-
-              {/* Step 5 — Admin */}
-              <div id="step-admin">
-                <FormSection
-                  step={5}
-                  title="Admin Account"
-                  description="Initial tenant administrator credentials."
-                  icon={Shield}
-                >
-                  <FormGrid>
-                    <FormInput
-                      control={form.control}
-                      name="adminFirstName"
-                      label="First name *"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="adminLastName"
-                      label="Last name *"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="adminEmail"
-                      label="Email *"
-                      type="email"
-                      autoComplete="email"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormInput
-                      control={form.control}
-                      name="adminPhone"
-                      label="Phone"
-                      type="tel"
-                      placeholder="+91 98765 43210"
-                      labelClassName="text-sm font-semibold text-slate-800"
-                    />
-                    <FormGridFull>
-                      <FormSelect
-                        control={form.control}
-                        name="onboardingStatus"
-                        label="Onboarding status"
-                        options={STATUS_OPTIONS}
-                      />
-                    </FormGridFull>
-                  </FormGrid>
-                </FormSection>
-              </div>
-
-              <div className="flex items-start gap-3 rounded-[22px] border border-blue-100 bg-blue-50/50 p-4">
-                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-                <p className="text-xs leading-relaxed text-slate-600">
-                  Core tenant data is provisioned via the organization API. Subscription limit
-                  fields are stored in admin records for operational reference.
-                </p>
-              </div>
-            </div>
-
-            {/* Live preview — desktop only */}
-            <div className="hidden xl:block">
-              <OnboardingPreviewPanel values={formValues} />
-            </div>
+            {currentStep === 6 && (
+              <OnboardingStepShell
+                step={6}
+                title="Review & confirm"
+                description="Verify everything looks correct before provisioning."
+              >
+                <OnboardingReviewSection
+                  values={formValues}
+                  momTemplates={momTemplates}
+                  onEditSection={scrollToSection}
+                />
+              </OnboardingStepShell>
+            )}
           </div>
 
           <div
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-10 border-t border-slate-200/80 bg-white/90 backdrop-blur-md supports-[backdrop-filter]:bg-white/80",
+              "fixed bottom-0 left-0 right-0 z-10 border-t border-slate-200/80 bg-white/95 backdrop-blur-md",
               collapsed ? "lg:left-[4.5rem]" : "lg:left-64",
             )}
           >
-            <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-4 lg:px-8">
-              <Button
-                type="submit"
-                className="min-w-[180px] rounded-xl bg-blue-600 shadow-sm shadow-blue-600/20 hover:bg-blue-700"
-                disabled={create.isPending}
-              >
-                {create.isPending ? "Provisioning…" : "Create organization"}
-              </Button>
-              <Button type="button" variant="outline" className="rounded-xl" asChild>
-                <Link to="/organizations">Cancel</Link>
-              </Button>
-              <span className="ml-auto hidden text-xs text-slate-500 sm:inline">
-                {completionPercent}% complete
-              </span>
+            <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-4 lg:px-8">
+              {currentStep > 1 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-xl"
+                  onClick={handleBack}
+                >
+                  <ChevronLeft className="mr-1 h-4 w-4" />
+                  Back
+                </Button>
+              ) : (
+                <Button type="button" variant="outline" className="rounded-xl" asChild>
+                  <Link to="/organizations">Cancel</Link>
+                </Button>
+              )}
+
+              {currentStep < TOTAL_STEPS ? (
+                <Button
+                  type="button"
+                  className="ml-auto min-w-[140px] rounded-xl bg-blue-600 hover:bg-blue-700"
+                  onClick={handleNext}
+                >
+                  Continue
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  className="ml-auto min-w-[180px] rounded-xl bg-blue-600 shadow-sm hover:bg-blue-700"
+                  disabled={create.isPending}
+                >
+                  {create.isPending ? "Provisioning…" : "Create organization"}
+                </Button>
+              )}
             </div>
           </div>
         </form>

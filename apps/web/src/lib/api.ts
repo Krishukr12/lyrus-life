@@ -105,6 +105,18 @@ export async function getMeetings(): Promise<Meeting[]> {
   return request<Meeting[]>("/meetings");
 }
 
+export interface PersonSuggestion {
+  name: string;
+  email: string;
+  source: "team" | "recent";
+}
+
+export async function getPeopleSuggestions(query: string): Promise<PersonSuggestion[]> {
+  return request<PersonSuggestion[]>(
+    `/people/suggestions${query ? `?q=${encodeURIComponent(query)}` : ""}`,
+  );
+}
+
 export async function getMeeting(id: string): Promise<Meeting | undefined> {
   try {
     return await request<Meeting>(`/meetings/${id}`);

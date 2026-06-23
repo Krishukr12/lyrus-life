@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { FileText, Layers, Upload } from "lucide-react";
+import { FileText, Layers, Plus, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/admin/EmptyState";
@@ -18,7 +18,6 @@ import { adminApi } from "@/services/api";
 import { ConfiguredTemplatesList } from "./ConfiguredTemplatesList";
 import { SectionEditorList } from "./SectionEditorList";
 import { TemplatePresetGrid } from "./TemplatePresetGrid";
-import { TemplatePreviewDialog } from "./TemplatePreviewDialog";
 import { TemplateUploadZone } from "./TemplateUploadZone";
 
 type MeetingNotesConfigStepProps = {
@@ -28,14 +27,14 @@ type MeetingNotesConfigStepProps = {
 
 export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConfigStepProps) {
   const [activeClientId, setActiveClientId] = useState<string | null>(templates[0]?.clientId ?? null);
-  const [previewPreset, setPreviewPreset] = useState<MomTemplatePreset | null>(null);
-  const [previewTemplate, setPreviewTemplate] = useState<OnboardingMomTemplateDraft | null>(null);
   const [mode, setMode] = useState<"presets" | "custom" | "upload">("presets");
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin", "mom-templates", "presets"],
     queryFn: () => adminApi.getMomTemplatePresets(),
   });
+
+  const presets = data?.presets ?? [];
 
   const activeTemplate = useMemo(
     () => templates.find((t) => t.clientId === activeClientId) ?? null,
@@ -52,6 +51,13 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
   }
 
   function handleSelectPreset(preset: MomTemplatePreset) {
+    const existing = templates.find((t) => t.presetKey === preset.key);
+    if (existing) {
+      setActiveClientId(existing.clientId);
+      toast.info(`${preset.name} is already added`);
+      return;
+    }
+
     const draft = presetToDraft(preset, templates.length === 0);
     const error = validateTemplateDraft(draft);
     if (error) {
@@ -71,14 +77,20 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
       source: "CUSTOM",
       isDefault: templates.length === 0,
       sections: [
-        createSectionDraft({
-          title: "Executive Summary",
-          aiInstructions: "Generate a concise executive summary.",
-        }, 0),
-        createSectionDraft({
-          title: "Action Items",
-          aiInstructions: "Extract tasks, owners, and deadlines.",
-        }, 1),
+        createSectionDraft(
+          {
+            title: "Executive Summary",
+            aiInstructions: "Generate a concise executive summary.",
+          },
+          0,
+        ),
+        createSectionDraft(
+          {
+            title: "Action Items",
+            aiInstructions: "Extract tasks, owners, and deadlines.",
+          },
+          1,
+        ),
       ],
     };
     upsertTemplate(draft);
@@ -90,21 +102,24 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
     const draft: OnboardingMomTemplateDraft = {
       clientId: createClientId(),
       name: file.name.replace(/\.[^.]+$/, ""),
-      description: "Imported from uploaded MOM document",
+      description: "Imported from uploaded document",
       category: "CUSTOM",
       source: "UPLOADED",
       isDefault: templates.length === 0,
       pendingUpload: file,
       sections: [
-        createSectionDraft({
-          title: "Meeting Overview",
-          aiInstructions: "Summarize the meeting purpose and context.",
-        }, 0),
+        createSectionDraft(
+          {
+            title: "Meeting Overview",
+            aiInstructions: "Summarize the meeting purpose and context.",
+          },
+          0,
+        ),
       ],
     };
     upsertTemplate(draft);
     setMode("custom");
-    toast.success("Upload template added — sections will be extracted after provisioning");
+    toast.success("Upload added — sections will be extracted after provisioning");
   }
 
   function updateActiveTemplate(patch: Partial<OnboardingMomTemplateDraft>) {
@@ -121,48 +136,52 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
     );
   }
 
-  function handleDuplicate(clientId: string) {
-    const source = templates.find((t) => t.clientId === clientId);
-    if (!source) return;
-    const copy: OnboardingMomTemplateDraft = {
-      ...source,
-      clientId: createClientId(),
-      name: `${source.name} (Copy)`,
-      isDefault: false,
-      sections: source.sections.map((s, index) => ({ ...s, id: createClientId(), sortOrder: index })),
-    };
-    onChange([...templates, copy]);
-    setActiveClientId(copy.clientId);
-  }
-
-  function handleArchive(clientId: string) {
-    onChange(templates.filter((t) => t.clientId !== clientId));
-    if (activeClientId === clientId) setActiveClientId(null);
-  }
-
   function handleDelete(clientId: string) {
-    handleArchive(clientId);
+    const next = templates.filter((t) => t.clientId !== clientId);
+    onChange(next);
+    if (activeClientId === clientId) {
+      setActiveClientId(next[0]?.clientId ?? null);
+    }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      <div className="rounded-lg border border-blue-100 bg-blue-50/60 px-4 py-3 text-sm text-slate-600">
+        <span className="font-medium text-slate-800">Meeting notes templates</span> define the
+        sections in AI-generated minutes — like Executive Summary, Decisions, and Action Items.
+        Pick one below; you&apos;ll preview the final document in the review step.
+      </div>
+
+      <ConfiguredTemplatesList
+        templates={templates}
+        activeClientId={activeClientId}
+        onSelect={setActiveClientId}
+        onSetDefault={handleSetDefault}
+        onDelete={handleDelete}
+        onEdit={(clientId) => {
+          setActiveClientId(clientId);
+          setMode("custom");
+        }}
+      />
+
       <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
-        <TabsList className="grid h-auto w-full grid-cols-3 rounded-2xl bg-slate-100/80 p-1">
-          <TabsTrigger value="presets" className="rounded-xl py-2.5 text-xs sm:text-sm">
-            <Layers className="mr-1.5 hidden h-4 w-4 sm:inline" />
-            Template library
+        <TabsList className="inline-flex h-auto w-full max-w-md rounded-xl bg-slate-100/80 p-1">
+          <TabsTrigger value="presets" className="flex-1 rounded-lg py-2 text-xs sm:text-sm">
+            <Layers className="mr-1.5 hidden h-3.5 w-3.5 sm:inline" />
+            Choose template
           </TabsTrigger>
-          <TabsTrigger value="custom" className="rounded-xl py-2.5 text-xs sm:text-sm">
-            <FileText className="mr-1.5 hidden h-4 w-4 sm:inline" />
-            Custom builder
+          <TabsTrigger value="custom" className="flex-1 rounded-lg py-2 text-xs sm:text-sm">
+            <FileText className="mr-1.5 hidden h-3.5 w-3.5 sm:inline" />
+            Customize
           </TabsTrigger>
-          <TabsTrigger value="upload" className="rounded-xl py-2.5 text-xs sm:text-sm">
-            <Upload className="mr-1.5 hidden h-4 w-4 sm:inline" />
-            Upload template
+          <TabsTrigger value="upload" className="flex-1 rounded-lg py-2 text-xs sm:text-sm">
+            <Upload className="mr-1.5 hidden h-3.5 w-3.5 sm:inline" />
+            Upload
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="presets" className="mt-5 space-y-5">
+        <TabsContent value="presets" className="mt-4 space-y-3">
+          <p className="text-xs text-slate-500">Click a template to add it for this organization.</p>
           {isError ? (
             <EmptyState
               icon={FileText}
@@ -171,29 +190,38 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
             />
           ) : (
             <TemplatePresetGrid
-              presets={data?.presets ?? []}
+              presets={presets}
               isLoading={isLoading}
-              onPreview={setPreviewPreset}
+              selectedKey={
+                activeTemplate?.presetKey ??
+                templates.find((t) => t.clientId === activeClientId)?.presetKey ??
+                null
+              }
               onSelect={handleSelectPreset}
             />
           )}
         </TabsContent>
 
-        <TabsContent value="custom" className="mt-5 space-y-5">
+        <TabsContent value="custom" className="mt-4 space-y-4">
           {!activeTemplate ? (
             <EmptyState
               icon={FileText}
-              title="No custom template selected"
-              description="Create a custom template or select one from your configured list."
+              title="No template to customize"
+              description="Choose a template from the library first, or create your own."
               action={
-                <Button type="button" className="rounded-xl bg-blue-600 hover:bg-blue-700" onClick={handleCreateCustom}>
+                <Button
+                  type="button"
+                  className="rounded-xl bg-blue-600 hover:bg-blue-700"
+                  onClick={handleCreateCustom}
+                >
+                  <Plus className="mr-1.5 h-4 w-4" />
                   Create custom template
                 </Button>
               }
             />
           ) : (
-            <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-              <div className="space-y-4 rounded-[22px] border border-slate-200/80 bg-slate-50/40 p-5">
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <Label className="text-xs font-semibold text-slate-700">Template name</Label>
                   <Input
@@ -204,30 +232,33 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
                 </div>
                 <div>
                   <Label className="text-xs font-semibold text-slate-700">Description</Label>
-                  <textarea
+                  <Input
                     value={activeTemplate.description}
                     onChange={(e) => updateActiveTemplate({ description: e.target.value })}
-                    className="mt-1 min-h-[72px] w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="mt-1 rounded-xl"
+                    placeholder="When to use this template"
                   />
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full rounded-xl"
-                  onClick={() => setPreviewTemplate(activeTemplate)}
-                >
-                  Preview structure
-                </Button>
               </div>
-              <SectionEditorList
-                sections={activeTemplate.sections}
-                onChange={(sections) => updateActiveTemplate({ sections })}
-              />
+              <div>
+                <p className="mb-2 text-xs font-semibold text-slate-700">Document sections</p>
+                <p className="mb-3 text-[11px] text-slate-500">
+                  Drag to reorder. Each section becomes a heading in the generated meeting notes.
+                </p>
+                <SectionEditorList
+                  sections={activeTemplate.sections}
+                  onChange={(sections) => updateActiveTemplate({ sections })}
+                />
+              </div>
             </div>
           )}
         </TabsContent>
 
-        <TabsContent value="upload" className="mt-5 space-y-5">
+        <TabsContent value="upload" className="mt-4 space-y-4">
+          <p className="text-xs text-slate-500">
+            Have an existing minutes format? Upload a DOCX or PDF and we&apos;ll match its
+            structure after the organization is created.
+          </p>
           <TemplateUploadZone
             file={activeTemplate?.pendingUpload}
             onFileSelect={(file) => {
@@ -237,52 +268,6 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
           />
         </TabsContent>
       </Tabs>
-
-      <ConfiguredTemplatesList
-        templates={templates}
-        activeClientId={activeClientId}
-        onSelect={setActiveClientId}
-        onPreview={setPreviewTemplate}
-        onSetDefault={handleSetDefault}
-        onDuplicate={handleDuplicate}
-        onArchive={handleArchive}
-        onDelete={handleDelete}
-        onEdit={(clientId) => {
-          setActiveClientId(clientId);
-          setMode("custom");
-        }}
-      />
-
-      {templates.length === 0 ? (
-        <EmptyState
-          icon={Layers}
-          title="Configure meeting notes"
-          description="Select a professional template, build a custom structure, or upload your existing MOM format. At least one template is required."
-          action={
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button type="button" variant="outline" className="rounded-xl" onClick={handleCreateCustom}>
-                Start custom template
-              </Button>
-            </div>
-          }
-        />
-      ) : null}
-
-      <TemplatePreviewDialog
-        open={!!previewPreset}
-        onOpenChange={(open) => !open && setPreviewPreset(null)}
-        title={previewPreset?.name ?? ""}
-        description={previewPreset?.description}
-        sections={previewPreset?.sections ?? []}
-      />
-
-      <TemplatePreviewDialog
-        open={!!previewTemplate}
-        onOpenChange={(open) => !open && setPreviewTemplate(null)}
-        title={previewTemplate?.name ?? ""}
-        description={previewTemplate?.description}
-        sections={previewTemplate?.sections ?? []}
-      />
     </div>
   );
 }

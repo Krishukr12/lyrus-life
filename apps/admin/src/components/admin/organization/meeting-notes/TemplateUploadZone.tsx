@@ -63,8 +63,8 @@ export function TemplateUploadZone({ file, onFileSelect, disabled }: TemplateUpl
             <FileUp className="h-5 w-5 text-blue-600" />
           )}
         </div>
-        <p className="text-sm font-semibold text-slate-800">Upload existing MOM template</p>
-        <p className="mt-1 text-xs text-slate-500">DOCX or PDF up to 25 MB. Headings will be extracted when possible.</p>
+        <p className="text-sm font-semibold text-slate-800">Upload your existing format</p>
+        <p className="mt-1 text-xs text-slate-500">DOCX or PDF up to 25 MB. We&apos;ll extract headings to match your layout.</p>
         <Button
           type="button"
           variant="outline"

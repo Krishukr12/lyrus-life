@@ -4,12 +4,11 @@ import { getMeetings, getTasks } from "@/lib/api";
 import { Meeting, UserTask } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import {
-  ChartNoAxesCombined,
   CheckCircle2,
   AlertTriangle,
   TrendingDown,
-  TrendingUp,
   CircleDashed,
   FileText,
   RefreshCcw,
@@ -234,121 +233,187 @@ export default function PlatformInsights() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl">
-      <div className="rounded-2xl border bg-gradient-to-r from-secondary/15 via-secondary/5 to-transparent p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-heading font-bold flex items-center gap-2">
-              <ChartNoAxesCombined className="h-6 w-6 text-secondary" />
-              Platform Intelligence Report
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Decision-grade metrics for management review: execution reliability, governance quality, and deal-risk exposure.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button size="sm" className="gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90" onClick={() => navigate("/meetings")}>
-              <Briefcase className="h-3.5 w-3.5" /> Review Meetings
-            </Button>
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={refreshData}>
-              <RefreshCcw className="h-3.5 w-3.5" /> Refresh
-            </Button>
-          </div>
+    <div className="space-y-7 max-w-7xl">
+      {/* Header */}
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Intelligence</p>
+          <h1 className="text-[26px] leading-tight font-heading font-bold mt-1">
+            Platform <span className="text-gradient">Intelligence Report</span>
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Decision-grade metrics for management review: execution reliability, governance quality, and deal-risk exposure.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="secondary" className="gap-1.5 shine" onClick={() => navigate("/meetings")}>
+            <Briefcase className="h-3.5 w-3.5" /> Review Meetings
+          </Button>
+          <Button variant="outline" className="gap-1.5" onClick={refreshData}>
+            <RefreshCcw className="h-3.5 w-3.5" /> Refresh
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Execution Reliability Index</p>
-          <p className={`text-2xl font-heading font-bold mt-1 ${statusColorByScore(insights.executionReliability)}`}>{insights.executionReliability}/100</p>
-          <p className="text-xs text-muted-foreground mt-1">Task closure + delay control + MoM hygiene</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Governance Score</p>
-          <p className={`text-2xl font-heading font-bold mt-1 ${statusColorByScore(insights.governanceScore)}`}>{insights.governanceScore}/100</p>
-          <p className="text-xs text-muted-foreground mt-1">Documentation quality and communication compliance</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Deal Risk Score</p>
-          <p className={`text-2xl font-heading font-bold mt-1 ${insights.dealRiskScore >= 55 ? "text-destructive" : "text-warning"}`}>{insights.dealRiskScore}/100</p>
-          <p className="text-xs text-muted-foreground mt-1">Higher score indicates higher chance of outcome slippage</p>
-        </Card>
+      {/* Score strip */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          {
+            label: "Execution Reliability Index",
+            value: insights.executionReliability,
+            tone: statusColorByScore(insights.executionReliability),
+            bar: insights.executionReliability >= 75 ? "bg-success" : insights.executionReliability >= 55 ? "bg-warning" : "bg-destructive",
+            hint: "Task closure + delay control + MoM hygiene",
+            icon: Gauge,
+          },
+          {
+            label: "Governance Score",
+            value: insights.governanceScore,
+            tone: statusColorByScore(insights.governanceScore),
+            bar: insights.governanceScore >= 75 ? "bg-success" : insights.governanceScore >= 55 ? "bg-warning" : "bg-destructive",
+            hint: "Documentation quality and communication compliance",
+            icon: FileText,
+          },
+          {
+            label: "Deal Risk Score",
+            value: insights.dealRiskScore,
+            tone: insights.dealRiskScore >= 55 ? "text-destructive" : "text-warning",
+            bar: insights.dealRiskScore >= 55 ? "bg-destructive" : "bg-warning",
+            hint: "Higher score indicates higher chance of outcome slippage",
+            icon: TrendingDown,
+          },
+        ].map((s, i) => (
+          <motion.div
+            key={s.label}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.07, duration: 0.4, ease: [0.21, 0.6, 0.35, 1] }}
+          >
+            <Card className="stat-card h-full">
+              <div className="flex items-start justify-between">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground pr-3">{s.label}</p>
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+                  <s.icon className="h-[18px] w-[18px]" />
+                </div>
+              </div>
+              <p className={`text-3xl font-heading font-bold tabular-nums mt-2 ${s.tone}`}>
+                {s.value}<span className="text-base font-semibold text-muted-foreground">/100</span>
+              </p>
+              <div className="mt-3 h-1.5 rounded-full bg-muted overflow-hidden">
+                <motion.div
+                  className={`h-full rounded-full ${s.bar}`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${s.value}%` }}
+                  transition={{ duration: 0.9, delay: 0.25 + i * 0.08, ease: [0.21, 0.6, 0.35, 1] }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-2.5">{s.hint}</p>
+            </Card>
+          </motion.div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Meeting Completion</p>
-          <p className="text-2xl font-heading font-bold mt-1">{insights.completionRate}%</p>
-          <p className="text-xs text-muted-foreground mt-1">{insights.completedMeetings}/{insights.totalMeetings} completed</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">MoM Compliance</p>
-          <p className="text-2xl font-heading font-bold mt-1">{insights.momCoverage}%</p>
-          <p className="text-xs text-muted-foreground mt-1">Share rate {insights.momShareRate}%</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Task Completion</p>
-          <p className="text-2xl font-heading font-bold mt-1">{insights.taskCompletionRate}%</p>
-          <p className="text-xs text-muted-foreground mt-1">{insights.totalTasks} actions tracked</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Overdue Exposure</p>
-          <p className={`text-2xl font-heading font-bold mt-1 ${insights.overdueRate >= 25 ? "text-destructive" : "text-success"}`}>{insights.overdueRate}%</p>
-          <p className="text-xs text-muted-foreground mt-1">{insights.overdueTasks} overdue actions</p>
-        </Card>
-      </div>
+      {/* KPI strip */}
+      <Card className="px-6 py-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:divide-x md:divide-border/60">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">Meeting Completion</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{insights.completionRate}%</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{insights.completedMeetings}/{insights.totalMeetings} completed</p>
+          </div>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">MoM Compliance</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{insights.momCoverage}%</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Share rate {insights.momShareRate}%</p>
+          </div>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">Task Completion</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{insights.taskCompletionRate}%</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{insights.totalTasks} actions tracked</p>
+          </div>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">Overdue Exposure</p>
+            <p className={`text-lg font-heading font-semibold tabular-nums mt-1 ${insights.overdueRate >= 25 ? "text-destructive" : "text-success"}`}>{insights.overdueRate}%</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{insights.overdueTasks} overdue actions</p>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="p-5">
+        <Card className="p-6">
           <h2 className="font-heading font-semibold flex items-center gap-2">
-            <Gauge className="h-4 w-4 text-secondary" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <Gauge className="h-3.5 w-3.5" />
+            </span>
             Decision Scorecard
           </h2>
-          <div className="mt-3 space-y-2 text-sm">
-            <div className="rounded-md border p-2 flex justify-between"><span>Ongoing Meetings</span><span className="font-medium">{insights.ongoingMeetings}</span></div>
-            <div className="rounded-md border p-2 flex justify-between"><span>Upcoming in 72h</span><span className="font-medium">{insights.upcomingWithin72h}</span></div>
-            <div className="rounded-md border p-2 flex justify-between"><span>Open Actions</span><span className="font-medium">{insights.openTasks}</span></div>
-            <div className="rounded-md border p-2 flex justify-between"><span>Stale Open Actions</span><span className="font-medium">{insights.staleTasks}</span></div>
-            <div className="rounded-md border p-2 flex justify-between"><span>Due Today</span><span className="font-medium">{insights.dueTodayTasks}</span></div>
-            <div className="rounded-md border p-2 flex justify-between"><span>Average Meeting Duration</span><span className="font-medium">{insights.avgDuration} min</span></div>
+          <div className="mt-4 divide-y divide-border/50 text-sm">
+            {[
+              { label: "Ongoing Meetings", value: insights.ongoingMeetings },
+              { label: "Upcoming in 72h", value: insights.upcomingWithin72h },
+              { label: "Open Actions", value: insights.openTasks },
+              { label: "Stale Open Actions", value: insights.staleTasks },
+              { label: "Due Today", value: insights.dueTodayTasks },
+              { label: "Average Meeting Duration", value: `${insights.avgDuration} min` },
+            ].map((row) => (
+              <div key={row.label} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
+                <span className="text-muted-foreground">{row.label}</span>
+                <span className="font-heading font-semibold tabular-nums">{row.value}</span>
+              </div>
+            ))}
           </div>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-6">
           <h2 className="font-heading font-semibold flex items-center gap-2">
-            <Briefcase className="h-4 w-4 text-secondary" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <Briefcase className="h-3.5 w-3.5" />
+            </span>
             Portfolio Mix
           </h2>
-          <div className="mt-3 space-y-3 text-sm">
-            <div>
-              <div className="flex justify-between text-xs mb-1"><span>Internal</span><span>{insights.internalMeetings}</span></div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-primary" style={{ width: `${pct(insights.internalMeetings, insights.totalMeetings)}%` }} /></div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs mb-1"><span>Client</span><span>{insights.clientMeetings}</span></div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-secondary" style={{ width: `${pct(insights.clientMeetings, insights.totalMeetings)}%` }} /></div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs mb-1"><span>Vendor</span><span>{insights.vendorMeetings}</span></div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-warning" style={{ width: `${pct(insights.vendorMeetings, insights.totalMeetings)}%` }} /></div>
-            </div>
-            <p className="text-xs text-muted-foreground pt-1">Use this mix to allocate account-management and operations bandwidth.</p>
+          <div className="mt-4 space-y-4 text-sm">
+            {[
+              { label: "Internal", value: insights.internalMeetings, bar: "bg-primary" },
+              { label: "Client", value: insights.clientMeetings, bar: "bg-secondary" },
+              { label: "Vendor", value: insights.vendorMeetings, bar: "bg-warning" },
+            ].map((row, idx) => (
+              <div key={row.label}>
+                <div className="flex justify-between text-xs mb-1.5">
+                  <span className="font-medium">{row.label}</span>
+                  <span className="tabular-nums text-muted-foreground">{row.value}</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    className={`h-full rounded-full ${row.bar}`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct(row.value, insights.totalMeetings)}%` }}
+                    transition={{ duration: 0.8, delay: 0.2 + idx * 0.1, ease: [0.21, 0.6, 0.35, 1] }}
+                  />
+                </div>
+              </div>
+            ))}
+            <p className="text-xs text-muted-foreground border-t border-border/50 mt-4 pt-3">Use this mix to allocate account-management and operations bandwidth.</p>
           </div>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-6">
           <h2 className="font-heading font-semibold flex items-center gap-2">
-            <Users className="h-4 w-4 text-secondary" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <Users className="h-3.5 w-3.5" />
+            </span>
             Stakeholder Load
           </h2>
-          <div className="mt-3 space-y-2 text-sm">
+          <div className="mt-4 space-y-1.5 text-sm">
             {insights.topStakeholders.length === 0 ? (
               <p className="text-muted-foreground text-sm">No stakeholder distribution data yet.</p>
             ) : (
               insights.topStakeholders.map((s) => (
-                <div key={s.name} className="rounded-md border p-2 flex justify-between">
-                  <span className="truncate pr-3">{s.name}</span>
-                  <span className="font-medium">{s.count}</span>
+                <div key={s.name} className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-muted/30 transition-colors">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
+                    {s.name.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase()}
+                  </span>
+                  <span className="truncate flex-1">{s.name}</span>
+                  <span className="font-heading font-semibold tabular-nums">{s.count}</span>
                 </div>
               ))
             )}
@@ -357,42 +422,48 @@ export default function PlatformInsights() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="p-5">
+        <Card className="p-6">
           <h2 className="font-heading font-semibold flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-success" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-success/10 text-success">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+            </span>
             What Went Well
           </h2>
-          <ul className="mt-3 space-y-2 text-sm">
+          <ul className="mt-4 space-y-2 text-sm">
             {insights.wentWell.map((item, idx) => (
-              <li key={idx} className="rounded-md bg-success/10 px-3 py-2">
+              <li key={idx} className="rounded-lg border border-success/15 bg-success/[0.07] px-3.5 py-2.5 leading-relaxed">
                 {item}
               </li>
             ))}
           </ul>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-6">
           <h2 className="font-heading font-semibold flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-warning" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-warning/10 text-warning">
+              <AlertTriangle className="h-3.5 w-3.5" />
+            </span>
             What Went Wrong
           </h2>
-          <ul className="mt-3 space-y-2 text-sm">
+          <ul className="mt-4 space-y-2 text-sm">
             {insights.wentWrong.map((item, idx) => (
-              <li key={idx} className="rounded-md bg-warning/15 px-3 py-2">
+              <li key={idx} className="rounded-lg border border-warning/20 bg-warning/[0.08] px-3.5 py-2.5 leading-relaxed">
                 {item}
               </li>
             ))}
           </ul>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-6">
           <h2 className="font-heading font-semibold flex items-center gap-2">
-            <TrendingDown className="h-4 w-4 text-destructive" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
+              <TrendingDown className="h-3.5 w-3.5" />
+            </span>
             Deal-Loss Signals
           </h2>
-          <ul className="mt-3 space-y-2 text-sm">
+          <ul className="mt-4 space-y-2 text-sm">
             {insights.potentialDealLossSignals.map((item, idx) => (
-              <li key={idx} className="rounded-md bg-destructive/10 px-3 py-2">
+              <li key={idx} className="rounded-lg border border-destructive/15 bg-destructive/[0.06] px-3.5 py-2.5 leading-relaxed">
                 {item}
               </li>
             ))}
@@ -401,64 +472,75 @@ export default function PlatformInsights() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-5">
+        <Card className="p-6">
           <h2 className="font-heading font-semibold flex items-center gap-2">
-            <ClipboardList className="h-4 w-4 text-secondary" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <ClipboardList className="h-3.5 w-3.5" />
+            </span>
             Management Actions (Next 7 Days)
           </h2>
-          <ul className="mt-3 space-y-2 text-sm">
+          <ul className="mt-4 space-y-2 text-sm">
             {insights.managementActions.map((action, idx) => (
-              <li key={idx} className="rounded-md bg-muted/40 px-3 py-2">{action}</li>
+              <li key={idx} className="flex items-start gap-3 rounded-lg border border-border/60 bg-muted/20 px-3.5 py-2.5 leading-relaxed">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-secondary/10 text-secondary text-[11px] font-semibold tabular-nums">
+                  {idx + 1}
+                </span>
+                {action}
+              </li>
             ))}
           </ul>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-6">
           <h2 className="font-heading font-semibold flex items-center gap-2">
-            <FileText className="h-4 w-4 text-secondary" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <FileText className="h-3.5 w-3.5" />
+            </span>
             Report Readiness & Data Gaps
           </h2>
-          <div className="mt-3 space-y-2 text-sm">
-            <p className="rounded-md bg-muted/40 px-3 py-2">
+          <div className="mt-4 space-y-2 text-sm">
+            <p className="rounded-lg border border-border/60 bg-muted/20 px-3.5 py-2.5 leading-relaxed">
               Current report quality is strong for operational control, but deal outcomes are still inferred.
             </p>
-            <p className="rounded-md bg-muted/40 px-3 py-2">
+            <p className="rounded-lg border border-border/60 bg-muted/20 px-3.5 py-2.5 leading-relaxed">
               Add explicit fields next: deal outcome, outcome value, loss reason category, and customer sentiment.
             </p>
-            <p className="rounded-md bg-muted/40 px-3 py-2 flex items-center gap-2">
-              <CalendarClock className="h-4 w-4 text-muted-foreground" />
+            <p className="rounded-lg border border-border/60 bg-muted/20 px-3.5 py-2.5 flex items-start gap-2 leading-relaxed">
+              <CalendarClock className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
               Once outcomes are logged per meeting, this page can produce board-level monthly trend reports.
             </p>
-            <p className="rounded-md bg-muted/40 px-3 py-2 flex items-center gap-2">
-              <CircleDashed className="h-4 w-4 text-muted-foreground" />
+            <p className="rounded-lg border border-border/60 bg-muted/20 px-3.5 py-2.5 flex items-start gap-2 leading-relaxed">
+              <CircleDashed className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
               Current analysis runs from meetings, MoM, and task execution signals only.
             </p>
           </div>
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Backlog Pressure</p>
-          <p className="text-xl font-heading font-bold mt-1">{insights.pendingTasks}</p>
-          <p className="text-xs text-muted-foreground mt-1">Pending tasks awaiting start</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Execution in Motion</p>
-          <p className="text-xl font-heading font-bold mt-1">{insights.inProgressTasks}</p>
-          <p className="text-xs text-muted-foreground mt-1">Tasks currently in progress</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Stale Open Rate</p>
-          <p className={`text-xl font-heading font-bold mt-1 ${insights.staleRate >= 35 ? "text-destructive" : "text-success"}`}>{insights.staleRate}%</p>
-          <p className="text-xs text-muted-foreground mt-1">Open tasks older than 5 days</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Upcoming Meetings</p>
-          <p className="text-xl font-heading font-bold mt-1">{insights.upcomingMeetings}</p>
-          <p className="text-xs text-muted-foreground mt-1">With {insights.upcomingWithin72h} in next 72h</p>
-        </Card>
-      </div>
+      <Card className="px-6 py-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:divide-x md:divide-border/60">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">Backlog Pressure</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{insights.pendingTasks}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Pending tasks awaiting start</p>
+          </div>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">Execution in Motion</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{insights.inProgressTasks}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Tasks currently in progress</p>
+          </div>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">Stale Open Rate</p>
+            <p className={`text-lg font-heading font-semibold tabular-nums mt-1 ${insights.staleRate >= 35 ? "text-destructive" : "text-success"}`}>{insights.staleRate}%</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Open tasks older than 5 days</p>
+          </div>
+          <div className="md:pl-6">
+            <p className="text-xs font-medium text-muted-foreground">Upcoming Meetings</p>
+            <p className="text-lg font-heading font-semibold tabular-nums mt-1">{insights.upcomingMeetings}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">With {insights.upcomingWithin72h} in next 72h</p>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

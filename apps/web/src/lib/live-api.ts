@@ -30,6 +30,24 @@ export interface LiveJoinToken {
   meetingId: string;
 }
 
+export interface JoinMeetingPreview {
+  meetingId: string;
+  title: string;
+  status: string;
+  isLive: boolean;
+  canJoin: boolean;
+}
+
+export interface GuestJoinSession {
+  meetingId: string;
+  title: string;
+  livekitUrl: string;
+  token: string;
+  roomName: string;
+  isLive: boolean;
+  sessionStartedAt: string;
+}
+
 async function liveRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const hasJsonBody = init?.body != null && init.body !== "";
   const response = await fetch(`${API_BASE}${path}`, {
@@ -87,6 +105,23 @@ export async function endLiveSession(meetingId: string): Promise<{ ok: boolean; 
 
 export async function getJoinMeetingAccess(slug: string): Promise<JoinMeetingAccess> {
   return authLiveRequest<JoinMeetingAccess>(`/meetings/join/${slug}`);
+}
+
+/** Public meeting preview for the join page — works without an account. */
+export async function getJoinMeetingPreview(slug: string): Promise<JoinMeetingPreview> {
+  return liveRequest<JoinMeetingPreview>(`/meetings/join/${slug}/preview`);
+}
+
+/** Join as an external guest. Only emails on the invite list are accepted. */
+export async function joinMeetingAsGuest(
+  slug: string,
+  name: string,
+  email: string,
+): Promise<GuestJoinSession> {
+  return liveRequest<GuestJoinSession>(`/meetings/join/${slug}/guest`, {
+    method: "POST",
+    body: JSON.stringify({ name, email }),
+  });
 }
 
 export async function getLiveMeetingStatus(

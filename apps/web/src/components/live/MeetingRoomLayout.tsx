@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Copy, Crown, PanelRightClose, PanelRightOpen, Radio, Users } from "lucide-react";
+import { Copy, Crown, PanelRightClose, PanelRightOpen, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -85,9 +85,9 @@ export function MeetingRoomLayout({
             {recordingActive && (
               <Badge
                 variant="outline"
-                className="gap-1.5 border-red-500/30 bg-red-500/10 text-red-200 text-[10px] font-medium hidden sm:flex"
+                className="gap-1.5 border-red-500/30 bg-red-500/10 text-red-200 text-[10px] font-medium hidden sm:flex backdrop-blur-sm"
               >
-                <Radio className="h-3 w-3 animate-pulse" />
+                <span className="meeting-recording-dot" aria-hidden />
                 Recording
                 {(recordingTrackCount ?? 0) > 0
                   ? ` · ${recordingTrackCount} audio${recordingTrackCount === 1 ? "" : " tracks"}`

@@ -2,92 +2,101 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const ONBOARDING_STEPS = [
-  { id: 1, title: "Company Information", short: "Company" },
-  { id: 2, title: "Business Details", short: "Business" },
-  { id: 3, title: "Subscription Plan", short: "Plan" },
-  { id: 4, title: "Meeting Notes Configuration", short: "Notes" },
-  { id: 5, title: "Admin Account", short: "Admin" },
+  { id: 1, title: "Company", short: "Company" },
+  { id: 2, title: "Business", short: "Business" },
+  { id: 3, title: "Plan", short: "Plan" },
+  { id: 4, title: "Notes", short: "Notes" },
+  { id: 5, title: "Admin", short: "Admin" },
+  { id: 6, title: "Review", short: "Review" },
 ] as const;
 
 export function OnboardingStepper({
-  activeStep = 1,
+  currentStep = 1,
   completionPercent,
+  onStepClick,
 }: {
-  activeStep?: number;
+  currentStep?: number;
   completionPercent?: number;
+  onStepClick?: (step: number) => void;
 }) {
   const percent =
-    completionPercent ?? Math.round(((activeStep - 1) / ONBOARDING_STEPS.length) * 100);
+    completionPercent ?? Math.round(((currentStep - 1) / ONBOARDING_STEPS.length) * 100);
 
   return (
-    <nav aria-label="Onboarding progress" className="mb-8">
-      <div className="overflow-hidden rounded-[22px] border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,23,42,0.05)] sm:p-6">
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <nav aria-label="Onboarding progress" className="mb-6">
+      <div className="rounded-2xl border border-slate-200/80 bg-white px-4 py-4 shadow-sm sm:px-6">
+        <div className="mb-4 flex items-center justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Onboarding progress
+            <p className="text-xs font-medium text-slate-500">
+              Step {currentStep} of {ONBOARDING_STEPS.length}
             </p>
-            <p className="mt-0.5 text-sm font-medium text-slate-700">
-              Step {activeStep} of {ONBOARDING_STEPS.length} ·{" "}
-              {ONBOARDING_STEPS[activeStep - 1]?.title}
+            <p className="text-sm font-semibold text-slate-900">
+              {ONBOARDING_STEPS[currentStep - 1]?.title}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold tabular-nums text-slate-900">{percent}%</span>
-            <span className="text-xs text-slate-500">complete</span>
+          <div className="text-right">
+            <span className="text-xl font-bold tabular-nums text-slate-900">{percent}%</span>
+            <p className="text-[11px] text-slate-400">complete</p>
           </div>
         </div>
 
-        <div className="relative mb-6 h-2 overflow-hidden rounded-full bg-slate-100">
+        <div className="relative mb-4 h-1.5 overflow-hidden rounded-full bg-slate-100">
           <div
-            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 transition-all duration-500 ease-out"
-            style={{ width: `${Math.max(percent, 8)}%` }}
+            className="absolute inset-y-0 left-0 rounded-full bg-blue-600 transition-all duration-500 ease-out"
+            style={{ width: `${Math.max(percent, 4)}%` }}
           />
         </div>
 
-        <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {ONBOARDING_STEPS.map((step) => {
-            const done = step.id < activeStep;
-            const current = step.id === activeStep;
+        <ol className="flex items-center justify-between gap-1">
+          {ONBOARDING_STEPS.map((step, index) => {
+            const done = step.id < currentStep;
+            const current = step.id === currentStep;
+            const clickable = done && onStepClick;
 
             return (
-              <li
-                key={step.id}
-                className={cn(
-                  "flex items-center gap-3 rounded-2xl border px-3 py-3 transition-all duration-300",
-                  done
-                    ? "border-emerald-200/80 bg-emerald-50/50"
-                    : current
-                      ? "border-blue-200 bg-blue-50/40 shadow-sm ring-1 ring-blue-500/10"
-                      : "border-slate-100 bg-slate-50/40",
-                )}
-              >
-                <span
+              <li key={step.id} className="flex flex-1 items-center">
+                <button
+                  type="button"
+                  disabled={!clickable}
+                  onClick={() => clickable && onStepClick(step.id)}
                   className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors",
-                    done
-                      ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/30"
-                      : current
-                        ? "bg-blue-600 text-white shadow-sm shadow-blue-600/30"
-                        : "bg-white text-slate-400 ring-1 ring-slate-200",
+                    "group flex w-full flex-col items-center gap-1.5",
+                    clickable && "cursor-pointer",
+                    !clickable && !current && "cursor-default",
                   )}
+                  aria-current={current ? "step" : undefined}
                 >
-                  {done ? <Check className="h-4 w-4" /> : step.id}
-                </span>
-                <div className="min-w-0 hidden md:block">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                    Step {step.id}
-                  </p>
-                  <p
+                  <span
                     className={cn(
-                      "truncate text-sm font-semibold",
-                      done ? "text-emerald-800" : current ? "text-slate-900" : "text-slate-500",
+                      "flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold transition-colors sm:h-8 sm:w-8 sm:text-xs",
+                      done
+                        ? "bg-emerald-500 text-white"
+                        : current
+                          ? "bg-blue-600 text-white ring-4 ring-blue-100"
+                          : "bg-slate-100 text-slate-400",
+                      clickable && "group-hover:bg-emerald-600",
                     )}
                   >
-                    {step.title}
-                  </p>
-                </div>
-                <p className="truncate text-xs font-semibold text-slate-700 md:hidden">{step.short}</p>
+                    {done ? <Check className="h-3.5 w-3.5" /> : step.id}
+                  </span>
+                  <span
+                    className={cn(
+                      "hidden text-[10px] font-medium sm:block",
+                      current ? "text-blue-700" : done ? "text-emerald-700" : "text-slate-400",
+                    )}
+                  >
+                    {step.short}
+                  </span>
+                </button>
+                {index < ONBOARDING_STEPS.length - 1 ? (
+                  <div
+                    className={cn(
+                      "mx-0.5 h-px flex-1 min-w-[8px] sm:mx-1",
+                      step.id < currentStep ? "bg-emerald-300" : "bg-slate-200",
+                    )}
+                    aria-hidden
+                  />
+                ) : null}
               </li>
             );
           })}

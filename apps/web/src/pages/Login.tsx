@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import {
-  Building2,
   AtSign,
   Lock,
   ArrowRight,
@@ -10,6 +9,8 @@ import {
   EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,8 +21,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useAuth } from "@/contexts/AuthContext";
-
-const companyName = import.meta.env.VITE_COMPANY_NAME ?? "Meeting Desk AI";
+import { APP_NAME } from "@/lib/brand";
 
 type Step = "signin" | "forgot-email" | "forgot-reset";
 
@@ -101,7 +101,7 @@ export default function Login() {
     setBusy(true);
     try {
       await login(email.trim(), password, redirectTo);
-      toast.success(`Welcome to ${companyName}`);
+      toast.success(`Welcome to ${APP_NAME}`);
     } catch (err) {
       if (err instanceof Error && err.message === "SUPER_ADMIN_REDIRECT") return;
       toast.error(err instanceof Error ? err.message : "Sign in failed");
@@ -138,7 +138,7 @@ export default function Login() {
     setBusy(true);
     try {
       await resetPassword(resetToken, otpCode, newPassword, confirmPassword);
-      toast.success(`Password updated. Welcome to ${companyName}`);
+      toast.success(`Password updated. Welcome to ${APP_NAME}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not reset password");
     } finally {
@@ -162,19 +162,36 @@ export default function Login() {
         : "Enter the code and choose a new password";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-teal-950/20 p-6">
-      <div className="w-full max-w-[420px] space-y-8">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background p-6">
+      {/* Animated aurora backdrop */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-40 left-1/2 h-[480px] w-[720px] -translate-x-1/2 rounded-full bg-secondary/15 blur-3xl animate-float" />
+        <div className="absolute -bottom-48 -left-32 h-[420px] w-[420px] rounded-full bg-primary/10 blur-3xl" />
+        <div
+          className="absolute -bottom-32 -right-24 h-[380px] w-[380px] rounded-full bg-teal-400/10 blur-3xl animate-float"
+          style={{ animationDelay: "2.2s" }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_-10%,hsl(var(--secondary)/0.08),transparent_60%)]" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
+        className="relative w-full max-w-[420px] space-y-8"
+      >
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border/60 bg-muted/60">
-            <Building2 className="h-5 w-5 text-foreground/70" />
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">{companyName}</h1>
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
-          </div>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+          >
+            <BrandMark variant="light" iconSize={44} className="justify-center mx-auto" showTagline={false} />
+          </motion.div>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
         </div>
 
-        <Card className="border-border/60 shadow-sm">
+        <Card className="glass-card border-border/50 shadow-lifted">
           <CardContent className="p-6">
             {step === "signin" && (
               <form onSubmit={handleSignIn} className="space-y-4">
@@ -348,9 +365,9 @@ export default function Login() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground">
-          Access is limited to authorized {companyName} accounts.
+          Access is limited to authorized {APP_NAME} accounts.
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }
