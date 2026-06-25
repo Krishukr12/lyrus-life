@@ -111,8 +111,11 @@ CREATE INDEX "InvoiceLineItem_invoiceId_sortOrder_idx" ON "InvoiceLineItem"("inv
 CREATE INDEX "Payment_organizationId_paidAt_idx" ON "Payment"("organizationId", "paidAt");
 CREATE INDEX "Payment_invoiceId_idx" ON "Payment"("invoiceId");
 CREATE INDEX "InvoiceDelivery_invoiceId_createdAt_idx" ON "InvoiceDelivery"("invoiceId", "createdAt");
+CREATE INDEX "InvoiceDelivery_organizationId_idx" ON "InvoiceDelivery"("organizationId");
 CREATE INDEX "BillingEvent_organizationId_createdAt_idx" ON "BillingEvent"("organizationId", "createdAt");
+CREATE INDEX "BillingEvent_type_idx" ON "BillingEvent"("type");
 CREATE INDEX "PricingChangeLog_createdAt_idx" ON "PricingChangeLog"("createdAt");
+CREATE INDEX "Invoice_invoiceNumber_idx" ON "Invoice"("invoiceNumber");
 
 ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "InvoiceLineItem" ADD CONSTRAINT "InvoiceLineItem_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice"("id") ON DELETE CASCADE ON UPDATE CASCADE;

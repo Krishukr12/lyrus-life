@@ -10,6 +10,7 @@ import {
   UserCog,
   Settings,
   ScrollText,
+  Link2,
 } from "lucide-react";
 import { LogoIcon } from "@/components/BrandMark";
 import { NavLink } from "@/components/NavLink";
@@ -35,6 +36,7 @@ const workspaceNavItems = [
   { title: "Meetings", url: "/meetings", icon: Users },
   { title: "Tasks", url: "/tasks", icon: ListChecks },
   { title: "Calendar", url: "/calendar", icon: CalendarDays },
+  { title: "Integrations", url: "/settings/integrations", icon: Link2 },
 ];
 
 const organizationNavItems = [

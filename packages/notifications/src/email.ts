@@ -15,7 +15,10 @@ export interface InviteResult {
 
 export interface SendMeetingInvitesInput {
   meetingId: string;
-  joinSlug: string;
+  joinUrl: string;
+  joinSlug?: string;
+  platformLabel?: string;
+  locationLabel?: string;
   title: string;
   description: string;
   scheduledAt: Date;
@@ -25,9 +28,15 @@ export interface SendMeetingInvitesInput {
   attendees: Array<{ name: string; email: string }>;
 }
 
-function getMeetingJoinUrl(joinSlug: string, attendeeEmail?: string): string {
+function resolveJoinUrl(input: SendMeetingInvitesInput, attendeeEmail?: string): string {
+  if (input.joinUrl) {
+    return attendeeEmail
+      ? `${input.joinUrl}${input.joinUrl.includes("?") ? "&" : "?"}email=${encodeURIComponent(attendeeEmail)}`
+      : input.joinUrl;
+  }
   const base = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
-  const url = `${base}/join/${joinSlug}`;
+  const slug = input.joinSlug ?? "";
+  const url = `${base}/join/${slug}`;
   return attendeeEmail ? `${url}?email=${encodeURIComponent(attendeeEmail)}` : url;
 }
 
@@ -35,7 +44,8 @@ function buildInviteHtml(
   input: SendMeetingInvitesInput,
   attendee: { name: string; email: string },
 ): string {
-  const joinUrl = getMeetingJoinUrl(input.joinSlug, attendee.email);
+  const joinUrl = resolveJoinUrl(input, attendee.email);
+  const platformName = input.platformLabel ?? "Lyrus Life";
   const when = input.scheduledAt.toLocaleString(undefined, {
     weekday: "long",
     year: "numeric",
@@ -57,9 +67,8 @@ function buildInviteHtml(
         </a>
       </p>
       <p style="color: #666; font-size: 13px; margin-top: 24px;">
-        This invite was sent to ${attendee.email}. If you have an account, sign in to join.
-        Otherwise just open the link and join as a guest with this email address —
-        only invited people can enter. A calendar invite (.ics) is attached.
+        This invite was sent to ${attendee.email}. Join on ${platformName} using the button above.
+        A calendar invite (.ics) is attached.
       </p>
     </div>
   `.trim();
@@ -69,13 +78,13 @@ function buildInviteText(
   input: SendMeetingInvitesInput,
   attendee: { name: string; email: string },
 ): string {
-  const joinUrl = getMeetingJoinUrl(input.joinSlug, attendee.email);
+  const joinUrl = resolveJoinUrl(input, attendee.email);
   return [
     `You're invited to: ${input.title}`,
     `When: ${input.scheduledAt.toLocaleString()} (${input.durationMinutes} min)`,
     input.description ? `Agenda: ${input.description}` : "",
     `Join: ${joinUrl}`,
-    `This invite was sent to ${attendee.email}. Open the link and join as a guest with this email if you don't have an account.`,
+    `This invite was sent to ${attendee.email}.`,
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -102,7 +111,8 @@ export async function sendMeetingInvites(
   }
 
   const end = new Date(input.scheduledAt.getTime() + input.durationMinutes * 60_000);
-  const joinUrl = getMeetingJoinUrl(input.joinSlug);
+  const joinUrl = resolveJoinUrl(input);
+  const location = input.locationLabel ?? "Lyrus Life (virtual)";
 
   const calendarBase: CalendarEventInput = {
     uid: `lyrus-meeting-${input.meetingId}@lyrus.life`,
@@ -113,7 +123,7 @@ export async function sendMeetingInvites(
     organizerName: input.organizerName,
     organizerEmail: input.organizerEmail,
     attendees: input.attendees,
-    location: "Lyrus Life (virtual)",
+    location,
     url: joinUrl,
   };
 

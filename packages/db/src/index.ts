@@ -32,6 +32,8 @@ export const InvoiceStatus = generatedExports.InvoiceStatus;
 export const PaymentStatus = generatedExports.PaymentStatus;
 export const InvoiceDeliveryStatus = generatedExports.InvoiceDeliveryStatus;
 export const OrganizationInvitationStatus = generatedExports.OrganizationInvitationStatus;
+export const IntegrationProvider = generatedExports.IntegrationProvider;
+export const MeetingPlatform = generatedExports.MeetingPlatform;
 
 export type PrismaClient = InstanceType<typeof PrismaClient>;
 
@@ -85,4 +87,7 @@ export type {
   BillingEvent,
   PricingChangeLog,
   OrganizationInvitation,
+  UserIntegration,
+  IntegrationProvider as IntegrationProviderType,
+  MeetingPlatform as MeetingPlatformType,
 } from "../generated/client/index.js";

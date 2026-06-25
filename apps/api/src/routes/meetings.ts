@@ -1,27 +1,16 @@
 import { createReadStream } from "node:fs";
 import { Router } from "express";
-import {
-  AudioStorageBackend,
-  MeetingStatus,
-  MeetingTag,
-  PipelineStep,
-  TaskStatus,
-  UserRole,
-  UserStatus,
-  prisma,
-} from "@lyrus/db";
+import { AudioStorageBackend, MeetingPlatform, MeetingStatus, MeetingTag, PipelineStep, TaskStatus, UserRole, UserStatus, prisma } from "@lyrus/db";
 import { assertMeetingAccess, meetingsListWhere } from "../lib/meeting-access.js";
 import { assertOrganizationCanCreateMeeting, PlanLimitError } from "../lib/plan-limits.js";
 import { generateJoinSlug } from "../lib/join-slug.js";
 import { requireAuthUser } from "../middleware/authenticate.js";
 import { authorize } from "../middleware/authorize.js";
-import { extractMeetingInsights } from "@lyrus/nlu";
 import { createMeetingSchema, editMomSchema, updateMeetingSchema } from "@lyrus/shared";
 import type { Prisma } from "@lyrus/db";
 import type { MeetingStatusType, MeetingTagType } from "../types/enums.js";
 import { parseActionDeadline } from "../lib/deadline.js";
 import {
-  extractionToMomPayload,
   formatDateTime,
   mapActionItemToTask,
   mapMeeting,
@@ -31,6 +20,7 @@ import {
 import { logAudit } from "../services/audit.js";
 import {
   createTranscriptFromNotes,
+  regenerateMomForMeeting,
   runMeetingPipeline,
   runNluFromExistingTranscript,
 } from "../services/pipeline.js";
@@ -41,6 +31,19 @@ import {
 } from "../services/storage/index.js";
 import { localFilePath } from "../services/storage/local.js";
 import { sendAndRecordMeetingInvites } from "../services/invites.js";
+import { assertUserHasIntegration } from "../services/integrations/index.js";
+import {
+  mapPlatformInput,
+  provisionExternalMeeting,
+} from "../services/integrations/meeting-platform.js";
+import {
+  externalMeetingNeedsLiveRefresh,
+  refreshExternalRecordingLiveStatus,
+  rescheduleBotForExternalMeeting,
+  scheduleBotForExternalMeeting,
+  syncExternalRecordingState,
+} from "../services/recording-bot/index.js";
+import { isRecallConfigured } from "../services/recording-bot/recall.js";
 import { sendMomToStakeholdersOnApproval } from "../services/mom-share.js";
 import { asyncHandler, sendAuthError } from "../lib/http.js";
 import { getMultipartFile, requireRouteParam } from "../lib/route-params.js";
@@ -149,6 +152,17 @@ export function createMeetingsRouter(): Router {
       res.status(404).json({ error: "Meeting not found" });
         return;
     }
+
+    if (isRecallConfigured() && externalMeetingNeedsLiveRefresh(meeting)) {
+      await refreshExternalRecordingLiveStatus(meeting.id);
+      const refreshed = await prisma.meeting.findUnique({
+        where: { id: meeting.id },
+        include: meetingInclude,
+      });
+      res.json(mapMeeting(refreshed ?? meeting));
+      return;
+    }
+
     res.json(mapMeeting(meeting));
   }));
 
@@ -182,6 +196,22 @@ export function createMeetingsRouter(): Router {
       }
     }
 
+    const platform = data.platform ?? "lyrus";
+    const dbPlatform = mapPlatformInput(platform);
+    const isExternal = platform === "google_meet" || platform === "microsoft_teams";
+
+    if (isExternal) {
+      await assertUserHasIntegration(user.id, platform);
+      if (!isRecallConfigured()) {
+        res.status(503).json({
+          error: "recording_not_configured",
+          message:
+            "Automated recording is not configured (RECALL_API_KEY). Contact your administrator.",
+        });
+        return;
+      }
+    }
+
     const meeting = await prisma.meeting.create({
       data: {
         title: data.title,
@@ -190,9 +220,10 @@ export function createMeetingsRouter(): Router {
         durationMinutes: data.duration,
         tag: mapTag(data.tag),
         notes: data.notes,
+        platform: dbPlatform,
         organizationId: user.organizationId ?? undefined,
         organizerId: user.id,
-        joinSlug: generateJoinSlug(),
+        joinSlug: isExternal ? null : generateJoinSlug(),
         participants: {
           create: data.stakeholders.map((s) => ({
             name: s.name,
@@ -203,7 +234,31 @@ export function createMeetingsRouter(): Router {
       include: meetingInclude,
     });
 
-    await logAudit(meeting.id, PipelineStep.USER_EDIT, { action: "create_meeting" }, user.id);
+    if (isExternal) {
+      const external = await provisionExternalMeeting({
+        platform,
+        userId: user.id,
+        meetingId: meeting.id,
+        title: data.title,
+        description: data.description,
+        scheduledAt,
+        durationMinutes: data.duration,
+        attendees: data.stakeholders,
+      });
+
+      await prisma.meeting.update({
+        where: { id: meeting.id },
+        data: {
+          externalMeetingUrl: external.externalMeetingUrl,
+          calendarEventId: external.calendarEventId ?? null,
+          externalMeetingId: external.externalMeetingId ?? null,
+        },
+      });
+
+      await scheduleBotForExternalMeeting(meeting.id);
+    }
+
+    await logAudit(meeting.id, PipelineStep.USER_EDIT, { action: "create_meeting", platform }, user.id);
 
     const inviteResults = await sendAndRecordMeetingInvites(meeting.id);
     const refreshed = await prisma.meeting.findUnique({
@@ -220,6 +275,147 @@ export function createMeetingsRouter(): Router {
         error: r.error,
       })),
     });
+  }));
+
+  // External meeting link can be re-provisioned (Google Meet / Teams) if missing or expired.
+  router.post("/meetings/:id/external/reprovision", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
+    const meetingId = requireRouteParam(req.params.id, "id");
+    try {
+      await assertMeetingAccess(user, meetingId);
+    } catch (err) {
+      sendAuthError(res, err);
+      return;
+    }
+
+    const meeting = await prisma.meeting.findUnique({
+      where: { id: meetingId },
+      include: { participants: true },
+    });
+    if (!meeting) {
+      res.status(404).json({ error: "Meeting not found" });
+      return;
+    }
+
+    const platform =
+      meeting.platform === MeetingPlatform.GOOGLE_MEET
+        ? "google_meet"
+        : meeting.platform === MeetingPlatform.MICROSOFT_TEAMS
+          ? "microsoft_teams"
+          : "lyrus";
+
+    if (platform === "lyrus") {
+      res.status(400).json({
+        error: "not_external",
+        message: "This meeting is not a Google Meet or Microsoft Teams meeting.",
+      });
+      return;
+    }
+
+    await assertUserHasIntegration(user.id, platform);
+    if (!isRecallConfigured()) {
+      res.status(503).json({
+        error: "recording_not_configured",
+        message:
+          "Automated recording is not configured (RECALL_API_KEY). Contact your administrator.",
+      });
+      return;
+    }
+
+    const external = await provisionExternalMeeting({
+      platform,
+      userId: user.id,
+      meetingId: meeting.id,
+      title: meeting.title,
+      description: meeting.description,
+      scheduledAt: meeting.scheduledAt,
+      durationMinutes: meeting.durationMinutes,
+      attendees: meeting.participants.map((p) => ({ email: p.email, name: p.name })),
+    });
+
+    await prisma.meeting.update({
+      where: { id: meeting.id },
+      data: {
+        externalMeetingUrl: external.externalMeetingUrl,
+        calendarEventId: external.calendarEventId ?? meeting.calendarEventId ?? null,
+        externalMeetingId: external.externalMeetingId ?? meeting.externalMeetingId ?? null,
+      },
+    });
+
+    await scheduleBotForExternalMeeting(meeting.id);
+    const refreshed = await prisma.meeting.findUnique({
+      where: { id: meeting.id },
+      include: meetingInclude,
+    });
+    res.json(mapMeeting(refreshed ?? (meeting as any)));
+  }));
+
+  // Poll Recall for a finished recording and run the MOM pipeline (works without webhooks).
+  router.post("/meetings/:id/recording/sync", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
+    const meetingId = requireRouteParam(req.params.id, "id");
+    try {
+      await assertMeetingAccess(user, meetingId);
+    } catch (err) {
+      sendAuthError(res, err);
+      return;
+    }
+
+    if (!isRecallConfigured()) {
+      res.status(503).json({
+        error: "recording_not_configured",
+        message: "Automated recording is not configured (RECALL_API_KEY).",
+      });
+      return;
+    }
+
+    const result = await syncExternalRecordingState(meetingId);
+    const refreshed = await prisma.meeting.findUnique({
+      where: { id: meetingId },
+      include: meetingInclude,
+    });
+    res.json({ result, meeting: mapMeeting(refreshed!) });
+  }));
+
+  // Schedule a new Recall bot when rejoining an external meeting.
+  router.post("/meetings/:id/recording/bot", asyncHandler(async (req, res) => {
+    const user = requireAuthUser(req);
+    const meetingId = requireRouteParam(req.params.id, "id");
+    try {
+      await assertMeetingAccess(user, meetingId);
+    } catch (err) {
+      sendAuthError(res, err);
+      return;
+    }
+
+    const meeting = await prisma.meeting.findUnique({ where: { id: meetingId } });
+    if (!meeting) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+
+    if (
+      meeting.platform !== MeetingPlatform.GOOGLE_MEET &&
+      meeting.platform !== MeetingPlatform.MICROSOFT_TEAMS
+    ) {
+      res.status(400).json({ error: "not_external" });
+      return;
+    }
+
+    if (!isRecallConfigured()) {
+      res.status(503).json({
+        error: "recording_not_configured",
+        message: "Automated recording is not configured (RECALL_API_KEY).",
+      });
+      return;
+    }
+
+    await rescheduleBotForExternalMeeting(meetingId);
+    const refreshed = await prisma.meeting.findUnique({
+      where: { id: meetingId },
+      include: meetingInclude,
+    });
+    res.json(mapMeeting(refreshed!));
   }));
 
   router.post("/meetings/:id/invites/resend", asyncHandler(async (req, res) => {
@@ -583,49 +779,31 @@ export function createMeetingsRouter(): Router {
       sendAuthError(res, err); return;
     }
 
+    const meetingId = requireRouteParam(req.params.id, "id");
     const meeting = await prisma.meeting.findUnique({
-      where: { id: requireRouteParam(req.params.id, 'id') },
-      include: { participants: true, transcript: true },
+      where: { id: meetingId },
+      include: { mom: true },
     });
     if (!meeting) {
       res.status(404).json({ error: "Meeting not found" });
         return;
     }
 
-    const transcriptText =
-      meeting.transcript?.fullText ||
-      meeting.notes ||
-      "No transcript available. Please upload meeting audio.";
+    try {
+      await regenerateMomForMeeting(meetingId);
+    } catch (err) {
+      res.status(500).json({
+        error: err instanceof Error ? err.message : "MOM generation failed",
+      });
+      return;
+    }
 
-    const extraction = await extractMeetingInsights({
-      transcript: transcriptText,
-      participants: meeting.participants.map((p) => p.name),
-      meetingDateIso: formatDateTime(meeting.scheduledAt).date,
-    });
+    const mom = await prisma.mom.findUnique({ where: { meetingId } });
+    if (!mom) {
+      res.status(500).json({ error: "MOM was not created" });
+      return;
+    }
 
-    const momPayload = extractionToMomPayload(meeting, extraction);
-    const { date, time } = formatDateTime(meeting.scheduledAt);
-    const participantNames = meeting.participants.map((p) => p.name);
-
-    const mom = await prisma.mom.upsert({
-      where: { meetingId: meeting.id },
-      create: {
-        meetingId: meeting.id,
-        title: meeting.title,
-        dateTime: `${date} ${time}`,
-        participants: participantNames as unknown as Prisma.InputJsonValue,
-        keyPoints: momPayload.keyPoints as unknown as Prisma.InputJsonValue,
-        actionItems: momPayload.actionItems as unknown as Prisma.InputJsonValue,
-      },
-      update: {
-        keyPoints: momPayload.keyPoints as unknown as Prisma.InputJsonValue,
-        actionItems: momPayload.actionItems as unknown as Prisma.InputJsonValue,
-        approved: false,
-        shared: false,
-      },
-    });
-
-    await logAudit(meeting.id, PipelineStep.MOM_GENERATED);
     res.json(mapMom(mom));
   }));
 

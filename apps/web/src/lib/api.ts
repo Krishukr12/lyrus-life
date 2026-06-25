@@ -22,7 +22,7 @@ function buildAuthHeaders(extra?: HeadersInit): HeadersInit {
   };
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+export async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const hasJsonBody = init?.body != null && init.body !== "";
   const headers: HeadersInit = buildAuthHeaders({
     ...(hasJsonBody ? { "Content-Type": "application/json" } : {}),
@@ -126,8 +126,34 @@ export async function getMeeting(id: string): Promise<Meeting | undefined> {
   }
 }
 
+export async function reprovisionExternalMeeting(meetingId: string): Promise<Meeting> {
+  return request<Meeting>(`/meetings/${meetingId}/external/reprovision`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function syncMeetingRecording(meetingId: string): Promise<{
+  result: "ingested" | "pending" | "failed" | "none";
+  meeting: Meeting;
+}> {
+  return request<{ result: "ingested" | "pending" | "failed" | "none"; meeting: Meeting }>(
+    `/meetings/${meetingId}/recording/sync`,
+    { method: "POST", body: JSON.stringify({}) },
+  );
+}
+
+export async function rescheduleMeetingRecordingBot(meetingId: string): Promise<Meeting> {
+  return request<Meeting>(`/meetings/${meetingId}/recording/bot`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
 export async function createMeeting(
-  data: Omit<Meeting, "id" | "status" | "notes" | "mom">,
+  data: Omit<Meeting, "id" | "status" | "notes" | "mom"> & {
+    platform?: "lyrus" | "google_meet" | "microsoft_teams";
+  },
 ): Promise<CreateMeetingResponse> {
   return request<CreateMeetingResponse>("/meetings", {
     method: "POST",
@@ -138,6 +164,7 @@ export async function createMeeting(
       time: data.time,
       duration: data.duration,
       tag: data.tag,
+      platform: data.platform ?? "lyrus",
       stakeholders: data.stakeholders,
       notes: "",
     }),

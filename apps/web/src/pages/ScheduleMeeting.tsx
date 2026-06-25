@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { createMeeting, getPeopleSuggestions, type PersonSuggestion } from "@/lib/api";
+import { getMyIntegrations } from "@/services/integrations-api";
 import { MeetingTag, Stakeholder } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,7 @@ export default function ScheduleMeeting() {
   const [time, setTime] = useState("");
   const [duration, setDuration] = useState("60");
   const [tag, setTag] = useState<MeetingTag>("internal");
+  const [platform, setPlatform] = useState<"lyrus" | "google_meet" | "microsoft_teams">("lyrus");
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
   const [sName, setSName] = useState("");
   const [sEmail, setSEmail] = useState("");
@@ -31,6 +34,16 @@ export default function ScheduleMeeting() {
   const [peopleQuery, setPeopleQuery] = useState("");
   const suggestTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { data: integrationsData } = useQuery({
+    queryKey: ["user", "integrations"],
+    queryFn: getMyIntegrations,
+  });
+
+  const googleConnected =
+    integrationsData?.integrations.find((i) => i.provider === "google")?.connected ?? false;
+  const microsoftConnected =
+    integrationsData?.integrations.find((i) => i.provider === "microsoft")?.connected ?? false;
 
   useEffect(() => {
     if (!suggestionsOpen) return;
@@ -132,6 +145,7 @@ export default function ScheduleMeeting() {
         time,
         duration: parseInt(duration, 10),
         tag,
+        platform,
         stakeholders: finalStakeholders,
       });
 
@@ -214,10 +228,31 @@ export default function ScheduleMeeting() {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Label>Meeting platform</Label>
+            <Select value={platform} onValueChange={(v) => setPlatform(v as typeof platform)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="lyrus">Lyrus Live (built-in)</SelectItem>
+                <SelectItem value="google_meet" disabled={!googleConnected}>
+                  Google Meet{!googleConnected ? " — connect in Integrations" : ""}
+                </SelectItem>
+                <SelectItem value="microsoft_teams" disabled={!microsoftConnected}>
+                  Microsoft Teams{!microsoftConnected ? " — connect in Integrations" : ""}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-muted-foreground text-xs">
+              {platform === "lyrus"
+                ? "Participants join in Lyrus Life. Recording starts when the host ends the meeting."
+                : "Participants join on the selected platform. A recording bot captures audio automatically for MOM."}
+            </p>
+          </div>
+
           <div className="space-y-3">
             <Label>Stakeholders *</Label>
             <p className="text-muted-foreground text-xs">
-              Each stakeholder receives a calendar invite (.ics) and email with a link to join the meeting in Lyrus Life.
+              Each stakeholder receives an email with a join link on the selected platform.
             </p>
             <div className="relative">
               <div className="flex gap-2">

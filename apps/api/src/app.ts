@@ -21,12 +21,17 @@ import { InvitationError } from "./services/invitation.service.js";
 import { PlanLimitError } from "./lib/plan-limits.js";
 import { createLiveRouter } from "./routes/live.js";
 import { createMeetingsRouter } from "./routes/meetings.js";
+import {
+  createIntegrationCallbacksRouter,
+  createIntegrationsRouter,
+  createWebhooksRouter,
+} from "./routes/integrations.js";
 
 export function createApp(corsOrigins: string[]): Express {
   const app = express();
 
   app.use(securityHeaders);
-  app.use(globalRateLimiter);
+  // app.use(globalRateLimiter);
   app.use(
     cors({
       origin: corsOrigins,
@@ -43,6 +48,8 @@ export function createApp(corsOrigins: string[]): Express {
 
   app.use(createAuthRouter());
   app.use(createLiveRouter());
+  app.use(createIntegrationCallbacksRouter());
+  app.use(createWebhooksRouter());
 
   const protectedApi = express.Router();
   protectedApi.use(authenticate);
@@ -54,6 +61,7 @@ export function createApp(corsOrigins: string[]): Express {
   protectedApi.use(createOrganizationUsersRouter());
   protectedApi.use(createOrganizationInvitationsRouter());
   protectedApi.use(createOrganizationSettingsRouter());
+  protectedApi.use(createIntegrationsRouter());
   protectedApi.use(createMeetingsRouter());
   app.use(protectedApi);
 

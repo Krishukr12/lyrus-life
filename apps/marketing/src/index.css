@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Syne:wght@500..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ink: 222 47% 11%;
+    --mist: 220 25% 97%;
+    --teal: 174 72% 46%;
+    --teal-soft: 174 55% 92%;
+    --navy: 224 64% 16%;
+    --navy-deep: 226 56% 9%;
+    --font-heading: 'Syne', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[hsl(var(--mist))] text-[hsl(var(--ink))] antialiased font-body;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand via-teal-300 to-cyan-400;
+  }
+
+  .section-pad {
+    @apply py-20 md:py-28;
+  }
+}

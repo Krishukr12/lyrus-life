@@ -38,6 +38,7 @@ export const createMeetingSchema = z.object({
     )
     .min(1, "Add at least one stakeholder to send meeting invites"),
   notes: z.string().optional().default(""),
+  platform: z.enum(["lyrus", "google_meet", "microsoft_teams"]).default("lyrus"),
 });
 
 export const updateMeetingSchema = z.object({

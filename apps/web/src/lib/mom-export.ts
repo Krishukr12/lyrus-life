@@ -180,6 +180,7 @@ function toMomPdfInput(meeting: Meeting, mom: MOM) {
     meetingTitle: meeting.title,
     meetingDate: `${meeting.date}`,
     durationMinutes: meeting.duration,
+    sections: mom.sections?.length ? mom.sections : undefined,
     mom: {
       createdAt: mom.createdAt,
       participants: mom.participants,

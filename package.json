@@ -14,6 +14,8 @@
     "db:push:force": "pnpm --filter @lyrus/db db:push:force",
     "db:seed": "pnpm --filter @lyrus/db db:seed",
     "db:migrate:deploy": "pnpm --filter @lyrus/db db:migrate:deploy",
+    "dev:marketing": "pnpm --filter marketing dev",
+    "build:marketing": "pnpm --filter marketing build",
     "setup": "docker compose up -d && cp -n .env.example .env 2>/dev/null || true && pnpm db:generate && pnpm db:push && pnpm db:seed",
     "test:transcription": "pnpm --filter api exec tsx ../../scripts/test-transcription.ts"
   },

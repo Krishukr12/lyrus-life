@@ -24,6 +24,7 @@ import ImpersonatePage from "@/pages/ImpersonatePage";
 import AccountSuspendedPage from "@/pages/AccountSuspendedPage";
 import JoinMeeting from "@/pages/JoinMeeting";
 import MeetingRoom from "@/pages/MeetingRoom";
+import IntegrationsPage from "@/pages/IntegrationsPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,7 @@ const App = () => (
                       <Route path="/meetings" element={<Meetings />} />
                       <Route path="/meetings/:id" element={<MeetingDetail />} />
                       <Route path="/schedule" element={<ScheduleMeeting />} />
+                      <Route path="/settings/integrations" element={<IntegrationsPage />} />
                       <Route path="/tasks" element={<Tasks />} />
                       <Route path="/calendar" element={<CalendarView />} />
                       <Route

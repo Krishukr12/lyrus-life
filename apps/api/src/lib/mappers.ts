@@ -8,7 +8,10 @@ import type {
   Summary,
   Transcript,
   TranscriptSegment,
+  MeetingPlatformType,
 } from "@lyrus/db";
+import { MeetingPlatform } from "@lyrus/db";
+import { buildRecordingProgress } from "../services/recording-bot/recording-progress.js";
 import type {
   MeetingStatusType,
   MeetingTagType,
@@ -41,6 +44,11 @@ export interface WebActionItem {
   deadline: string;
 }
 
+export interface WebMomSection {
+  title: string;
+  content: string[];
+}
+
 export interface WebMOM {
   id: string;
   meetingId: string;
@@ -49,6 +57,7 @@ export interface WebMOM {
   participants: string[];
   keyPoints: string[];
   actionItems: WebActionItem[];
+  sections?: WebMomSection[];
   createdAt: string;
   shared: boolean;
   approved: boolean;
@@ -90,6 +99,18 @@ export interface WebMeeting {
     sentAt: string;
   }>;
   joinSlug?: string;
+  platform?: "lyrus" | "google_meet" | "microsoft_teams";
+  externalMeetingUrl?: string;
+  recordingBotStatus?: string | null;
+  recordingProgress?: {
+    phase: string;
+    step: number;
+    totalSteps: number;
+    title: string;
+    detail: string;
+    isLive: boolean;
+    isProcessing: boolean;
+  } | null;
 }
 
 export interface WebUserTask {
@@ -152,6 +173,9 @@ export function mapMom(mom: Mom): WebMOM {
   const actionItems = Array.isArray(mom.actionItems)
     ? (mom.actionItems as unknown as WebActionItem[])
     : [];
+  const sections = Array.isArray(mom.sections)
+    ? (mom.sections as unknown as WebMomSection[])
+    : undefined;
 
   return {
     id: mom.id,
@@ -161,6 +185,7 @@ export function mapMom(mom: Mom): WebMOM {
     participants: Array.isArray(mom.participants) ? (mom.participants as string[]) : [],
     keyPoints,
     actionItems,
+    sections,
     createdAt: mom.createdAt.toISOString(),
     shared: mom.shared,
     approved: mom.approved,
@@ -168,6 +193,17 @@ export function mapMom(mom: Mom): WebMOM {
     approvedAt: mom.approvedAt?.toISOString(),
     lastEditedAt: mom.lastEditedAt?.toISOString(),
   };
+}
+
+function mapDbPlatform(platform: MeetingPlatformType): WebMeeting["platform"] {
+  switch (platform) {
+    case "GOOGLE_MEET":
+      return "google_meet";
+    case "MICROSOFT_TEAMS":
+      return "microsoft_teams";
+    default:
+      return "lyrus";
+  }
 }
 
 export function mapMeeting(meeting: MeetingWithRelations): WebMeeting {
@@ -188,6 +224,9 @@ export function mapMeeting(meeting: MeetingWithRelations): WebMeeting {
     tag: mapDbTag(meeting.tag),
     notes: meeting.notes,
     joinSlug: meeting.joinSlug ?? undefined,
+    platform: mapDbPlatform(meeting.platform),
+    externalMeetingUrl: meeting.externalMeetingUrl ?? undefined,
+    recordingBotStatus: meeting.recordingBotStatus ?? undefined,
   };
 
   if (meeting.status === "PROCESSING") {
@@ -195,6 +234,22 @@ export function mapMeeting(meeting: MeetingWithRelations): WebMeeting {
   }
   if (meeting.status === "FAILED") {
     web.pipelineStatus = "failed";
+  }
+
+  const isExternal =
+    meeting.platform === MeetingPlatform.GOOGLE_MEET ||
+    meeting.platform === MeetingPlatform.MICROSOFT_TEAMS;
+  if (isExternal) {
+    const progress = buildRecordingProgress({
+      recordingBotStatus: meeting.recordingBotStatus,
+      pipelineStatus: web.pipelineStatus ?? null,
+      meetingStatus: meeting.status,
+      hasMom: Boolean(meeting.mom),
+      hasTranscript: Boolean(meeting.transcript),
+    });
+    if (progress) {
+      web.recordingProgress = progress;
+    }
   }
 
   if (meeting.mom) {

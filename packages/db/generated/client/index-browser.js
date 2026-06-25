@@ -327,6 +327,21 @@ exports.Prisma.AuthOtpScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.UserIntegrationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  accessTokenEnc: 'accessTokenEnc',
+  refreshTokenEnc: 'refreshTokenEnc',
+  expiresAt: 'expiresAt',
+  scopes: 'scopes',
+  externalAccountId: 'externalAccountId',
+  externalEmail: 'externalEmail',
+  preferences: 'preferences',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.MeetingScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -337,7 +352,12 @@ exports.Prisma.MeetingScalarFieldEnum = {
   status: 'status',
   tag: 'tag',
   notes: 'notes',
+  platform: 'platform',
   calendarEventId: 'calendarEventId',
+  externalMeetingUrl: 'externalMeetingUrl',
+  externalMeetingId: 'externalMeetingId',
+  recordingBotId: 'recordingBotId',
+  recordingBotStatus: 'recordingBotStatus',
   recordingUrl: 'recordingUrl',
   organizerId: 'organizerId',
   livekitRoomId: 'livekitRoomId',
@@ -596,6 +616,11 @@ exports.OrganizationInvitationStatus = exports.$Enums.OrganizationInvitationStat
   CANCELLED: 'CANCELLED'
 };
 
+exports.IntegrationProvider = exports.$Enums.IntegrationProvider = {
+  GOOGLE: 'GOOGLE',
+  MICROSOFT: 'MICROSOFT'
+};
+
 exports.MeetingStatus = exports.$Enums.MeetingStatus = {
   UPCOMING: 'UPCOMING',
   ONGOING: 'ONGOING',
@@ -608,6 +633,12 @@ exports.MeetingTag = exports.$Enums.MeetingTag = {
   INTERNAL: 'INTERNAL',
   CLIENT: 'CLIENT',
   VENDOR: 'VENDOR'
+};
+
+exports.MeetingPlatform = exports.$Enums.MeetingPlatform = {
+  LYRUS_LIVEKIT: 'LYRUS_LIVEKIT',
+  GOOGLE_MEET: 'GOOGLE_MEET',
+  MICROSOFT_TEAMS: 'MICROSOFT_TEAMS'
 };
 
 exports.MomTemplateCategory = exports.$Enums.MomTemplateCategory = {
@@ -682,6 +713,7 @@ exports.Prisma.ModelName = {
   EmployeeProfile: 'EmployeeProfile',
   TenantAuditLog: 'TenantAuditLog',
   AuthOtp: 'AuthOtp',
+  UserIntegration: 'UserIntegration',
   Meeting: 'Meeting',
   MomTemplate: 'MomTemplate',
   MomTemplateSection: 'MomTemplateSection',

@@ -1,8 +1,2 @@
--- CreateIndex
-CREATE INDEX "BillingEvent_type_idx" ON "BillingEvent"("type");
-
--- CreateIndex
-CREATE INDEX "Invoice_invoiceNumber_idx" ON "Invoice"("invoiceNumber");
-
--- CreateIndex
-CREATE INDEX "InvoiceDelivery_organizationId_idx" ON "InvoiceDelivery"("organizationId");
+-- Indexes for billing tables were moved to 20260612140000_billing_invoices
+-- (tables are created there; this migration originally ran too early).

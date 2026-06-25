@@ -8,6 +8,8 @@ import {
   approveMOM,
   uploadMeetingAudio,
   resendMeetingInvites,
+  rescheduleMeetingRecordingBot,
+  syncMeetingRecording,
 } from "@/lib/api";
 import { ActionItem, Meeting } from "@/lib/types";
 import { Card } from "@/components/ui/card";
@@ -19,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge, TagBadge } from "@/components/StatusBadge";
 import { MomStakeholderBadge } from "@/components/MomStakeholderBadge";
+import { ExternalRecordingProgress } from "@/components/ExternalRecordingProgress";
 import {
   ArrowLeft,
   Clock,
@@ -111,6 +114,50 @@ export default function MeetingDetail() {
     return () => clearInterval(interval);
   }, [meeting?.pipelineStatus, refreshMeeting]);
 
+  // Poll Recall for live status + MOM pipeline (local dev often has no webhook URL).
+  useEffect(() => {
+    if (!id || !meeting) return;
+    const external =
+      meeting.platform === "google_meet" || meeting.platform === "microsoft_teams";
+    if (!external) return;
+
+    const botStatus = meeting.recordingBotStatus;
+    const shouldPoll =
+      Boolean(meeting.recordingProgress?.isLive) ||
+      Boolean(meeting.recordingProgress?.isProcessing) ||
+      botStatus === "scheduled" ||
+      botStatus === "scheduling" ||
+      botStatus === "joining" ||
+      botStatus === "waiting_room" ||
+      botStatus === "in_call" ||
+      botStatus === "recording" ||
+      botStatus === "call_ended" ||
+      (botStatus === "processing" && meeting.pipelineStatus !== "processing") ||
+      meeting.pipelineStatus === "processing";
+
+    if (!shouldPoll) return;
+
+    const poll = () => {
+      void syncMeetingRecording(id)
+        .then(({ meeting: updated }) => setMeeting(normalizeMeeting(updated)))
+        .catch(() => {
+          // ignore transient poll errors
+        });
+    };
+
+    poll();
+    const interval = setInterval(poll, meeting.recordingProgress?.isLive ? 5000 : 8000);
+    return () => clearInterval(interval);
+  }, [
+    id,
+    meeting?.platform,
+    meeting?.recordingBotStatus,
+    meeting?.pipelineStatus,
+    meeting?.recordingProgress?.isLive,
+    meeting?.recordingProgress?.isProcessing,
+    meeting?.recordingProgress?.phase,
+  ]);
+
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -150,12 +197,58 @@ export default function MeetingDetail() {
 
   const handleJoin = () => {
     if (!meeting) return;
+    const external =
+      meeting.platform === "google_meet" || meeting.platform === "microsoft_teams";
+    if (meeting.externalMeetingUrl && external) {
+      window.open(meeting.externalMeetingUrl, "_blank", "noopener,noreferrer");
+      // Server is idempotent: reuses bot on first join, schedules a new one only after prior session ended.
+      void rescheduleMeetingRecordingBot(meeting.id)
+        .then((updated) => setMeeting(normalizeMeeting(updated)))
+        .catch((err) => {
+          toast.error(err instanceof Error ? err.message : "Could not schedule recording bot");
+        });
+      return;
+    }
+    if (meeting.externalMeetingUrl) {
+      window.open(meeting.externalMeetingUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    // Never route external-platform meetings into the in-built LiveKit room.
+    // If the external join URL is missing, it means provisioning failed or the meeting wasn't refreshed.
+    if (meeting.platform === "google_meet" || meeting.platform === "microsoft_teams") {
+      toast.loading("Recreating external meeting link…", { id: "reprovision" });
+      void import("@/lib/api")
+        .then(({ reprovisionExternalMeeting }) => reprovisionExternalMeeting(meeting.id))
+        .then((updated) => {
+          toast.dismiss("reprovision");
+          setMeeting(updated);
+          if (updated.externalMeetingUrl) {
+            window.open(updated.externalMeetingUrl, "_blank", "noopener,noreferrer");
+          } else {
+            toast.error("Could not generate external meeting link. Please try again.");
+          }
+        })
+        .catch((err) => {
+          toast.dismiss("reprovision");
+          toast.error(err instanceof Error ? err.message : "Could not recreate external meeting link");
+        });
+      return;
+    }
     if (meeting.joinSlug) {
       navigate(`/join/${meeting.joinSlug}`);
     } else {
       navigate(`/meetings/${meeting.id}/live`);
     }
   };
+
+  const isExternalPlatform =
+    meeting?.platform === "google_meet" || meeting?.platform === "microsoft_teams";
+  const platformLabel =
+    meeting?.platform === "google_meet"
+      ? "Google Meet"
+      : meeting?.platform === "microsoft_teams"
+        ? "Microsoft Teams"
+        : "Lyrus Live";
 
   const handleResendInvites = async () => {
     if (!meeting) return;
@@ -243,8 +336,17 @@ export default function MeetingDetail() {
     }
   };
 
+  const canApproveMom =
+    Boolean(meeting?.mom) &&
+    !meeting?.mom?.approved &&
+    meeting?.status === "completed";
+
   const handleApproveMom = async () => {
     if (!meeting?.mom) return;
+    if (meeting.status !== "completed") {
+      toast.error("Meeting must finish before MOM can be approved and shared.");
+      return;
+    }
     setApprovingMom(true);
     try {
       await approveMOM(meeting.id);
@@ -330,9 +432,10 @@ export default function MeetingDetail() {
               </div>
             </div>
 
-            <div className="flex gap-6 text-sm text-muted-foreground">
+            <div className="flex gap-6 text-sm text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {meeting.date} at {meeting.time}</span>
               <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {meeting.duration} min</span>
+              <Badge variant="outline" className="text-[10px]">{platformLabel}</Badge>
             </div>
 
             <div>
@@ -378,17 +481,18 @@ export default function MeetingDetail() {
             </div>
 
             <div className="flex gap-2 flex-wrap">
-              {meeting.status !== "completed" && (
+              {(isExternalPlatform || meeting.status !== "completed") && (
                 <Button onClick={handleJoin} variant="secondary" className="gap-2 shine" size="sm">
-                  <Video className="h-3.5 w-3.5" /> Join Meeting
+                  <Video className="h-3.5 w-3.5" />
+                  {isExternalPlatform ? `Join on ${platformLabel}` : "Join Meeting"}
                 </Button>
               )}
-              {meeting.status === "upcoming" && (
+              {meeting.status === "upcoming" && !isExternalPlatform && (
                 <Button onClick={handleStart} variant="outline" size="sm" className="gap-2">
                   <Play className="h-3.5 w-3.5" /> Start Meeting
                 </Button>
               )}
-              {meeting.status !== "completed" && (
+              {meeting.status !== "completed" && !isExternalPlatform && (
                 <Button onClick={handleComplete} variant="outline" size="sm" className="gap-2">
                   <CheckCircle2 className="h-3.5 w-3.5" /> Mark Completed
                 </Button>
@@ -401,6 +505,10 @@ export default function MeetingDetail() {
           </Card>
         </motion.div>
 
+        {isExternalPlatform && meeting.recordingProgress && !meeting.mom && (
+          <ExternalRecordingProgress meeting={meeting} />
+        )}
+
         <Card className="p-6 space-y-4">
           <h2 className="text-lg font-heading font-semibold">Meeting Notes</h2>
           <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add meeting notes here..." rows={5} />
@@ -409,37 +517,48 @@ export default function MeetingDetail() {
 
         <Card className="p-6 space-y-4">
           <h2 className="text-lg font-heading font-semibold">Recording</h2>
-          <p className="text-muted-foreground text-sm">
-            Upload meeting audio for speech-to-text with speaker segments, then AI extracts tasks and decisions.
-          </p>
-          <input
-            ref={audioInputRef}
-            type="file"
-            accept="audio/*,video/webm"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) void handleAudioUpload(file);
-              e.target.value = "";
-            }}
-          />
-          <motion.div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              disabled={uploadingAudio}
-              onClick={() => audioInputRef.current?.click()}
-            >
-              {uploadingAudio ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mic className="h-3.5 w-3.5" />}
-              Upload audio
-            </Button>
-            {meeting.pipelineStatus === "processing" && (
-              <Badge variant="outline" className="gap-1">
-                <Loader2 className="h-3 w-3 animate-spin" /> Processing…
-              </Badge>
-            )}
-          </motion.div>
+          {isExternalPlatform ? (
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>
+                A recording bot joins your {platformLabel} call automatically. When everyone leaves,
+                the bot exits on its own — even if time remains on the calendar — then MOM is generated.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="text-muted-foreground text-sm">
+                Upload meeting audio for speech-to-text with speaker segments, then AI extracts tasks and decisions.
+              </p>
+              <input
+                ref={audioInputRef}
+                type="file"
+                accept="audio/*,video/webm"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void handleAudioUpload(file);
+                  e.target.value = "";
+                }}
+              />
+              <motion.div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  disabled={uploadingAudio}
+                  onClick={() => audioInputRef.current?.click()}
+                >
+                  {uploadingAudio ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mic className="h-3.5 w-3.5" />}
+                  Upload audio
+                </Button>
+                {meeting.pipelineStatus === "processing" && (
+                  <Badge variant="outline" className="gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" /> Processing…
+                  </Badge>
+                )}
+              </motion.div>
+            </>
+          )}
           {meeting.transcript && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg border bg-muted/20 p-4">
               <motion.div className="max-h-64 space-y-2 overflow-y-auto text-sm">
@@ -479,7 +598,7 @@ export default function MeetingDetail() {
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="gap-1 border-warning/30 bg-warning/10 text-warning">
-                        Awaiting Lyrus approval
+                        Awaiting approval
                       </Badge>
                     )}
                   </div>
@@ -537,19 +656,31 @@ export default function MeetingDetail() {
                       </div>
                       <div className="min-w-0 flex-1 space-y-4">
                         <div>
-                          <h3 className="font-heading text-sm font-semibold">Lyrus Life approval</h3>
+                          <h3 className="font-heading text-sm font-semibold">Review & approve</h3>
                           <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-                            Stakeholders only receive this MOM after a Lyrus Life reviewer approves it. Approval emails the
-                            Lyrus Life MOM PDF to every stakeholder.
-                            to everyone listed on this meeting immediately.
+                            Stakeholders only receive this MOM after a reviewer approves it. Approval emails the
+                            MOM PDF to everyone listed on this meeting.
                           </p>
                         </div>
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <p className="text-muted-foreground text-sm">
-                            Approving as{" "}
-                            <span className="font-medium text-foreground">{getCurrentUserDisplayName()}</span>
+                            {meeting.status !== "completed" ? (
+                              <>
+                                Approval unlocks when the meeting ends and MOM generation finishes.
+                              </>
+                            ) : (
+                              <>
+                                Approving as{" "}
+                                <span className="font-medium text-foreground">{getCurrentUserDisplayName()}</span>
+                              </>
+                            )}
                           </p>
-                          <Button size="sm" onClick={handleApproveMom} disabled={approvingMom} className="gap-2 shrink-0 sm:h-10">
+                          <Button
+                            size="sm"
+                            onClick={handleApproveMom}
+                            disabled={approvingMom || !canApproveMom}
+                            className="gap-2 shrink-0 sm:h-10"
+                          >
                             {approvingMom ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                             Approve & send
                           </Button>
@@ -653,6 +784,20 @@ export default function MeetingDetail() {
                         ))}
                       </ul>
                     </div>
+                    {(meeting.mom.sections ?? []).length > 0 && (
+                      <div className="space-y-3">
+                        {(meeting.mom.sections ?? []).map((section, i) => (
+                          <div key={i}>
+                            <p className="font-medium text-muted-foreground">{section.title}</p>
+                            <ul className="mt-1 list-inside list-disc space-y-1">
+                              {(section.content ?? []).map((line, j) => (
+                                <li key={j}>{line}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <div>
                       <p className="font-medium text-muted-foreground">Action Items</p>
                       <div className="mt-2 overflow-hidden rounded-lg border">
@@ -678,6 +823,38 @@ export default function MeetingDetail() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+
+        {isExternalPlatform && !meeting.mom && !meeting.recordingProgress && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="overflow-hidden border-dashed">
+              <div className="space-y-3 p-6">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-secondary" />
+                  <h2 className="text-lg font-heading font-semibold">Minutes of Meeting</h2>
+                </div>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  After your {platformLabel} call ends, the recording is transcribed and a draft MOM is created
+                  automatically — same workflow as Lyrus Live: edit the draft, approve it, then export or email
+                  stakeholders. Nothing is sent until you approve.
+                </p>
+                {(meeting.pipelineStatus === "processing" ||
+                  meeting.recordingBotStatus === "processing" ||
+                  meeting.recordingBotStatus === "scheduling") && (
+                  <Badge variant="outline" className="gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Generating MOM from recording…
+                  </Badge>
+                )}
+                {meeting.recordingBotStatus === "done" && meeting.pipelineStatus !== "processing" && (
+                  <Button variant="outline" size="sm" className="gap-2" onClick={handleGenerateMOM} disabled={generatingMom}>
+                    {generatingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+                    Generate MOM now
+                  </Button>
+                )}
               </div>
             </Card>
           </motion.div>

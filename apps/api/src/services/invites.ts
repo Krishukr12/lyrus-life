@@ -1,7 +1,17 @@
-import { InviteStatus, PipelineStep, prisma } from "@lyrus/db";
+import { InviteStatus, MeetingPlatform, PipelineStep, prisma } from "@lyrus/db";
 import { getOrganizerEmail, sendMeetingInvites, type InviteResult } from "@lyrus/notifications";
 import { ensureMeetingJoinSlug } from "../lib/meeting-join-access.js";
+import {
+  mapPlatformToWeb,
+  platformLabel,
+  platformLocation,
+} from "./integrations/meeting-platform.js";
 import { logAudit } from "./audit.js";
+
+function webAppJoinUrl(joinSlug: string): string {
+  const base = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
+  return `${base}/join/${joinSlug}`;
+}
 
 export async function sendAndRecordMeetingInvites(meetingId: string): Promise<InviteResult[]> {
   const meeting = await prisma.meeting.findUnique({
@@ -19,11 +29,33 @@ export async function sendAndRecordMeetingInvites(meetingId: string): Promise<In
 
   const organizerName = meeting.organizer?.name ?? "Lyrus Life Host";
   const organizerEmail = meeting.organizer?.email ?? getOrganizerEmail();
-  const joinSlug = meeting.joinSlug ?? (await ensureMeetingJoinSlug(meeting.id));
+
+  const isExternal =
+    meeting.platform === MeetingPlatform.GOOGLE_MEET ||
+    meeting.platform === MeetingPlatform.MICROSOFT_TEAMS;
+
+  const joinSlug =
+    !isExternal && meeting.joinSlug
+      ? meeting.joinSlug
+      : !isExternal
+        ? await ensureMeetingJoinSlug(meeting.id)
+        : undefined;
+
+  const platform = mapPlatformToWeb(meeting.platform);
+  const joinUrl = isExternal
+    ? (meeting.externalMeetingUrl ?? "")
+    : webAppJoinUrl(joinSlug!);
+
+  if (!joinUrl) {
+    throw new Error("Meeting join URL is missing");
+  }
 
   const results = await sendMeetingInvites({
     meetingId: meeting.id,
+    joinUrl,
     joinSlug,
+    platformLabel: platformLabel(platform),
+    locationLabel: platformLocation(platform),
     title: meeting.title,
     description: meeting.description,
     scheduledAt: meeting.scheduledAt,
@@ -57,6 +89,8 @@ export async function sendAndRecordMeetingInvites(meetingId: string): Promise<In
     sent: results.filter((r) => r.status === "sent" || r.status === "logged").length,
     failed: results.filter((r) => r.status === "failed").length,
     recipients: results.map((r) => r.email),
+    platform: meeting.platform,
+    joinUrl,
   });
 
   return results;

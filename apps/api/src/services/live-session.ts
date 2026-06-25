@@ -6,6 +6,7 @@ import {
   getLiveMeetingNotes,
   getLiveRoomParticipantCount,
 } from "../socket/live-meeting.js";
+import { createTranscriptFromNotes, runNluFromExistingTranscript } from "./pipeline.js";
 import { logTenantAudit } from "./tenant-audit.service.js";
 
 type MeetingLiveFields = {
@@ -103,6 +104,33 @@ export async function endLiveSessionForMeeting(
     action: "meeting.ended",
     metadata: { meetingId, title: meeting.title, auto: options?.auto ?? false },
   });
+
+  // Mirror the external-meeting flow: once the meeting ends, generate MOM automatically.
+  // For LiveKit meetings we may not have an uploaded recording, so we fall back to notes.
+  try {
+    const trimmed = socketNotes.trim();
+    if (trimmed) {
+      // Prefer not to clobber user-authored notes; append socket notes if any exist.
+      const existingNotes = meeting.notes?.trim() ?? "";
+      const merged =
+        existingNotes && !existingNotes.includes(trimmed)
+          ? `${existingNotes}\n\n${trimmed}`
+          : existingNotes || trimmed;
+      if (merged !== meeting.notes) {
+        await prisma.meeting.update({
+          where: { id: meetingId },
+          data: { notes: merged },
+        });
+      }
+    }
+
+    // If no audio was uploaded, generate a transcript from notes and run NLU to produce MOM.
+    await createTranscriptFromNotes(meetingId);
+    await runNluFromExistingTranscript(meetingId);
+  } catch (err) {
+    // Do not block the "end meeting" operation on pipeline failures.
+    console.warn("Post-meeting pipeline failed", err);
+  }
 
   if (options?.auto) {
     const emptyMs = Number(process.env.LIVE_EMPTY_ROOM_MS ?? 3000);

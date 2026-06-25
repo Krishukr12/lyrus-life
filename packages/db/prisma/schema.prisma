@@ -56,6 +56,17 @@ enum InviteStatus {
   FAILED
 }
 
+enum IntegrationProvider {
+  GOOGLE
+  MICROSOFT
+}
+
+enum MeetingPlatform {
+  LYRUS_LIVEKIT
+  GOOGLE_MEET
+  MICROSOFT_TEAMS
+}
+
 enum AudioStorageBackend {
   LOCAL
   S3
@@ -365,6 +376,7 @@ model User {
   otpCodes           AuthOtp[]
   sentInvitations    OrganizationInvitation[] @relation("InvitationSentBy")
   acceptedInvitation OrganizationInvitation?  @relation("InvitationAcceptedUser")
+  integrations       UserIntegration[]
 
   @@index([organizationId])
   @@index([organizationId, status])
@@ -447,6 +459,26 @@ model AuthOtp {
   @@index([expiresAt])
 }
 
+model UserIntegration {
+  id                String              @id @default(cuid())
+  userId            String
+  provider          IntegrationProvider
+  accessTokenEnc    String
+  refreshTokenEnc   String?
+  expiresAt         DateTime?
+  scopes            String              @default("")
+  externalAccountId String?
+  externalEmail     String?
+  preferences       Json?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
 model Meeting {
   id              String        @id @default(cuid())
   organizationId  String?
@@ -457,11 +489,16 @@ model Meeting {
   status          MeetingStatus @default(UPCOMING)
   tag             MeetingTag    @default(INTERNAL)
   notes           String        @default("")
-  calendarEventId String?
-  recordingUrl    String?
-  organizerId     String?
-  livekitRoomId   String?
-  joinSlug        String?       @unique
+  platform            MeetingPlatform @default(LYRUS_LIVEKIT)
+  calendarEventId     String?
+  externalMeetingUrl  String?
+  externalMeetingId   String?
+  recordingBotId      String?
+  recordingBotStatus  String?
+  recordingUrl        String?
+  organizerId         String?
+  livekitRoomId       String?
+  joinSlug            String?       @unique
   liveStartedAt     DateTime?
   liveBroadcastAt   DateTime?
   liveEndedAt       DateTime?

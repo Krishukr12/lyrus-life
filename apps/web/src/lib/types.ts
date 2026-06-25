@@ -55,6 +55,18 @@ export interface Stakeholder {
     pipelineStatus?: "processing" | "failed" | null;
     invites?: MeetingInviteRecord[];
     joinSlug?: string;
+    platform?: "lyrus" | "google_meet" | "microsoft_teams";
+    externalMeetingUrl?: string;
+    recordingBotStatus?: string | null;
+    recordingProgress?: {
+      phase: string;
+      step: number;
+      totalSteps: number;
+      title: string;
+      detail: string;
+      isLive: boolean;
+      isProcessing: boolean;
+    } | null;
   }
   
   export interface MOM {
@@ -65,6 +77,7 @@ export interface Stakeholder {
     participants: string[];
     keyPoints: string[];
     actionItems: ActionItem[];
+    sections?: Array<{ title: string; content: string[] }>;
     createdAt: string;
     shared: boolean;
   approved: boolean;

@@ -84,6 +84,11 @@ export type TenantAuditLog = $Result.DefaultSelection<Prisma.$TenantAuditLogPayl
  */
 export type AuthOtp = $Result.DefaultSelection<Prisma.$AuthOtpPayload>
 /**
+ * Model UserIntegration
+ * 
+ */
+export type UserIntegration = $Result.DefaultSelection<Prisma.$UserIntegrationPayload>
+/**
  * Model Meeting
  * 
  */
@@ -223,6 +228,23 @@ export const InviteStatus: {
 };
 
 export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus]
+
+
+export const IntegrationProvider: {
+  GOOGLE: 'GOOGLE',
+  MICROSOFT: 'MICROSOFT'
+};
+
+export type IntegrationProvider = (typeof IntegrationProvider)[keyof typeof IntegrationProvider]
+
+
+export const MeetingPlatform: {
+  LYRUS_LIVEKIT: 'LYRUS_LIVEKIT',
+  GOOGLE_MEET: 'GOOGLE_MEET',
+  MICROSOFT_TEAMS: 'MICROSOFT_TEAMS'
+};
+
+export type MeetingPlatform = (typeof MeetingPlatform)[keyof typeof MeetingPlatform]
 
 
 export const AudioStorageBackend: {
@@ -378,6 +400,14 @@ export const PipelineStep: typeof $Enums.PipelineStep
 export type InviteStatus = $Enums.InviteStatus
 
 export const InviteStatus: typeof $Enums.InviteStatus
+
+export type IntegrationProvider = $Enums.IntegrationProvider
+
+export const IntegrationProvider: typeof $Enums.IntegrationProvider
+
+export type MeetingPlatform = $Enums.MeetingPlatform
+
+export const MeetingPlatform: typeof $Enums.MeetingPlatform
 
 export type AudioStorageBackend = $Enums.AudioStorageBackend
 
@@ -691,6 +721,16 @@ export class PrismaClient<
     * ```
     */
   get authOtp(): Prisma.AuthOtpDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.userIntegration`: Exposes CRUD operations for the **UserIntegration** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserIntegrations
+    * const userIntegrations = await prisma.userIntegration.findMany()
+    * ```
+    */
+  get userIntegration(): Prisma.UserIntegrationDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.meeting`: Exposes CRUD operations for the **Meeting** model.
@@ -1279,6 +1319,7 @@ export namespace Prisma {
     EmployeeProfile: 'EmployeeProfile',
     TenantAuditLog: 'TenantAuditLog',
     AuthOtp: 'AuthOtp',
+    UserIntegration: 'UserIntegration',
     Meeting: 'Meeting',
     MomTemplate: 'MomTemplate',
     MomTemplateSection: 'MomTemplateSection',
@@ -1308,7 +1349,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "platformPricingConfig" | "organizationBilling" | "invoice" | "invoiceLineItem" | "payment" | "invoiceDelivery" | "billingEvent" | "pricingChangeLog" | "organization" | "user" | "organizationInvitation" | "employeeProfile" | "tenantAuditLog" | "authOtp" | "meeting" | "momTemplate" | "momTemplateSection" | "momTemplateUpload" | "meetingInvite" | "meetingParticipant" | "audioFile" | "transcript" | "transcriptSegment" | "mom" | "actionItem" | "decision" | "summary" | "auditLog"
+      modelProps: "platformPricingConfig" | "organizationBilling" | "invoice" | "invoiceLineItem" | "payment" | "invoiceDelivery" | "billingEvent" | "pricingChangeLog" | "organization" | "user" | "organizationInvitation" | "employeeProfile" | "tenantAuditLog" | "authOtp" | "userIntegration" | "meeting" | "momTemplate" | "momTemplateSection" | "momTemplateUpload" | "meetingInvite" | "meetingParticipant" | "audioFile" | "transcript" | "transcriptSegment" | "mom" | "actionItem" | "decision" | "summary" | "auditLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2345,6 +2386,80 @@ export namespace Prisma {
           count: {
             args: Prisma.AuthOtpCountArgs<ExtArgs>
             result: $Utils.Optional<AuthOtpCountAggregateOutputType> | number
+          }
+        }
+      }
+      UserIntegration: {
+        payload: Prisma.$UserIntegrationPayload<ExtArgs>
+        fields: Prisma.UserIntegrationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.UserIntegrationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UserIntegrationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>
+          }
+          findFirst: {
+            args: Prisma.UserIntegrationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UserIntegrationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>
+          }
+          findMany: {
+            args: Prisma.UserIntegrationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>[]
+          }
+          create: {
+            args: Prisma.UserIntegrationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>
+          }
+          createMany: {
+            args: Prisma.UserIntegrationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.UserIntegrationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>[]
+          }
+          delete: {
+            args: Prisma.UserIntegrationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>
+          }
+          update: {
+            args: Prisma.UserIntegrationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>
+          }
+          deleteMany: {
+            args: Prisma.UserIntegrationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UserIntegrationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.UserIntegrationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>[]
+          }
+          upsert: {
+            args: Prisma.UserIntegrationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserIntegrationPayload>
+          }
+          aggregate: {
+            args: Prisma.UserIntegrationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateUserIntegration>
+          }
+          groupBy: {
+            args: Prisma.UserIntegrationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<UserIntegrationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UserIntegrationCountArgs<ExtArgs>
+            result: $Utils.Optional<UserIntegrationCountAggregateOutputType> | number
           }
         }
       }
@@ -3506,6 +3621,7 @@ export namespace Prisma {
     employeeProfile?: EmployeeProfileOmit
     tenantAuditLog?: TenantAuditLogOmit
     authOtp?: AuthOtpOmit
+    userIntegration?: UserIntegrationOmit
     meeting?: MeetingOmit
     momTemplate?: MomTemplateOmit
     momTemplateSection?: MomTemplateSectionOmit
@@ -3750,6 +3866,7 @@ export namespace Prisma {
     tenantAuditLogs: number
     otpCodes: number
     sentInvitations: number
+    integrations: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3760,6 +3877,7 @@ export namespace Prisma {
     tenantAuditLogs?: boolean | UserCountOutputTypeCountTenantAuditLogsArgs
     otpCodes?: boolean | UserCountOutputTypeCountOtpCodesArgs
     sentInvitations?: boolean | UserCountOutputTypeCountSentInvitationsArgs
+    integrations?: boolean | UserCountOutputTypeCountIntegrationsArgs
   }
 
   // Custom InputTypes
@@ -3820,6 +3938,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSentInvitationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OrganizationInvitationWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountIntegrationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserIntegrationWhereInput
   }
 
 
@@ -15211,6 +15336,7 @@ export namespace Prisma {
     otpCodes?: boolean | User$otpCodesArgs<ExtArgs>
     sentInvitations?: boolean | User$sentInvitationsArgs<ExtArgs>
     acceptedInvitation?: boolean | User$acceptedInvitationArgs<ExtArgs>
+    integrations?: boolean | User$integrationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -15288,6 +15414,7 @@ export namespace Prisma {
     otpCodes?: boolean | User$otpCodesArgs<ExtArgs>
     sentInvitations?: boolean | User$sentInvitationsArgs<ExtArgs>
     acceptedInvitation?: boolean | User$acceptedInvitationArgs<ExtArgs>
+    integrations?: boolean | User$integrationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15313,6 +15440,7 @@ export namespace Prisma {
       otpCodes: Prisma.$AuthOtpPayload<ExtArgs>[]
       sentInvitations: Prisma.$OrganizationInvitationPayload<ExtArgs>[]
       acceptedInvitation: Prisma.$OrganizationInvitationPayload<ExtArgs> | null
+      integrations: Prisma.$UserIntegrationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -15736,6 +15864,7 @@ export namespace Prisma {
     otpCodes<T extends User$otpCodesArgs<ExtArgs> = {}>(args?: Subset<T, User$otpCodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuthOtpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentInvitations<T extends User$sentInvitationsArgs<ExtArgs> = {}>(args?: Subset<T, User$sentInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrganizationInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     acceptedInvitation<T extends User$acceptedInvitationArgs<ExtArgs> = {}>(args?: Subset<T, User$acceptedInvitationArgs<ExtArgs>>): Prisma__OrganizationInvitationClient<$Result.GetResult<Prisma.$OrganizationInvitationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    integrations<T extends User$integrationsArgs<ExtArgs> = {}>(args?: Subset<T, User$integrationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16423,6 +16552,30 @@ export namespace Prisma {
      */
     include?: OrganizationInvitationInclude<ExtArgs> | null
     where?: OrganizationInvitationWhereInput
+  }
+
+  /**
+   * User.integrations
+   */
+  export type User$integrationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    where?: UserIntegrationWhereInput
+    orderBy?: UserIntegrationOrderByWithRelationInput | UserIntegrationOrderByWithRelationInput[]
+    cursor?: UserIntegrationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserIntegrationScalarFieldEnum | UserIntegrationScalarFieldEnum[]
   }
 
   /**
@@ -20995,6 +21148,1156 @@ export namespace Prisma {
 
 
   /**
+   * Model UserIntegration
+   */
+
+  export type AggregateUserIntegration = {
+    _count: UserIntegrationCountAggregateOutputType | null
+    _min: UserIntegrationMinAggregateOutputType | null
+    _max: UserIntegrationMaxAggregateOutputType | null
+  }
+
+  export type UserIntegrationMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    provider: $Enums.IntegrationProvider | null
+    accessTokenEnc: string | null
+    refreshTokenEnc: string | null
+    expiresAt: Date | null
+    scopes: string | null
+    externalAccountId: string | null
+    externalEmail: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UserIntegrationMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    provider: $Enums.IntegrationProvider | null
+    accessTokenEnc: string | null
+    refreshTokenEnc: string | null
+    expiresAt: Date | null
+    scopes: string | null
+    externalAccountId: string | null
+    externalEmail: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UserIntegrationCountAggregateOutputType = {
+    id: number
+    userId: number
+    provider: number
+    accessTokenEnc: number
+    refreshTokenEnc: number
+    expiresAt: number
+    scopes: number
+    externalAccountId: number
+    externalEmail: number
+    preferences: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type UserIntegrationMinAggregateInputType = {
+    id?: true
+    userId?: true
+    provider?: true
+    accessTokenEnc?: true
+    refreshTokenEnc?: true
+    expiresAt?: true
+    scopes?: true
+    externalAccountId?: true
+    externalEmail?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type UserIntegrationMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    provider?: true
+    accessTokenEnc?: true
+    refreshTokenEnc?: true
+    expiresAt?: true
+    scopes?: true
+    externalAccountId?: true
+    externalEmail?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type UserIntegrationCountAggregateInputType = {
+    id?: true
+    userId?: true
+    provider?: true
+    accessTokenEnc?: true
+    refreshTokenEnc?: true
+    expiresAt?: true
+    scopes?: true
+    externalAccountId?: true
+    externalEmail?: true
+    preferences?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type UserIntegrationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserIntegration to aggregate.
+     */
+    where?: UserIntegrationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserIntegrations to fetch.
+     */
+    orderBy?: UserIntegrationOrderByWithRelationInput | UserIntegrationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UserIntegrationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserIntegrations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserIntegrations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned UserIntegrations
+    **/
+    _count?: true | UserIntegrationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UserIntegrationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UserIntegrationMaxAggregateInputType
+  }
+
+  export type GetUserIntegrationAggregateType<T extends UserIntegrationAggregateArgs> = {
+        [P in keyof T & keyof AggregateUserIntegration]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUserIntegration[P]>
+      : GetScalarType<T[P], AggregateUserIntegration[P]>
+  }
+
+
+
+
+  export type UserIntegrationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserIntegrationWhereInput
+    orderBy?: UserIntegrationOrderByWithAggregationInput | UserIntegrationOrderByWithAggregationInput[]
+    by: UserIntegrationScalarFieldEnum[] | UserIntegrationScalarFieldEnum
+    having?: UserIntegrationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UserIntegrationCountAggregateInputType | true
+    _min?: UserIntegrationMinAggregateInputType
+    _max?: UserIntegrationMaxAggregateInputType
+  }
+
+  export type UserIntegrationGroupByOutputType = {
+    id: string
+    userId: string
+    provider: $Enums.IntegrationProvider
+    accessTokenEnc: string
+    refreshTokenEnc: string | null
+    expiresAt: Date | null
+    scopes: string
+    externalAccountId: string | null
+    externalEmail: string | null
+    preferences: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: UserIntegrationCountAggregateOutputType | null
+    _min: UserIntegrationMinAggregateOutputType | null
+    _max: UserIntegrationMaxAggregateOutputType | null
+  }
+
+  type GetUserIntegrationGroupByPayload<T extends UserIntegrationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<UserIntegrationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UserIntegrationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UserIntegrationGroupByOutputType[P]>
+            : GetScalarType<T[P], UserIntegrationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UserIntegrationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    provider?: boolean
+    accessTokenEnc?: boolean
+    refreshTokenEnc?: boolean
+    expiresAt?: boolean
+    scopes?: boolean
+    externalAccountId?: boolean
+    externalEmail?: boolean
+    preferences?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userIntegration"]>
+
+  export type UserIntegrationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    provider?: boolean
+    accessTokenEnc?: boolean
+    refreshTokenEnc?: boolean
+    expiresAt?: boolean
+    scopes?: boolean
+    externalAccountId?: boolean
+    externalEmail?: boolean
+    preferences?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userIntegration"]>
+
+  export type UserIntegrationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    provider?: boolean
+    accessTokenEnc?: boolean
+    refreshTokenEnc?: boolean
+    expiresAt?: boolean
+    scopes?: boolean
+    externalAccountId?: boolean
+    externalEmail?: boolean
+    preferences?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userIntegration"]>
+
+  export type UserIntegrationSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    provider?: boolean
+    accessTokenEnc?: boolean
+    refreshTokenEnc?: boolean
+    expiresAt?: boolean
+    scopes?: boolean
+    externalAccountId?: boolean
+    externalEmail?: boolean
+    preferences?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type UserIntegrationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "accessTokenEnc" | "refreshTokenEnc" | "expiresAt" | "scopes" | "externalAccountId" | "externalEmail" | "preferences" | "createdAt" | "updatedAt", ExtArgs["result"]["userIntegration"]>
+  export type UserIntegrationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type UserIntegrationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type UserIntegrationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $UserIntegrationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "UserIntegration"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      provider: $Enums.IntegrationProvider
+      accessTokenEnc: string
+      refreshTokenEnc: string | null
+      expiresAt: Date | null
+      scopes: string
+      externalAccountId: string | null
+      externalEmail: string | null
+      preferences: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["userIntegration"]>
+    composites: {}
+  }
+
+  type UserIntegrationGetPayload<S extends boolean | null | undefined | UserIntegrationDefaultArgs> = $Result.GetResult<Prisma.$UserIntegrationPayload, S>
+
+  type UserIntegrationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<UserIntegrationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: UserIntegrationCountAggregateInputType | true
+    }
+
+  export interface UserIntegrationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserIntegration'], meta: { name: 'UserIntegration' } }
+    /**
+     * Find zero or one UserIntegration that matches the filter.
+     * @param {UserIntegrationFindUniqueArgs} args - Arguments to find a UserIntegration
+     * @example
+     * // Get one UserIntegration
+     * const userIntegration = await prisma.userIntegration.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends UserIntegrationFindUniqueArgs>(args: SelectSubset<T, UserIntegrationFindUniqueArgs<ExtArgs>>): Prisma__UserIntegrationClient<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one UserIntegration that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {UserIntegrationFindUniqueOrThrowArgs} args - Arguments to find a UserIntegration
+     * @example
+     * // Get one UserIntegration
+     * const userIntegration = await prisma.userIntegration.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends UserIntegrationFindUniqueOrThrowArgs>(args: SelectSubset<T, UserIntegrationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UserIntegrationClient<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserIntegration that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserIntegrationFindFirstArgs} args - Arguments to find a UserIntegration
+     * @example
+     * // Get one UserIntegration
+     * const userIntegration = await prisma.userIntegration.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends UserIntegrationFindFirstArgs>(args?: SelectSubset<T, UserIntegrationFindFirstArgs<ExtArgs>>): Prisma__UserIntegrationClient<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserIntegration that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserIntegrationFindFirstOrThrowArgs} args - Arguments to find a UserIntegration
+     * @example
+     * // Get one UserIntegration
+     * const userIntegration = await prisma.userIntegration.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends UserIntegrationFindFirstOrThrowArgs>(args?: SelectSubset<T, UserIntegrationFindFirstOrThrowArgs<ExtArgs>>): Prisma__UserIntegrationClient<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more UserIntegrations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserIntegrationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all UserIntegrations
+     * const userIntegrations = await prisma.userIntegration.findMany()
+     * 
+     * // Get first 10 UserIntegrations
+     * const userIntegrations = await prisma.userIntegration.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const userIntegrationWithIdOnly = await prisma.userIntegration.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends UserIntegrationFindManyArgs>(args?: SelectSubset<T, UserIntegrationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a UserIntegration.
+     * @param {UserIntegrationCreateArgs} args - Arguments to create a UserIntegration.
+     * @example
+     * // Create one UserIntegration
+     * const UserIntegration = await prisma.userIntegration.create({
+     *   data: {
+     *     // ... data to create a UserIntegration
+     *   }
+     * })
+     * 
+     */
+    create<T extends UserIntegrationCreateArgs>(args: SelectSubset<T, UserIntegrationCreateArgs<ExtArgs>>): Prisma__UserIntegrationClient<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many UserIntegrations.
+     * @param {UserIntegrationCreateManyArgs} args - Arguments to create many UserIntegrations.
+     * @example
+     * // Create many UserIntegrations
+     * const userIntegration = await prisma.userIntegration.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends UserIntegrationCreateManyArgs>(args?: SelectSubset<T, UserIntegrationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many UserIntegrations and returns the data saved in the database.
+     * @param {UserIntegrationCreateManyAndReturnArgs} args - Arguments to create many UserIntegrations.
+     * @example
+     * // Create many UserIntegrations
+     * const userIntegration = await prisma.userIntegration.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many UserIntegrations and only return the `id`
+     * const userIntegrationWithIdOnly = await prisma.userIntegration.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends UserIntegrationCreateManyAndReturnArgs>(args?: SelectSubset<T, UserIntegrationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a UserIntegration.
+     * @param {UserIntegrationDeleteArgs} args - Arguments to delete one UserIntegration.
+     * @example
+     * // Delete one UserIntegration
+     * const UserIntegration = await prisma.userIntegration.delete({
+     *   where: {
+     *     // ... filter to delete one UserIntegration
+     *   }
+     * })
+     * 
+     */
+    delete<T extends UserIntegrationDeleteArgs>(args: SelectSubset<T, UserIntegrationDeleteArgs<ExtArgs>>): Prisma__UserIntegrationClient<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one UserIntegration.
+     * @param {UserIntegrationUpdateArgs} args - Arguments to update one UserIntegration.
+     * @example
+     * // Update one UserIntegration
+     * const userIntegration = await prisma.userIntegration.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends UserIntegrationUpdateArgs>(args: SelectSubset<T, UserIntegrationUpdateArgs<ExtArgs>>): Prisma__UserIntegrationClient<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more UserIntegrations.
+     * @param {UserIntegrationDeleteManyArgs} args - Arguments to filter UserIntegrations to delete.
+     * @example
+     * // Delete a few UserIntegrations
+     * const { count } = await prisma.userIntegration.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends UserIntegrationDeleteManyArgs>(args?: SelectSubset<T, UserIntegrationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserIntegrations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserIntegrationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many UserIntegrations
+     * const userIntegration = await prisma.userIntegration.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends UserIntegrationUpdateManyArgs>(args: SelectSubset<T, UserIntegrationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserIntegrations and returns the data updated in the database.
+     * @param {UserIntegrationUpdateManyAndReturnArgs} args - Arguments to update many UserIntegrations.
+     * @example
+     * // Update many UserIntegrations
+     * const userIntegration = await prisma.userIntegration.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more UserIntegrations and only return the `id`
+     * const userIntegrationWithIdOnly = await prisma.userIntegration.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends UserIntegrationUpdateManyAndReturnArgs>(args: SelectSubset<T, UserIntegrationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one UserIntegration.
+     * @param {UserIntegrationUpsertArgs} args - Arguments to update or create a UserIntegration.
+     * @example
+     * // Update or create a UserIntegration
+     * const userIntegration = await prisma.userIntegration.upsert({
+     *   create: {
+     *     // ... data to create a UserIntegration
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the UserIntegration we want to update
+     *   }
+     * })
+     */
+    upsert<T extends UserIntegrationUpsertArgs>(args: SelectSubset<T, UserIntegrationUpsertArgs<ExtArgs>>): Prisma__UserIntegrationClient<$Result.GetResult<Prisma.$UserIntegrationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of UserIntegrations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserIntegrationCountArgs} args - Arguments to filter UserIntegrations to count.
+     * @example
+     * // Count the number of UserIntegrations
+     * const count = await prisma.userIntegration.count({
+     *   where: {
+     *     // ... the filter for the UserIntegrations we want to count
+     *   }
+     * })
+    **/
+    count<T extends UserIntegrationCountArgs>(
+      args?: Subset<T, UserIntegrationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UserIntegrationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a UserIntegration.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserIntegrationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UserIntegrationAggregateArgs>(args: Subset<T, UserIntegrationAggregateArgs>): Prisma.PrismaPromise<GetUserIntegrationAggregateType<T>>
+
+    /**
+     * Group by UserIntegration.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserIntegrationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UserIntegrationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UserIntegrationGroupByArgs['orderBy'] }
+        : { orderBy?: UserIntegrationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UserIntegrationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserIntegrationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the UserIntegration model
+   */
+  readonly fields: UserIntegrationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for UserIntegration.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__UserIntegrationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the UserIntegration model
+   */
+  interface UserIntegrationFieldRefs {
+    readonly id: FieldRef<"UserIntegration", 'String'>
+    readonly userId: FieldRef<"UserIntegration", 'String'>
+    readonly provider: FieldRef<"UserIntegration", 'IntegrationProvider'>
+    readonly accessTokenEnc: FieldRef<"UserIntegration", 'String'>
+    readonly refreshTokenEnc: FieldRef<"UserIntegration", 'String'>
+    readonly expiresAt: FieldRef<"UserIntegration", 'DateTime'>
+    readonly scopes: FieldRef<"UserIntegration", 'String'>
+    readonly externalAccountId: FieldRef<"UserIntegration", 'String'>
+    readonly externalEmail: FieldRef<"UserIntegration", 'String'>
+    readonly preferences: FieldRef<"UserIntegration", 'Json'>
+    readonly createdAt: FieldRef<"UserIntegration", 'DateTime'>
+    readonly updatedAt: FieldRef<"UserIntegration", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * UserIntegration findUnique
+   */
+  export type UserIntegrationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * Filter, which UserIntegration to fetch.
+     */
+    where: UserIntegrationWhereUniqueInput
+  }
+
+  /**
+   * UserIntegration findUniqueOrThrow
+   */
+  export type UserIntegrationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * Filter, which UserIntegration to fetch.
+     */
+    where: UserIntegrationWhereUniqueInput
+  }
+
+  /**
+   * UserIntegration findFirst
+   */
+  export type UserIntegrationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * Filter, which UserIntegration to fetch.
+     */
+    where?: UserIntegrationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserIntegrations to fetch.
+     */
+    orderBy?: UserIntegrationOrderByWithRelationInput | UserIntegrationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserIntegrations.
+     */
+    cursor?: UserIntegrationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserIntegrations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserIntegrations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserIntegrations.
+     */
+    distinct?: UserIntegrationScalarFieldEnum | UserIntegrationScalarFieldEnum[]
+  }
+
+  /**
+   * UserIntegration findFirstOrThrow
+   */
+  export type UserIntegrationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * Filter, which UserIntegration to fetch.
+     */
+    where?: UserIntegrationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserIntegrations to fetch.
+     */
+    orderBy?: UserIntegrationOrderByWithRelationInput | UserIntegrationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserIntegrations.
+     */
+    cursor?: UserIntegrationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserIntegrations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserIntegrations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserIntegrations.
+     */
+    distinct?: UserIntegrationScalarFieldEnum | UserIntegrationScalarFieldEnum[]
+  }
+
+  /**
+   * UserIntegration findMany
+   */
+  export type UserIntegrationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * Filter, which UserIntegrations to fetch.
+     */
+    where?: UserIntegrationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserIntegrations to fetch.
+     */
+    orderBy?: UserIntegrationOrderByWithRelationInput | UserIntegrationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing UserIntegrations.
+     */
+    cursor?: UserIntegrationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserIntegrations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserIntegrations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserIntegrations.
+     */
+    distinct?: UserIntegrationScalarFieldEnum | UserIntegrationScalarFieldEnum[]
+  }
+
+  /**
+   * UserIntegration create
+   */
+  export type UserIntegrationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a UserIntegration.
+     */
+    data: XOR<UserIntegrationCreateInput, UserIntegrationUncheckedCreateInput>
+  }
+
+  /**
+   * UserIntegration createMany
+   */
+  export type UserIntegrationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many UserIntegrations.
+     */
+    data: UserIntegrationCreateManyInput | UserIntegrationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * UserIntegration createManyAndReturn
+   */
+  export type UserIntegrationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * The data used to create many UserIntegrations.
+     */
+    data: UserIntegrationCreateManyInput | UserIntegrationCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UserIntegration update
+   */
+  export type UserIntegrationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a UserIntegration.
+     */
+    data: XOR<UserIntegrationUpdateInput, UserIntegrationUncheckedUpdateInput>
+    /**
+     * Choose, which UserIntegration to update.
+     */
+    where: UserIntegrationWhereUniqueInput
+  }
+
+  /**
+   * UserIntegration updateMany
+   */
+  export type UserIntegrationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update UserIntegrations.
+     */
+    data: XOR<UserIntegrationUpdateManyMutationInput, UserIntegrationUncheckedUpdateManyInput>
+    /**
+     * Filter which UserIntegrations to update
+     */
+    where?: UserIntegrationWhereInput
+    /**
+     * Limit how many UserIntegrations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserIntegration updateManyAndReturn
+   */
+  export type UserIntegrationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * The data used to update UserIntegrations.
+     */
+    data: XOR<UserIntegrationUpdateManyMutationInput, UserIntegrationUncheckedUpdateManyInput>
+    /**
+     * Filter which UserIntegrations to update
+     */
+    where?: UserIntegrationWhereInput
+    /**
+     * Limit how many UserIntegrations to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UserIntegration upsert
+   */
+  export type UserIntegrationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the UserIntegration to update in case it exists.
+     */
+    where: UserIntegrationWhereUniqueInput
+    /**
+     * In case the UserIntegration found by the `where` argument doesn't exist, create a new UserIntegration with this data.
+     */
+    create: XOR<UserIntegrationCreateInput, UserIntegrationUncheckedCreateInput>
+    /**
+     * In case the UserIntegration was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UserIntegrationUpdateInput, UserIntegrationUncheckedUpdateInput>
+  }
+
+  /**
+   * UserIntegration delete
+   */
+  export type UserIntegrationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+    /**
+     * Filter which UserIntegration to delete.
+     */
+    where: UserIntegrationWhereUniqueInput
+  }
+
+  /**
+   * UserIntegration deleteMany
+   */
+  export type UserIntegrationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserIntegrations to delete
+     */
+    where?: UserIntegrationWhereInput
+    /**
+     * Limit how many UserIntegrations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserIntegration without action
+   */
+  export type UserIntegrationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserIntegration
+     */
+    select?: UserIntegrationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserIntegration
+     */
+    omit?: UserIntegrationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIntegrationInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Meeting
    */
 
@@ -21024,7 +22327,12 @@ export namespace Prisma {
     status: $Enums.MeetingStatus | null
     tag: $Enums.MeetingTag | null
     notes: string | null
+    platform: $Enums.MeetingPlatform | null
     calendarEventId: string | null
+    externalMeetingUrl: string | null
+    externalMeetingId: string | null
+    recordingBotId: string | null
+    recordingBotStatus: string | null
     recordingUrl: string | null
     organizerId: string | null
     livekitRoomId: string | null
@@ -21047,7 +22355,12 @@ export namespace Prisma {
     status: $Enums.MeetingStatus | null
     tag: $Enums.MeetingTag | null
     notes: string | null
+    platform: $Enums.MeetingPlatform | null
     calendarEventId: string | null
+    externalMeetingUrl: string | null
+    externalMeetingId: string | null
+    recordingBotId: string | null
+    recordingBotStatus: string | null
     recordingUrl: string | null
     organizerId: string | null
     livekitRoomId: string | null
@@ -21070,7 +22383,12 @@ export namespace Prisma {
     status: number
     tag: number
     notes: number
+    platform: number
     calendarEventId: number
+    externalMeetingUrl: number
+    externalMeetingId: number
+    recordingBotId: number
+    recordingBotStatus: number
     recordingUrl: number
     organizerId: number
     livekitRoomId: number
@@ -21103,7 +22421,12 @@ export namespace Prisma {
     status?: true
     tag?: true
     notes?: true
+    platform?: true
     calendarEventId?: true
+    externalMeetingUrl?: true
+    externalMeetingId?: true
+    recordingBotId?: true
+    recordingBotStatus?: true
     recordingUrl?: true
     organizerId?: true
     livekitRoomId?: true
@@ -21126,7 +22449,12 @@ export namespace Prisma {
     status?: true
     tag?: true
     notes?: true
+    platform?: true
     calendarEventId?: true
+    externalMeetingUrl?: true
+    externalMeetingId?: true
+    recordingBotId?: true
+    recordingBotStatus?: true
     recordingUrl?: true
     organizerId?: true
     livekitRoomId?: true
@@ -21149,7 +22477,12 @@ export namespace Prisma {
     status?: true
     tag?: true
     notes?: true
+    platform?: true
     calendarEventId?: true
+    externalMeetingUrl?: true
+    externalMeetingId?: true
+    recordingBotId?: true
+    recordingBotStatus?: true
     recordingUrl?: true
     organizerId?: true
     livekitRoomId?: true
@@ -21259,7 +22592,12 @@ export namespace Prisma {
     status: $Enums.MeetingStatus
     tag: $Enums.MeetingTag
     notes: string
+    platform: $Enums.MeetingPlatform
     calendarEventId: string | null
+    externalMeetingUrl: string | null
+    externalMeetingId: string | null
+    recordingBotId: string | null
+    recordingBotStatus: string | null
     recordingUrl: string | null
     organizerId: string | null
     livekitRoomId: string | null
@@ -21301,7 +22639,12 @@ export namespace Prisma {
     status?: boolean
     tag?: boolean
     notes?: boolean
+    platform?: boolean
     calendarEventId?: boolean
+    externalMeetingUrl?: boolean
+    externalMeetingId?: boolean
+    recordingBotId?: boolean
+    recordingBotStatus?: boolean
     recordingUrl?: boolean
     organizerId?: boolean
     livekitRoomId?: boolean
@@ -21337,7 +22680,12 @@ export namespace Prisma {
     status?: boolean
     tag?: boolean
     notes?: boolean
+    platform?: boolean
     calendarEventId?: boolean
+    externalMeetingUrl?: boolean
+    externalMeetingId?: boolean
+    recordingBotId?: boolean
+    recordingBotStatus?: boolean
     recordingUrl?: boolean
     organizerId?: boolean
     livekitRoomId?: boolean
@@ -21363,7 +22711,12 @@ export namespace Prisma {
     status?: boolean
     tag?: boolean
     notes?: boolean
+    platform?: boolean
     calendarEventId?: boolean
+    externalMeetingUrl?: boolean
+    externalMeetingId?: boolean
+    recordingBotId?: boolean
+    recordingBotStatus?: boolean
     recordingUrl?: boolean
     organizerId?: boolean
     livekitRoomId?: boolean
@@ -21389,7 +22742,12 @@ export namespace Prisma {
     status?: boolean
     tag?: boolean
     notes?: boolean
+    platform?: boolean
     calendarEventId?: boolean
+    externalMeetingUrl?: boolean
+    externalMeetingId?: boolean
+    recordingBotId?: boolean
+    recordingBotStatus?: boolean
     recordingUrl?: boolean
     organizerId?: boolean
     livekitRoomId?: boolean
@@ -21402,7 +22760,7 @@ export namespace Prisma {
     momTemplateId?: boolean
   }
 
-  export type MeetingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "title" | "description" | "scheduledAt" | "durationMinutes" | "status" | "tag" | "notes" | "calendarEventId" | "recordingUrl" | "organizerId" | "livekitRoomId" | "joinSlug" | "liveStartedAt" | "liveBroadcastAt" | "liveEndedAt" | "createdAt" | "updatedAt" | "momTemplateId", ExtArgs["result"]["meeting"]>
+  export type MeetingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "title" | "description" | "scheduledAt" | "durationMinutes" | "status" | "tag" | "notes" | "platform" | "calendarEventId" | "externalMeetingUrl" | "externalMeetingId" | "recordingBotId" | "recordingBotStatus" | "recordingUrl" | "organizerId" | "livekitRoomId" | "joinSlug" | "liveStartedAt" | "liveBroadcastAt" | "liveEndedAt" | "createdAt" | "updatedAt" | "momTemplateId", ExtArgs["result"]["meeting"]>
   export type MeetingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organization?: boolean | Meeting$organizationArgs<ExtArgs>
     momTemplate?: boolean | Meeting$momTemplateArgs<ExtArgs>
@@ -21455,7 +22813,12 @@ export namespace Prisma {
       status: $Enums.MeetingStatus
       tag: $Enums.MeetingTag
       notes: string
+      platform: $Enums.MeetingPlatform
       calendarEventId: string | null
+      externalMeetingUrl: string | null
+      externalMeetingId: string | null
+      recordingBotId: string | null
+      recordingBotStatus: string | null
       recordingUrl: string | null
       organizerId: string | null
       livekitRoomId: string | null
@@ -21910,7 +23273,12 @@ export namespace Prisma {
     readonly status: FieldRef<"Meeting", 'MeetingStatus'>
     readonly tag: FieldRef<"Meeting", 'MeetingTag'>
     readonly notes: FieldRef<"Meeting", 'String'>
+    readonly platform: FieldRef<"Meeting", 'MeetingPlatform'>
     readonly calendarEventId: FieldRef<"Meeting", 'String'>
+    readonly externalMeetingUrl: FieldRef<"Meeting", 'String'>
+    readonly externalMeetingId: FieldRef<"Meeting", 'String'>
+    readonly recordingBotId: FieldRef<"Meeting", 'String'>
+    readonly recordingBotStatus: FieldRef<"Meeting", 'String'>
     readonly recordingUrl: FieldRef<"Meeting", 'String'>
     readonly organizerId: FieldRef<"Meeting", 'String'>
     readonly livekitRoomId: FieldRef<"Meeting", 'String'>
@@ -37657,6 +39025,24 @@ export namespace Prisma {
   export type AuthOtpScalarFieldEnum = (typeof AuthOtpScalarFieldEnum)[keyof typeof AuthOtpScalarFieldEnum]
 
 
+  export const UserIntegrationScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    provider: 'provider',
+    accessTokenEnc: 'accessTokenEnc',
+    refreshTokenEnc: 'refreshTokenEnc',
+    expiresAt: 'expiresAt',
+    scopes: 'scopes',
+    externalAccountId: 'externalAccountId',
+    externalEmail: 'externalEmail',
+    preferences: 'preferences',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type UserIntegrationScalarFieldEnum = (typeof UserIntegrationScalarFieldEnum)[keyof typeof UserIntegrationScalarFieldEnum]
+
+
   export const MeetingScalarFieldEnum: {
     id: 'id',
     organizationId: 'organizationId',
@@ -37667,7 +39053,12 @@ export namespace Prisma {
     status: 'status',
     tag: 'tag',
     notes: 'notes',
+    platform: 'platform',
     calendarEventId: 'calendarEventId',
+    externalMeetingUrl: 'externalMeetingUrl',
+    externalMeetingId: 'externalMeetingId',
+    recordingBotId: 'recordingBotId',
+    recordingBotStatus: 'recordingBotStatus',
     recordingUrl: 'recordingUrl',
     organizerId: 'organizerId',
     livekitRoomId: 'livekitRoomId',
@@ -38142,6 +39533,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'IntegrationProvider'
+   */
+  export type EnumIntegrationProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IntegrationProvider'>
+    
+
+
+  /**
+   * Reference to a field of type 'IntegrationProvider[]'
+   */
+  export type ListEnumIntegrationProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IntegrationProvider[]'>
+    
+
+
+  /**
    * Reference to a field of type 'MeetingStatus'
    */
   export type EnumMeetingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MeetingStatus'>
@@ -38166,6 +39571,20 @@ export namespace Prisma {
    * Reference to a field of type 'MeetingTag[]'
    */
   export type ListEnumMeetingTagFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MeetingTag[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'MeetingPlatform'
+   */
+  export type EnumMeetingPlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MeetingPlatform'>
+    
+
+
+  /**
+   * Reference to a field of type 'MeetingPlatform[]'
+   */
+  export type ListEnumMeetingPlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MeetingPlatform[]'>
     
 
 
@@ -39190,6 +40609,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpListRelationFilter
     sentInvitations?: OrganizationInvitationListRelationFilter
     acceptedInvitation?: XOR<OrganizationInvitationNullableScalarRelationFilter, OrganizationInvitationWhereInput> | null
+    integrations?: UserIntegrationListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -39220,6 +40640,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpOrderByRelationAggregateInput
     sentInvitations?: OrganizationInvitationOrderByRelationAggregateInput
     acceptedInvitation?: OrganizationInvitationOrderByWithRelationInput
+    integrations?: UserIntegrationOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -39253,6 +40674,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpListRelationFilter
     sentInvitations?: OrganizationInvitationListRelationFilter
     acceptedInvitation?: XOR<OrganizationInvitationNullableScalarRelationFilter, OrganizationInvitationWhereInput> | null
+    integrations?: UserIntegrationListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -39613,6 +41035,97 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"AuthOtp"> | Date | string
   }
 
+  export type UserIntegrationWhereInput = {
+    AND?: UserIntegrationWhereInput | UserIntegrationWhereInput[]
+    OR?: UserIntegrationWhereInput[]
+    NOT?: UserIntegrationWhereInput | UserIntegrationWhereInput[]
+    id?: StringFilter<"UserIntegration"> | string
+    userId?: StringFilter<"UserIntegration"> | string
+    provider?: EnumIntegrationProviderFilter<"UserIntegration"> | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFilter<"UserIntegration"> | string
+    refreshTokenEnc?: StringNullableFilter<"UserIntegration"> | string | null
+    expiresAt?: DateTimeNullableFilter<"UserIntegration"> | Date | string | null
+    scopes?: StringFilter<"UserIntegration"> | string
+    externalAccountId?: StringNullableFilter<"UserIntegration"> | string | null
+    externalEmail?: StringNullableFilter<"UserIntegration"> | string | null
+    preferences?: JsonNullableFilter<"UserIntegration">
+    createdAt?: DateTimeFilter<"UserIntegration"> | Date | string
+    updatedAt?: DateTimeFilter<"UserIntegration"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type UserIntegrationOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    accessTokenEnc?: SortOrder
+    refreshTokenEnc?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    scopes?: SortOrder
+    externalAccountId?: SortOrderInput | SortOrder
+    externalEmail?: SortOrderInput | SortOrder
+    preferences?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type UserIntegrationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_provider?: UserIntegrationUserIdProviderCompoundUniqueInput
+    AND?: UserIntegrationWhereInput | UserIntegrationWhereInput[]
+    OR?: UserIntegrationWhereInput[]
+    NOT?: UserIntegrationWhereInput | UserIntegrationWhereInput[]
+    userId?: StringFilter<"UserIntegration"> | string
+    provider?: EnumIntegrationProviderFilter<"UserIntegration"> | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFilter<"UserIntegration"> | string
+    refreshTokenEnc?: StringNullableFilter<"UserIntegration"> | string | null
+    expiresAt?: DateTimeNullableFilter<"UserIntegration"> | Date | string | null
+    scopes?: StringFilter<"UserIntegration"> | string
+    externalAccountId?: StringNullableFilter<"UserIntegration"> | string | null
+    externalEmail?: StringNullableFilter<"UserIntegration"> | string | null
+    preferences?: JsonNullableFilter<"UserIntegration">
+    createdAt?: DateTimeFilter<"UserIntegration"> | Date | string
+    updatedAt?: DateTimeFilter<"UserIntegration"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId_provider">
+
+  export type UserIntegrationOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    accessTokenEnc?: SortOrder
+    refreshTokenEnc?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    scopes?: SortOrder
+    externalAccountId?: SortOrderInput | SortOrder
+    externalEmail?: SortOrderInput | SortOrder
+    preferences?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: UserIntegrationCountOrderByAggregateInput
+    _max?: UserIntegrationMaxOrderByAggregateInput
+    _min?: UserIntegrationMinOrderByAggregateInput
+  }
+
+  export type UserIntegrationScalarWhereWithAggregatesInput = {
+    AND?: UserIntegrationScalarWhereWithAggregatesInput | UserIntegrationScalarWhereWithAggregatesInput[]
+    OR?: UserIntegrationScalarWhereWithAggregatesInput[]
+    NOT?: UserIntegrationScalarWhereWithAggregatesInput | UserIntegrationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"UserIntegration"> | string
+    userId?: StringWithAggregatesFilter<"UserIntegration"> | string
+    provider?: EnumIntegrationProviderWithAggregatesFilter<"UserIntegration"> | $Enums.IntegrationProvider
+    accessTokenEnc?: StringWithAggregatesFilter<"UserIntegration"> | string
+    refreshTokenEnc?: StringNullableWithAggregatesFilter<"UserIntegration"> | string | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"UserIntegration"> | Date | string | null
+    scopes?: StringWithAggregatesFilter<"UserIntegration"> | string
+    externalAccountId?: StringNullableWithAggregatesFilter<"UserIntegration"> | string | null
+    externalEmail?: StringNullableWithAggregatesFilter<"UserIntegration"> | string | null
+    preferences?: JsonNullableWithAggregatesFilter<"UserIntegration">
+    createdAt?: DateTimeWithAggregatesFilter<"UserIntegration"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"UserIntegration"> | Date | string
+  }
+
   export type MeetingWhereInput = {
     AND?: MeetingWhereInput | MeetingWhereInput[]
     OR?: MeetingWhereInput[]
@@ -39626,7 +41139,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFilter<"Meeting"> | $Enums.MeetingStatus
     tag?: EnumMeetingTagFilter<"Meeting"> | $Enums.MeetingTag
     notes?: StringFilter<"Meeting"> | string
+    platform?: EnumMeetingPlatformFilter<"Meeting"> | $Enums.MeetingPlatform
     calendarEventId?: StringNullableFilter<"Meeting"> | string | null
+    externalMeetingUrl?: StringNullableFilter<"Meeting"> | string | null
+    externalMeetingId?: StringNullableFilter<"Meeting"> | string | null
+    recordingBotId?: StringNullableFilter<"Meeting"> | string | null
+    recordingBotStatus?: StringNullableFilter<"Meeting"> | string | null
     recordingUrl?: StringNullableFilter<"Meeting"> | string | null
     organizerId?: StringNullableFilter<"Meeting"> | string | null
     livekitRoomId?: StringNullableFilter<"Meeting"> | string | null
@@ -39661,7 +41179,12 @@ export namespace Prisma {
     status?: SortOrder
     tag?: SortOrder
     notes?: SortOrder
+    platform?: SortOrder
     calendarEventId?: SortOrderInput | SortOrder
+    externalMeetingUrl?: SortOrderInput | SortOrder
+    externalMeetingId?: SortOrderInput | SortOrder
+    recordingBotId?: SortOrderInput | SortOrder
+    recordingBotStatus?: SortOrderInput | SortOrder
     recordingUrl?: SortOrderInput | SortOrder
     organizerId?: SortOrderInput | SortOrder
     livekitRoomId?: SortOrderInput | SortOrder
@@ -39700,7 +41223,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFilter<"Meeting"> | $Enums.MeetingStatus
     tag?: EnumMeetingTagFilter<"Meeting"> | $Enums.MeetingTag
     notes?: StringFilter<"Meeting"> | string
+    platform?: EnumMeetingPlatformFilter<"Meeting"> | $Enums.MeetingPlatform
     calendarEventId?: StringNullableFilter<"Meeting"> | string | null
+    externalMeetingUrl?: StringNullableFilter<"Meeting"> | string | null
+    externalMeetingId?: StringNullableFilter<"Meeting"> | string | null
+    recordingBotId?: StringNullableFilter<"Meeting"> | string | null
+    recordingBotStatus?: StringNullableFilter<"Meeting"> | string | null
     recordingUrl?: StringNullableFilter<"Meeting"> | string | null
     organizerId?: StringNullableFilter<"Meeting"> | string | null
     livekitRoomId?: StringNullableFilter<"Meeting"> | string | null
@@ -39734,7 +41262,12 @@ export namespace Prisma {
     status?: SortOrder
     tag?: SortOrder
     notes?: SortOrder
+    platform?: SortOrder
     calendarEventId?: SortOrderInput | SortOrder
+    externalMeetingUrl?: SortOrderInput | SortOrder
+    externalMeetingId?: SortOrderInput | SortOrder
+    recordingBotId?: SortOrderInput | SortOrder
+    recordingBotStatus?: SortOrderInput | SortOrder
     recordingUrl?: SortOrderInput | SortOrder
     organizerId?: SortOrderInput | SortOrder
     livekitRoomId?: SortOrderInput | SortOrder
@@ -39765,7 +41298,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusWithAggregatesFilter<"Meeting"> | $Enums.MeetingStatus
     tag?: EnumMeetingTagWithAggregatesFilter<"Meeting"> | $Enums.MeetingTag
     notes?: StringWithAggregatesFilter<"Meeting"> | string
+    platform?: EnumMeetingPlatformWithAggregatesFilter<"Meeting"> | $Enums.MeetingPlatform
     calendarEventId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    externalMeetingUrl?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    externalMeetingId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    recordingBotId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    recordingBotStatus?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
     recordingUrl?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
     organizerId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
     livekitRoomId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
@@ -41790,6 +43328,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -41818,6 +43357,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -41846,6 +43386,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -41874,6 +43415,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -42267,6 +43809,110 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type UserIntegrationCreateInput = {
+    id?: string
+    provider: $Enums.IntegrationProvider
+    accessTokenEnc: string
+    refreshTokenEnc?: string | null
+    expiresAt?: Date | string | null
+    scopes?: string
+    externalAccountId?: string | null
+    externalEmail?: string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutIntegrationsInput
+  }
+
+  export type UserIntegrationUncheckedCreateInput = {
+    id?: string
+    userId: string
+    provider: $Enums.IntegrationProvider
+    accessTokenEnc: string
+    refreshTokenEnc?: string | null
+    expiresAt?: Date | string | null
+    scopes?: string
+    externalAccountId?: string | null
+    externalEmail?: string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserIntegrationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumIntegrationProviderFieldUpdateOperationsInput | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFieldUpdateOperationsInput | string
+    refreshTokenEnc?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scopes?: StringFieldUpdateOperationsInput | string
+    externalAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutIntegrationsNestedInput
+  }
+
+  export type UserIntegrationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumIntegrationProviderFieldUpdateOperationsInput | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFieldUpdateOperationsInput | string
+    refreshTokenEnc?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scopes?: StringFieldUpdateOperationsInput | string
+    externalAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserIntegrationCreateManyInput = {
+    id?: string
+    userId: string
+    provider: $Enums.IntegrationProvider
+    accessTokenEnc: string
+    refreshTokenEnc?: string | null
+    expiresAt?: Date | string | null
+    scopes?: string
+    externalAccountId?: string | null
+    externalEmail?: string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserIntegrationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumIntegrationProviderFieldUpdateOperationsInput | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFieldUpdateOperationsInput | string
+    refreshTokenEnc?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scopes?: StringFieldUpdateOperationsInput | string
+    externalAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserIntegrationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumIntegrationProviderFieldUpdateOperationsInput | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFieldUpdateOperationsInput | string
+    refreshTokenEnc?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scopes?: StringFieldUpdateOperationsInput | string
+    externalAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MeetingCreateInput = {
     id?: string
     title: string
@@ -42276,7 +43922,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -42309,7 +43960,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -42340,7 +43996,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42373,7 +44034,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42405,7 +44071,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -42427,7 +44098,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42448,7 +44124,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44582,6 +46263,12 @@ export namespace Prisma {
     isNot?: OrganizationInvitationWhereInput | null
   }
 
+  export type UserIntegrationListRelationFilter = {
+    every?: UserIntegrationWhereInput
+    some?: UserIntegrationWhereInput
+    none?: UserIntegrationWhereInput
+  }
+
   export type ActionItemOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -44591,6 +46278,10 @@ export namespace Prisma {
   }
 
   export type AuthOtpOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type UserIntegrationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -44846,6 +46537,71 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type EnumIntegrationProviderFilter<$PrismaModel = never> = {
+    equals?: $Enums.IntegrationProvider | EnumIntegrationProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.IntegrationProvider[] | ListEnumIntegrationProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IntegrationProvider[] | ListEnumIntegrationProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumIntegrationProviderFilter<$PrismaModel> | $Enums.IntegrationProvider
+  }
+
+  export type UserIntegrationUserIdProviderCompoundUniqueInput = {
+    userId: string
+    provider: $Enums.IntegrationProvider
+  }
+
+  export type UserIntegrationCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    accessTokenEnc?: SortOrder
+    refreshTokenEnc?: SortOrder
+    expiresAt?: SortOrder
+    scopes?: SortOrder
+    externalAccountId?: SortOrder
+    externalEmail?: SortOrder
+    preferences?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserIntegrationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    accessTokenEnc?: SortOrder
+    refreshTokenEnc?: SortOrder
+    expiresAt?: SortOrder
+    scopes?: SortOrder
+    externalAccountId?: SortOrder
+    externalEmail?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserIntegrationMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    accessTokenEnc?: SortOrder
+    refreshTokenEnc?: SortOrder
+    expiresAt?: SortOrder
+    scopes?: SortOrder
+    externalAccountId?: SortOrder
+    externalEmail?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumIntegrationProviderWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IntegrationProvider | EnumIntegrationProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.IntegrationProvider[] | ListEnumIntegrationProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IntegrationProvider[] | ListEnumIntegrationProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumIntegrationProviderWithAggregatesFilter<$PrismaModel> | $Enums.IntegrationProvider
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIntegrationProviderFilter<$PrismaModel>
+    _max?: NestedEnumIntegrationProviderFilter<$PrismaModel>
+  }
+
   export type EnumMeetingStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.MeetingStatus | EnumMeetingStatusFieldRefInput<$PrismaModel>
     in?: $Enums.MeetingStatus[] | ListEnumMeetingStatusFieldRefInput<$PrismaModel>
@@ -44858,6 +46614,13 @@ export namespace Prisma {
     in?: $Enums.MeetingTag[] | ListEnumMeetingTagFieldRefInput<$PrismaModel>
     notIn?: $Enums.MeetingTag[] | ListEnumMeetingTagFieldRefInput<$PrismaModel>
     not?: NestedEnumMeetingTagFilter<$PrismaModel> | $Enums.MeetingTag
+  }
+
+  export type EnumMeetingPlatformFilter<$PrismaModel = never> = {
+    equals?: $Enums.MeetingPlatform | EnumMeetingPlatformFieldRefInput<$PrismaModel>
+    in?: $Enums.MeetingPlatform[] | ListEnumMeetingPlatformFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MeetingPlatform[] | ListEnumMeetingPlatformFieldRefInput<$PrismaModel>
+    not?: NestedEnumMeetingPlatformFilter<$PrismaModel> | $Enums.MeetingPlatform
   }
 
   export type MeetingParticipantListRelationFilter = {
@@ -44925,7 +46688,12 @@ export namespace Prisma {
     status?: SortOrder
     tag?: SortOrder
     notes?: SortOrder
+    platform?: SortOrder
     calendarEventId?: SortOrder
+    externalMeetingUrl?: SortOrder
+    externalMeetingId?: SortOrder
+    recordingBotId?: SortOrder
+    recordingBotStatus?: SortOrder
     recordingUrl?: SortOrder
     organizerId?: SortOrder
     livekitRoomId?: SortOrder
@@ -44952,7 +46720,12 @@ export namespace Prisma {
     status?: SortOrder
     tag?: SortOrder
     notes?: SortOrder
+    platform?: SortOrder
     calendarEventId?: SortOrder
+    externalMeetingUrl?: SortOrder
+    externalMeetingId?: SortOrder
+    recordingBotId?: SortOrder
+    recordingBotStatus?: SortOrder
     recordingUrl?: SortOrder
     organizerId?: SortOrder
     livekitRoomId?: SortOrder
@@ -44975,7 +46748,12 @@ export namespace Prisma {
     status?: SortOrder
     tag?: SortOrder
     notes?: SortOrder
+    platform?: SortOrder
     calendarEventId?: SortOrder
+    externalMeetingUrl?: SortOrder
+    externalMeetingId?: SortOrder
+    recordingBotId?: SortOrder
+    recordingBotStatus?: SortOrder
     recordingUrl?: SortOrder
     organizerId?: SortOrder
     livekitRoomId?: SortOrder
@@ -45010,6 +46788,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMeetingTagFilter<$PrismaModel>
     _max?: NestedEnumMeetingTagFilter<$PrismaModel>
+  }
+
+  export type EnumMeetingPlatformWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MeetingPlatform | EnumMeetingPlatformFieldRefInput<$PrismaModel>
+    in?: $Enums.MeetingPlatform[] | ListEnumMeetingPlatformFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MeetingPlatform[] | ListEnumMeetingPlatformFieldRefInput<$PrismaModel>
+    not?: NestedEnumMeetingPlatformWithAggregatesFilter<$PrismaModel> | $Enums.MeetingPlatform
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMeetingPlatformFilter<$PrismaModel>
+    _max?: NestedEnumMeetingPlatformFilter<$PrismaModel>
   }
 
   export type EnumMomTemplateCategoryFilter<$PrismaModel = never> = {
@@ -46483,6 +48271,13 @@ export namespace Prisma {
     connect?: OrganizationInvitationWhereUniqueInput
   }
 
+  export type UserIntegrationCreateNestedManyWithoutUserInput = {
+    create?: XOR<UserIntegrationCreateWithoutUserInput, UserIntegrationUncheckedCreateWithoutUserInput> | UserIntegrationCreateWithoutUserInput[] | UserIntegrationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserIntegrationCreateOrConnectWithoutUserInput | UserIntegrationCreateOrConnectWithoutUserInput[]
+    createMany?: UserIntegrationCreateManyUserInputEnvelope
+    connect?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutInvitedByInput = {
     create?: XOR<UserCreateWithoutInvitedByInput, UserUncheckedCreateWithoutInvitedByInput> | UserCreateWithoutInvitedByInput[] | UserUncheckedCreateWithoutInvitedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutInvitedByInput | UserCreateOrConnectWithoutInvitedByInput[]
@@ -46542,6 +48337,13 @@ export namespace Prisma {
     create?: XOR<OrganizationInvitationCreateWithoutUserInput, OrganizationInvitationUncheckedCreateWithoutUserInput>
     connectOrCreate?: OrganizationInvitationCreateOrConnectWithoutUserInput
     connect?: OrganizationInvitationWhereUniqueInput
+  }
+
+  export type UserIntegrationUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<UserIntegrationCreateWithoutUserInput, UserIntegrationUncheckedCreateWithoutUserInput> | UserIntegrationCreateWithoutUserInput[] | UserIntegrationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserIntegrationCreateOrConnectWithoutUserInput | UserIntegrationCreateOrConnectWithoutUserInput[]
+    createMany?: UserIntegrationCreateManyUserInputEnvelope
+    connect?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
   }
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -46694,6 +48496,20 @@ export namespace Prisma {
     update?: XOR<XOR<OrganizationInvitationUpdateToOneWithWhereWithoutUserInput, OrganizationInvitationUpdateWithoutUserInput>, OrganizationInvitationUncheckedUpdateWithoutUserInput>
   }
 
+  export type UserIntegrationUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UserIntegrationCreateWithoutUserInput, UserIntegrationUncheckedCreateWithoutUserInput> | UserIntegrationCreateWithoutUserInput[] | UserIntegrationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserIntegrationCreateOrConnectWithoutUserInput | UserIntegrationCreateOrConnectWithoutUserInput[]
+    upsert?: UserIntegrationUpsertWithWhereUniqueWithoutUserInput | UserIntegrationUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UserIntegrationCreateManyUserInputEnvelope
+    set?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+    disconnect?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+    delete?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+    connect?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+    update?: UserIntegrationUpdateWithWhereUniqueWithoutUserInput | UserIntegrationUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UserIntegrationUpdateManyWithWhereWithoutUserInput | UserIntegrationUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UserIntegrationScalarWhereInput | UserIntegrationScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutInvitedByNestedInput = {
     create?: XOR<UserCreateWithoutInvitedByInput, UserUncheckedCreateWithoutInvitedByInput> | UserCreateWithoutInvitedByInput[] | UserUncheckedCreateWithoutInvitedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutInvitedByInput | UserCreateOrConnectWithoutInvitedByInput[]
@@ -46812,6 +48628,20 @@ export namespace Prisma {
     update?: XOR<XOR<OrganizationInvitationUpdateToOneWithWhereWithoutUserInput, OrganizationInvitationUpdateWithoutUserInput>, OrganizationInvitationUncheckedUpdateWithoutUserInput>
   }
 
+  export type UserIntegrationUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UserIntegrationCreateWithoutUserInput, UserIntegrationUncheckedCreateWithoutUserInput> | UserIntegrationCreateWithoutUserInput[] | UserIntegrationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserIntegrationCreateOrConnectWithoutUserInput | UserIntegrationCreateOrConnectWithoutUserInput[]
+    upsert?: UserIntegrationUpsertWithWhereUniqueWithoutUserInput | UserIntegrationUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UserIntegrationCreateManyUserInputEnvelope
+    set?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+    disconnect?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+    delete?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+    connect?: UserIntegrationWhereUniqueInput | UserIntegrationWhereUniqueInput[]
+    update?: UserIntegrationUpdateWithWhereUniqueWithoutUserInput | UserIntegrationUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UserIntegrationUpdateManyWithWhereWithoutUserInput | UserIntegrationUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UserIntegrationScalarWhereInput | UserIntegrationScalarWhereInput[]
+  }
+
   export type OrganizationCreateNestedOneWithoutInvitationsInput = {
     create?: XOR<OrganizationCreateWithoutInvitationsInput, OrganizationUncheckedCreateWithoutInvitationsInput>
     connectOrCreate?: OrganizationCreateOrConnectWithoutInvitationsInput
@@ -46918,6 +48748,24 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutOtpCodesInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOtpCodesInput, UserUpdateWithoutOtpCodesInput>, UserUncheckedUpdateWithoutOtpCodesInput>
+  }
+
+  export type UserCreateNestedOneWithoutIntegrationsInput = {
+    create?: XOR<UserCreateWithoutIntegrationsInput, UserUncheckedCreateWithoutIntegrationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutIntegrationsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumIntegrationProviderFieldUpdateOperationsInput = {
+    set?: $Enums.IntegrationProvider
+  }
+
+  export type UserUpdateOneRequiredWithoutIntegrationsNestedInput = {
+    create?: XOR<UserCreateWithoutIntegrationsInput, UserUncheckedCreateWithoutIntegrationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutIntegrationsInput
+    upsert?: UserUpsertWithoutIntegrationsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutIntegrationsInput, UserUpdateWithoutIntegrationsInput>, UserUncheckedUpdateWithoutIntegrationsInput>
   }
 
   export type OrganizationCreateNestedOneWithoutMeetingsInput = {
@@ -47064,6 +48912,10 @@ export namespace Prisma {
 
   export type EnumMeetingTagFieldUpdateOperationsInput = {
     set?: $Enums.MeetingTag
+  }
+
+  export type EnumMeetingPlatformFieldUpdateOperationsInput = {
+    set?: $Enums.MeetingPlatform
   }
 
   export type OrganizationUpdateOneWithoutMeetingsNestedInput = {
@@ -48205,6 +50057,23 @@ export namespace Prisma {
     _max?: NestedEnumOrganizationInvitationStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumIntegrationProviderFilter<$PrismaModel = never> = {
+    equals?: $Enums.IntegrationProvider | EnumIntegrationProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.IntegrationProvider[] | ListEnumIntegrationProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IntegrationProvider[] | ListEnumIntegrationProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumIntegrationProviderFilter<$PrismaModel> | $Enums.IntegrationProvider
+  }
+
+  export type NestedEnumIntegrationProviderWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IntegrationProvider | EnumIntegrationProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.IntegrationProvider[] | ListEnumIntegrationProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IntegrationProvider[] | ListEnumIntegrationProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumIntegrationProviderWithAggregatesFilter<$PrismaModel> | $Enums.IntegrationProvider
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIntegrationProviderFilter<$PrismaModel>
+    _max?: NestedEnumIntegrationProviderFilter<$PrismaModel>
+  }
+
   export type NestedEnumMeetingStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.MeetingStatus | EnumMeetingStatusFieldRefInput<$PrismaModel>
     in?: $Enums.MeetingStatus[] | ListEnumMeetingStatusFieldRefInput<$PrismaModel>
@@ -48217,6 +50086,13 @@ export namespace Prisma {
     in?: $Enums.MeetingTag[] | ListEnumMeetingTagFieldRefInput<$PrismaModel>
     notIn?: $Enums.MeetingTag[] | ListEnumMeetingTagFieldRefInput<$PrismaModel>
     not?: NestedEnumMeetingTagFilter<$PrismaModel> | $Enums.MeetingTag
+  }
+
+  export type NestedEnumMeetingPlatformFilter<$PrismaModel = never> = {
+    equals?: $Enums.MeetingPlatform | EnumMeetingPlatformFieldRefInput<$PrismaModel>
+    in?: $Enums.MeetingPlatform[] | ListEnumMeetingPlatformFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MeetingPlatform[] | ListEnumMeetingPlatformFieldRefInput<$PrismaModel>
+    not?: NestedEnumMeetingPlatformFilter<$PrismaModel> | $Enums.MeetingPlatform
   }
 
   export type NestedEnumMeetingStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -48237,6 +50113,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMeetingTagFilter<$PrismaModel>
     _max?: NestedEnumMeetingTagFilter<$PrismaModel>
+  }
+
+  export type NestedEnumMeetingPlatformWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MeetingPlatform | EnumMeetingPlatformFieldRefInput<$PrismaModel>
+    in?: $Enums.MeetingPlatform[] | ListEnumMeetingPlatformFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MeetingPlatform[] | ListEnumMeetingPlatformFieldRefInput<$PrismaModel>
+    not?: NestedEnumMeetingPlatformWithAggregatesFilter<$PrismaModel> | $Enums.MeetingPlatform
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMeetingPlatformFilter<$PrismaModel>
+    _max?: NestedEnumMeetingPlatformFilter<$PrismaModel>
   }
 
   export type NestedEnumMomTemplateCategoryFilter<$PrismaModel = never> = {
@@ -49645,6 +51531,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOrganizationInput = {
@@ -49672,6 +51559,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOrganizationInput = {
@@ -49693,7 +51581,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -49724,7 +51617,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -50149,7 +52047,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFilter<"Meeting"> | $Enums.MeetingStatus
     tag?: EnumMeetingTagFilter<"Meeting"> | $Enums.MeetingTag
     notes?: StringFilter<"Meeting"> | string
+    platform?: EnumMeetingPlatformFilter<"Meeting"> | $Enums.MeetingPlatform
     calendarEventId?: StringNullableFilter<"Meeting"> | string | null
+    externalMeetingUrl?: StringNullableFilter<"Meeting"> | string | null
+    externalMeetingId?: StringNullableFilter<"Meeting"> | string | null
+    recordingBotId?: StringNullableFilter<"Meeting"> | string | null
+    recordingBotStatus?: StringNullableFilter<"Meeting"> | string | null
     recordingUrl?: StringNullableFilter<"Meeting"> | string | null
     organizerId?: StringNullableFilter<"Meeting"> | string | null
     livekitRoomId?: StringNullableFilter<"Meeting"> | string | null
@@ -50539,6 +52442,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutInvitedUsersInput = {
@@ -50566,6 +52470,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutInvitedUsersInput = {
@@ -50598,6 +52503,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutInvitedByInput = {
@@ -50625,6 +52531,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutInvitedByInput = {
@@ -50671,7 +52578,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -50703,7 +52615,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -50945,6 +52862,44 @@ export namespace Prisma {
     create: XOR<OrganizationInvitationCreateWithoutUserInput, OrganizationInvitationUncheckedCreateWithoutUserInput>
   }
 
+  export type UserIntegrationCreateWithoutUserInput = {
+    id?: string
+    provider: $Enums.IntegrationProvider
+    accessTokenEnc: string
+    refreshTokenEnc?: string | null
+    expiresAt?: Date | string | null
+    scopes?: string
+    externalAccountId?: string | null
+    externalEmail?: string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserIntegrationUncheckedCreateWithoutUserInput = {
+    id?: string
+    provider: $Enums.IntegrationProvider
+    accessTokenEnc: string
+    refreshTokenEnc?: string | null
+    expiresAt?: Date | string | null
+    scopes?: string
+    externalAccountId?: string | null
+    externalEmail?: string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserIntegrationCreateOrConnectWithoutUserInput = {
+    where: UserIntegrationWhereUniqueInput
+    create: XOR<UserIntegrationCreateWithoutUserInput, UserIntegrationUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserIntegrationCreateManyUserInputEnvelope = {
+    data: UserIntegrationCreateManyUserInput | UserIntegrationCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type OrganizationUpsertWithoutUsersInput = {
     update: XOR<OrganizationUpdateWithoutUsersInput, OrganizationUncheckedUpdateWithoutUsersInput>
     create: XOR<OrganizationCreateWithoutUsersInput, OrganizationUncheckedCreateWithoutUsersInput>
@@ -51060,6 +53015,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInvitedUsersInput = {
@@ -51087,6 +53043,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutInvitedByInput = {
@@ -51325,6 +53282,40 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type UserIntegrationUpsertWithWhereUniqueWithoutUserInput = {
+    where: UserIntegrationWhereUniqueInput
+    update: XOR<UserIntegrationUpdateWithoutUserInput, UserIntegrationUncheckedUpdateWithoutUserInput>
+    create: XOR<UserIntegrationCreateWithoutUserInput, UserIntegrationUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserIntegrationUpdateWithWhereUniqueWithoutUserInput = {
+    where: UserIntegrationWhereUniqueInput
+    data: XOR<UserIntegrationUpdateWithoutUserInput, UserIntegrationUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserIntegrationUpdateManyWithWhereWithoutUserInput = {
+    where: UserIntegrationScalarWhereInput
+    data: XOR<UserIntegrationUpdateManyMutationInput, UserIntegrationUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type UserIntegrationScalarWhereInput = {
+    AND?: UserIntegrationScalarWhereInput | UserIntegrationScalarWhereInput[]
+    OR?: UserIntegrationScalarWhereInput[]
+    NOT?: UserIntegrationScalarWhereInput | UserIntegrationScalarWhereInput[]
+    id?: StringFilter<"UserIntegration"> | string
+    userId?: StringFilter<"UserIntegration"> | string
+    provider?: EnumIntegrationProviderFilter<"UserIntegration"> | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFilter<"UserIntegration"> | string
+    refreshTokenEnc?: StringNullableFilter<"UserIntegration"> | string | null
+    expiresAt?: DateTimeNullableFilter<"UserIntegration"> | Date | string | null
+    scopes?: StringFilter<"UserIntegration"> | string
+    externalAccountId?: StringNullableFilter<"UserIntegration"> | string | null
+    externalEmail?: StringNullableFilter<"UserIntegration"> | string | null
+    preferences?: JsonNullableFilter<"UserIntegration">
+    createdAt?: DateTimeFilter<"UserIntegration"> | Date | string
+    updatedAt?: DateTimeFilter<"UserIntegration"> | Date | string
+  }
+
   export type OrganizationCreateWithoutInvitationsInput = {
     id?: string
     name: string
@@ -51423,6 +53414,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogCreateNestedManyWithoutUserInput
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSentInvitationsInput = {
@@ -51450,6 +53442,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogUncheckedCreateNestedManyWithoutUserInput
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSentInvitationsInput = {
@@ -51482,6 +53475,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogCreateNestedManyWithoutUserInput
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAcceptedInvitationInput = {
@@ -51509,6 +53503,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogUncheckedCreateNestedManyWithoutUserInput
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAcceptedInvitationInput = {
@@ -51631,6 +53626,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogUpdateManyWithoutUserNestedInput
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentInvitationsInput = {
@@ -51658,6 +53654,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogUncheckedUpdateManyWithoutUserNestedInput
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutAcceptedInvitationInput = {
@@ -51696,6 +53693,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogUpdateManyWithoutUserNestedInput
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAcceptedInvitationInput = {
@@ -51723,6 +53721,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogUncheckedUpdateManyWithoutUserNestedInput
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutEmployeeProfileInput = {
@@ -51750,6 +53749,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEmployeeProfileInput = {
@@ -51777,6 +53777,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEmployeeProfileInput = {
@@ -51820,6 +53821,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmployeeProfileInput = {
@@ -51847,6 +53849,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type OrganizationCreateWithoutAuditEventsInput = {
@@ -51947,6 +53950,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTenantAuditLogsInput = {
@@ -51974,6 +53978,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTenantAuditLogsInput = {
@@ -52096,6 +54101,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTenantAuditLogsInput = {
@@ -52123,6 +54129,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutOtpCodesInput = {
@@ -52150,6 +54157,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOtpCodesInput = {
@@ -52177,6 +54185,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOtpCodesInput = {
@@ -52220,6 +54229,7 @@ export namespace Prisma {
     tenantAuditLogs?: TenantAuditLogUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOtpCodesInput = {
@@ -52245,6 +54255,135 @@ export namespace Prisma {
     ownedTasks?: ActionItemUncheckedUpdateManyWithoutOwnerNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
     tenantAuditLogs?: TenantAuditLogUncheckedUpdateManyWithoutUserNestedInput
+    sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+    acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutIntegrationsInput = {
+    id?: string
+    firstName?: string
+    lastName?: string
+    email: string
+    mobile?: string | null
+    name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
+    status?: $Enums.UserStatus
+    mustChangePassword?: boolean
+    emailVerifiedAt?: Date | string | null
+    lastLoginAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organization?: OrganizationCreateNestedOneWithoutUsersInput
+    invitedBy?: UserCreateNestedOneWithoutInvitedUsersInput
+    invitedUsers?: UserCreateNestedManyWithoutInvitedByInput
+    employeeProfile?: EmployeeProfileCreateNestedOneWithoutUserInput
+    organizedMeetings?: MeetingCreateNestedManyWithoutOrganizerInput
+    ownedTasks?: ActionItemCreateNestedManyWithoutOwnerInput
+    auditLogs?: AuditLogCreateNestedManyWithoutUserInput
+    tenantAuditLogs?: TenantAuditLogCreateNestedManyWithoutUserInput
+    otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
+    sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
+    acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutIntegrationsInput = {
+    id?: string
+    organizationId?: string | null
+    firstName?: string
+    lastName?: string
+    email: string
+    mobile?: string | null
+    name: string
+    passwordHash?: string | null
+    role?: $Enums.UserRole
+    status?: $Enums.UserStatus
+    mustChangePassword?: boolean
+    emailVerifiedAt?: Date | string | null
+    invitedById?: string | null
+    lastLoginAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    invitedUsers?: UserUncheckedCreateNestedManyWithoutInvitedByInput
+    employeeProfile?: EmployeeProfileUncheckedCreateNestedOneWithoutUserInput
+    organizedMeetings?: MeetingUncheckedCreateNestedManyWithoutOrganizerInput
+    ownedTasks?: ActionItemUncheckedCreateNestedManyWithoutOwnerInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
+    tenantAuditLogs?: TenantAuditLogUncheckedCreateNestedManyWithoutUserInput
+    otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
+    sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
+    acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutIntegrationsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutIntegrationsInput, UserUncheckedCreateWithoutIntegrationsInput>
+  }
+
+  export type UserUpsertWithoutIntegrationsInput = {
+    update: XOR<UserUpdateWithoutIntegrationsInput, UserUncheckedUpdateWithoutIntegrationsInput>
+    create: XOR<UserCreateWithoutIntegrationsInput, UserUncheckedCreateWithoutIntegrationsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutIntegrationsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutIntegrationsInput, UserUncheckedUpdateWithoutIntegrationsInput>
+  }
+
+  export type UserUpdateWithoutIntegrationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    mobile?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organization?: OrganizationUpdateOneWithoutUsersNestedInput
+    invitedBy?: UserUpdateOneWithoutInvitedUsersNestedInput
+    invitedUsers?: UserUpdateManyWithoutInvitedByNestedInput
+    employeeProfile?: EmployeeProfileUpdateOneWithoutUserNestedInput
+    organizedMeetings?: MeetingUpdateManyWithoutOrganizerNestedInput
+    ownedTasks?: ActionItemUpdateManyWithoutOwnerNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
+    tenantAuditLogs?: TenantAuditLogUpdateManyWithoutUserNestedInput
+    otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
+    sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
+    acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutIntegrationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    organizationId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    mobile?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    emailVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    invitedById?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedUsers?: UserUncheckedUpdateManyWithoutInvitedByNestedInput
+    employeeProfile?: EmployeeProfileUncheckedUpdateOneWithoutUserNestedInput
+    organizedMeetings?: MeetingUncheckedUpdateManyWithoutOrganizerNestedInput
+    ownedTasks?: ActionItemUncheckedUpdateManyWithoutOwnerNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
+    tenantAuditLogs?: TenantAuditLogUncheckedUpdateManyWithoutUserNestedInput
+    otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -52386,6 +54525,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOrganizedMeetingsInput = {
@@ -52413,6 +54553,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOrganizedMeetingsInput = {
@@ -52839,6 +54980,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrganizedMeetingsInput = {
@@ -52866,6 +55008,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MeetingParticipantUpsertWithWhereUniqueWithoutMeetingInput = {
@@ -53338,7 +55481,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -53370,7 +55518,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -53784,7 +55937,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -53816,7 +55974,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -53862,7 +56025,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53894,7 +56062,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53924,7 +56097,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -53956,7 +56134,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -54002,7 +56185,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54034,7 +56222,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54064,7 +56257,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -54096,7 +56294,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -54142,7 +56345,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54174,7 +56382,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54204,7 +56417,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -54236,7 +56454,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -54310,7 +56533,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54342,7 +56570,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54457,7 +56690,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -54489,7 +56727,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -54535,7 +56778,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54567,7 +56815,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54597,7 +56850,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -54629,7 +56887,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -54680,6 +56943,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedTasksInput = {
@@ -54707,6 +56971,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedTasksInput = {
@@ -54734,7 +56999,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54766,7 +57036,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54823,6 +57098,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedTasksInput = {
@@ -54850,6 +57126,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MeetingCreateWithoutDecisionsInput = {
@@ -54861,7 +57138,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -54893,7 +57175,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -54939,7 +57226,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54971,7 +57263,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55001,7 +57298,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -55033,7 +57335,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -55079,7 +57386,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55111,7 +57423,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55141,7 +57458,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -55173,7 +57495,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -55224,6 +57551,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -55251,6 +57579,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedCreateNestedManyWithoutUserInput
     sentInvitations?: OrganizationInvitationUncheckedCreateNestedManyWithoutInvitedByInput
     acceptedInvitation?: OrganizationInvitationUncheckedCreateNestedOneWithoutUserInput
+    integrations?: UserIntegrationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -55278,7 +57607,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55310,7 +57644,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55367,6 +57706,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -55394,6 +57734,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type InvoiceLineItemCreateManyInvoiceInput = {
@@ -55551,7 +57892,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -55677,6 +58023,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrganizationInput = {
@@ -55704,6 +58051,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutOrganizationInput = {
@@ -55733,7 +58081,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55764,7 +58117,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55795,7 +58153,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56114,7 +58477,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     livekitRoomId?: string | null
     joinSlug?: string | null
@@ -56185,6 +58553,20 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type UserIntegrationCreateManyUserInput = {
+    id?: string
+    provider: $Enums.IntegrationProvider
+    accessTokenEnc: string
+    refreshTokenEnc?: string | null
+    expiresAt?: Date | string | null
+    scopes?: string
+    externalAccountId?: string | null
+    externalEmail?: string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type UserUpdateWithoutInvitedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     firstName?: StringFieldUpdateOperationsInput | string
@@ -56210,6 +58592,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInvitedByInput = {
@@ -56237,6 +58620,7 @@ export namespace Prisma {
     otpCodes?: AuthOtpUncheckedUpdateManyWithoutUserNestedInput
     sentInvitations?: OrganizationInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
     acceptedInvitation?: OrganizationInvitationUncheckedUpdateOneWithoutUserNestedInput
+    integrations?: UserIntegrationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutInvitedByInput = {
@@ -56266,7 +58650,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56298,7 +58687,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56329,7 +58723,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56514,6 +58913,48 @@ export namespace Prisma {
     mobile?: NullableStringFieldUpdateOperationsInput | string | null
     designation?: NullableStringFieldUpdateOperationsInput | string | null
     department?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserIntegrationUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumIntegrationProviderFieldUpdateOperationsInput | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFieldUpdateOperationsInput | string
+    refreshTokenEnc?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scopes?: StringFieldUpdateOperationsInput | string
+    externalAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserIntegrationUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumIntegrationProviderFieldUpdateOperationsInput | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFieldUpdateOperationsInput | string
+    refreshTokenEnc?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scopes?: StringFieldUpdateOperationsInput | string
+    externalAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserIntegrationUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumIntegrationProviderFieldUpdateOperationsInput | $Enums.IntegrationProvider
+    accessTokenEnc?: StringFieldUpdateOperationsInput | string
+    refreshTokenEnc?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scopes?: StringFieldUpdateOperationsInput | string
+    externalAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -56788,7 +59229,12 @@ export namespace Prisma {
     status?: $Enums.MeetingStatus
     tag?: $Enums.MeetingTag
     notes?: string
+    platform?: $Enums.MeetingPlatform
     calendarEventId?: string | null
+    externalMeetingUrl?: string | null
+    externalMeetingId?: string | null
+    recordingBotId?: string | null
+    recordingBotStatus?: string | null
     recordingUrl?: string | null
     organizerId?: string | null
     livekitRoomId?: string | null
@@ -56935,7 +59381,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
     joinSlug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56967,7 +59418,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56998,7 +59454,12 @@ export namespace Prisma {
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     tag?: EnumMeetingTagFieldUpdateOperationsInput | $Enums.MeetingTag
     notes?: StringFieldUpdateOperationsInput | string
+    platform?: EnumMeetingPlatformFieldUpdateOperationsInput | $Enums.MeetingPlatform
     calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    externalMeetingId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotId?: NullableStringFieldUpdateOperationsInput | string | null
+    recordingBotStatus?: NullableStringFieldUpdateOperationsInput | string | null
     recordingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     livekitRoomId?: NullableStringFieldUpdateOperationsInput | string | null
