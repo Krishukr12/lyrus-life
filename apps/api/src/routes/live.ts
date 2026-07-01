@@ -1,3 +1,4 @@
+import { resolveWebAppUrl } from "@lyrus/shared";
 import { Router } from "express";
 import { MeetingStatus, UserRole, prisma } from "@lyrus/db";
 import { assertMeetingAccess } from "../lib/meeting-access.js";
@@ -42,7 +43,7 @@ async function buildLiveSessionResponse(
   options: { isHost: boolean; isLive: boolean },
 ) {
   const joinSlug = meeting.joinSlug ?? (await ensureMeetingJoinSlug(meeting.id));
-  const webBase = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
+  const webBase = resolveWebAppUrl();
   const token = await createLiveKitToken({
     roomName: meeting.id,
     participantName: user.name,

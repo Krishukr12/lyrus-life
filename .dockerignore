@@ -1,0 +1,56 @@
+# Dependencies & caches
+node_modules
+**/node_modules
+.pnpm-store
+.turbo
+
+# Build outputs (rebuilt inside Docker)
+dist
+**/dist
+.next
+out
+build
+
+# Local env & secrets — never bake into images
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+
+# Git & IDE
+.git
+.gitignore
+.cursor
+.vscode
+.idea
+
+# Frontend apps (not needed for API image)
+apps/web
+apps/admin
+apps/marketing
+
+# Dev-only packages
+packages/eslint-config
+
+# Uploads & local data
+uploads
+apps/api/uploads
+invites
+coverage
+
+# Docs & misc
+*.md
+!docs/DEPLOYMENT.md
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker artifacts
+docker-compose.yml
+livekit.yaml
+
+# Test & debug
+**/*.test.ts
+**/*.spec.ts

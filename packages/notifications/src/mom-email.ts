@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { generateMomPdfBytes, momPdfFilename, type MomPdfInput } from "@lyrus/mom-pdf";
+import { resolveWebAppUrl } from "./app-urls.js";
 import nodemailer from "nodemailer";
 import type { InviteResult } from "./email.js";
 import { createSmtpTransport, getSmtpConfig } from "./smtp-config.js";
@@ -23,13 +24,12 @@ export interface SendMomToStakeholdersInput {
   stakeholders: Array<{ name: string; email: string }>;
 }
 
-function getWebAppUrl(meetingId: string): string {
-  const base = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
-  return `${base}/meetings/${meetingId}`;
+function getMeetingPageUrl(meetingId: string): string {
+  return `${resolveWebAppUrl()}/meetings/${meetingId}`;
 }
 
 function buildMomShareHtml(input: SendMomToStakeholdersInput): string {
-  const meetingUrl = getWebAppUrl(input.meetingId);
+  const meetingUrl = getMeetingPageUrl(input.meetingId);
   const keyPointsHtml = input.pdfInput.mom.keyPoints
     .map((p) => `<li>${p.replace(/</g, "&lt;")}</li>`)
     .join("");
@@ -82,7 +82,7 @@ export async function sendMomToStakeholders(
   const pdf = Buffer.from(generateMomPdfBytes(input.pdfInput));
   const pdfFilename = momPdfFilename(input.meetingTitle);
   const html = buildMomShareHtml(input);
-  const meetingUrl = getWebAppUrl(input.meetingId);
+  const meetingUrl = getMeetingPageUrl(input.meetingId);
   const text = [
     `Minutes of Meeting: ${input.meetingTitle}`,
     `Approved by: ${input.approvedBy}`,

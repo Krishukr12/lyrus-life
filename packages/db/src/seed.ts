@@ -1,83 +1,80 @@
-import { hashSecret } from "@lyrus/auth";
-import "./load-env.js";
-import { UserRole, UserStatus, prisma } from "./index.js";
+import { config } from "dotenv";
+import { resolve } from "node:path";
+import { MeetingStatus, MeetingTag, prisma } from "./index.js";
 
-function fullName(firstName: string, lastName: string) {
-  return `${firstName} ${lastName}`.trim();
-}
-
-async function upsertSuperAdmin(input: {
-  email: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-}) {
-  const email = input.email.toLowerCase();
-  const passwordHash = await hashSecret(input.password);
-  const name = fullName(input.firstName, input.lastName);
-
-  await prisma.user.upsert({
-    where: { email },
-    create: {
-      email,
-      firstName: input.firstName,
-      lastName: input.lastName,
-      name,
-      passwordHash,
-      role: UserRole.SUPER_ADMIN,
-      status: UserStatus.ACTIVE,
-      organizationId: null,
-    },
-    update: {
-      firstName: input.firstName,
-      lastName: input.lastName,
-      name,
-      passwordHash,
-      role: UserRole.SUPER_ADMIN,
-      status: UserStatus.ACTIVE,
-      organizationId: null,
-    },
-  });
-
-  console.info(`Seeded super admin: ${email}`);
-}
-
-async function seedPlatformPricing() {
-  await prisma.platformPricingConfig.upsert({
-    where: { id: "default" },
-    create: {
-      id: "default",
-      starterMonthlyInr: 999,
-      starterYearlyInr: 9_999,
-      growthMonthlyInr: 2_999,
-      growthYearlyInr: 29_999,
-      enterpriseBaseMonthlyInr: 9_999,
-      extraUserMonthlyInr: 99,
-      extraLocationMonthlyInr: 499,
-      gstPercent: 18,
-      freeTrialDays: 14,
-    },
-    update: {},
-  });
-  console.info("Seeded platform pricing config (defaults)");
-}
+config({ path: resolve(import.meta.dirname, "../../../.env") });
+config({ path: resolve(import.meta.dirname, "../.env") });
 
 async function main() {
-  await upsertSuperAdmin({
-    email: "krishan.kumar@virtualedge.in".toLowerCase(),
-    firstName: process.env.SEED_SUPER_ADMIN_FIRST_NAME ?? "Krishan",
-    lastName: process.env.SEED_SUPER_ADMIN_LAST_NAME ?? "Kumar",
-    password: process.env.SEED_SUPER_ADMIN_PASSWORD ?? "Krishukrishan1211@",
+  const organizer = await prisma.user.upsert({
+    where: { email: "host@lyrus.life" },
+    update: {},
+    create: {
+      email: "host@lyrus.life",
+      name: "Lyrus Host",
+    },
   });
 
-  await seedPlatformPricing();
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(10, 0, 0, 0);
+
+  const lastWeek = new Date(now);
+  lastWeek.setDate(lastWeek.getDate() - 7);
+  lastWeek.setHours(14, 0, 0, 0);
+
+  await prisma.meeting.upsert({
+    where: { id: "seed-meeting-upcoming" },
+    update: {},
+    create: {
+      id: "seed-meeting-upcoming",
+      title: "Q3 Planning Sync",
+      description: "Quarterly planning and resource alignment",
+      scheduledAt: tomorrow,
+      durationMinutes: 45,
+      status: MeetingStatus.UPCOMING,
+      tag: MeetingTag.INTERNAL,
+      organizerId: organizer.id,
+      participants: {
+        create: [
+          { name: "Alice Chen", email: "alice@lyrus.life", role: "Team Lead" },
+          { name: "Bob Martinez", email: "bob@lyrus.life", role: "Analyst" },
+          { name: "Carol Singh", email: "carol@lyrus.life", role: "Manager" },
+        ],
+      },
+    },
+  });
+
+  await prisma.meeting.upsert({
+    where: { id: "seed-meeting-completed" },
+    update: {},
+    create: {
+      id: "seed-meeting-completed",
+      title: "Client Onboarding Review",
+      description: "Review onboarding milestones with client stakeholders",
+      scheduledAt: lastWeek,
+      durationMinutes: 60,
+      status: MeetingStatus.COMPLETED,
+      tag: MeetingTag.CLIENT,
+      notes:
+        "Discussed pilot timeline and budget constraints.\nClient requested revised cost breakdown.",
+      organizerId: organizer.id,
+      participants: {
+        create: [
+          { name: "Alice Chen", email: "alice@lyrus.life" },
+          { name: "David Park", email: "david@client.com" },
+        ],
+      },
+    },
+  });
+
+  console.log("Database seeded.");
 }
 
 main()
-  .catch((err) => {
-    console.error(err);
+  .catch((e) => {
+    console.error(e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .finally(() => prisma.$disconnect());

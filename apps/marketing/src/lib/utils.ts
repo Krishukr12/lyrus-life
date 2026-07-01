@@ -5,8 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/** Product app URL — set VITE_APP_URL=https://app.meetingdesk.in in production */
-export const APP_URL = (import.meta.env.VITE_APP_URL as string | undefined)?.replace(/\/$/, "") || "https://app.meetingdesk.in";
+/** Product app URL — set VITE_APP_URL=https://customer.meetingdesk.in in production */
+export const APP_URL = (import.meta.env.VITE_APP_URL as string | undefined)?.replace(/\/$/, "") || "https://customer.meetingdesk.in";
 
 export function appLink(path: string) {
   const base = APP_URL;

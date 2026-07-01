@@ -2,6 +2,7 @@ import { OrganizationInvitationStatus, UserStatus, prisma } from "@lyrus/db";
 import { sendUserInvitationEmail } from "@lyrus/notifications";
 import { addDays } from "date-fns";
 import type { inviteOrgUserSchema } from "@lyrus/shared";
+import { resolveWebAppUrl } from "@lyrus/shared";
 import type { z } from "zod";
 import { generateInviteToken, hashInviteToken } from "../lib/invite-token.js";
 import {
@@ -34,8 +35,7 @@ export class InvitationError extends Error {
 }
 
 function inviteAcceptUrl(token: string): string {
-  const webAppUrl = process.env.WEB_APP_URL ?? "http://localhost:8080";
-  return `${webAppUrl}/auth/accept-invite?token=${encodeURIComponent(token)}`;
+  return `${resolveWebAppUrl()}/auth/accept-invite?token=${encodeURIComponent(token)}`;
 }
 
 export const invitationService = {

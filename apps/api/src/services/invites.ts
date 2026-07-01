@@ -1,5 +1,6 @@
 import { InviteStatus, MeetingPlatform, PipelineStep, prisma } from "@lyrus/db";
 import { getOrganizerEmail, sendMeetingInvites, type InviteResult } from "@lyrus/notifications";
+import { webAppJoinUrl } from "@lyrus/shared";
 import { ensureMeetingJoinSlug } from "../lib/meeting-join-access.js";
 import {
   mapPlatformToWeb,
@@ -7,11 +8,6 @@ import {
   platformLocation,
 } from "./integrations/meeting-platform.js";
 import { logAudit } from "./audit.js";
-
-function webAppJoinUrl(joinSlug: string): string {
-  const base = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
-  return `${base}/join/${joinSlug}`;
-}
 
 export async function sendAndRecordMeetingInvites(meetingId: string): Promise<InviteResult[]> {
   const meeting = await prisma.meeting.findUnique({

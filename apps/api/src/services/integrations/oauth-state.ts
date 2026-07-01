@@ -1,4 +1,9 @@
 import { SignJWT, jwtVerify } from "jose";
+import {
+  integrationCallbackUrl as sharedIntegrationCallbackUrl,
+  webIntegrationsRedirect as sharedWebIntegrationsRedirect,
+  type PublicUrlRequest,
+} from "@lyrus/shared";
 
 const STATE_TTL_SECONDS = 600;
 
@@ -27,18 +32,13 @@ export async function verifyOAuthState(
   return { userId, provider };
 }
 
-function apiPublicBase(): string {
-  const explicit = process.env.API_PUBLIC_URL?.replace(/\/$/, "");
-  if (explicit) return explicit;
-  const port = process.env.API_PORT ?? "3001";
-  return `http://localhost:${port}`;
-}
-
-export function integrationCallbackUrl(provider: "google" | "microsoft"): string {
-  return `${apiPublicBase()}/integrations/${provider}/callback`;
+export function integrationCallbackUrl(
+  provider: "google" | "microsoft",
+  req?: PublicUrlRequest,
+): string {
+  return sharedIntegrationCallbackUrl(provider, req);
 }
 
 export function webIntegrationsRedirect(query = ""): string {
-  const base = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
-  return `${base}/settings/integrations${query}`;
+  return sharedWebIntegrationsRedirect(query);
 }

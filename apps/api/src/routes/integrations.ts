@@ -59,7 +59,7 @@ export function createIntegrationsRouter(): Router {
         res.status(400).json({ error: "invalid_provider" });
         return;
       }
-      const { authUrl } = await startIntegrationConnect(user.id, parsed.data);
+      const { authUrl } = await startIntegrationConnect(user.id, parsed.data, req);
       res.json({ authUrl });
     }),
   );
@@ -223,7 +223,7 @@ export function createIntegrationCallbacksRouter(): Router {
       }
 
       try {
-        await handleIntegrationCallback(parsed.data, code, state);
+        await handleIntegrationCallback(parsed.data, code, state, req);
         res.redirect(webIntegrationsRedirect(`?connected=${parsed.data}`));
       } catch (err) {
         const message = err instanceof Error ? err.message : "oauth_failed";

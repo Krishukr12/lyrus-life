@@ -1,5 +1,6 @@
 import { BillingStatus, OrganizationStatus, UserRole, UserStatus, prisma } from "@lyrus/db";
 import { sendOrgAdminWelcomeEmail } from "@lyrus/notifications";
+import { webAppLoginUrl } from "@lyrus/shared";
 import type { createOrganizationSchema, updateOrganizationSchema } from "@lyrus/shared";
 import type { z } from "zod";
 import { organizationRepository } from "../repositories/organization.repository.js";
@@ -150,7 +151,6 @@ export const organizationService = {
       return { organization, admin };
     });
 
-    const webAppUrl = process.env.WEB_APP_URL ?? "http://localhost:8080";
     if (input.momTemplates?.templates?.length) {
       await momTemplateService.provisionOnboardingTemplates(
         actorId,
@@ -183,7 +183,7 @@ export const organizationService = {
         name: result.admin.name,
         organizationName: result.organization.name,
         temporaryPassword,
-        loginUrl: `${webAppUrl}/login`,
+        loginUrl: webAppLoginUrl(),
       });
     } catch (err) {
       console.warn("Failed to send org admin welcome email", err);

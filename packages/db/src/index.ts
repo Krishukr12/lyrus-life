@@ -1,11 +1,9 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import enumModule from "../generated/client/enums.js";
 import generatedModule from "../generated/client/index.js";
 import "./load-env.js";
 import { pgConnectionConfig } from "./pg-config.js";
 
-const enumExports = (enumModule as { default?: typeof enumModule }).default ?? enumModule;
 const generatedExports =
   (generatedModule as { default?: typeof generatedModule }).default ?? generatedModule;
 
@@ -18,7 +16,7 @@ export const {
   TaskPriority,
   PipelineStep,
   InviteStatus,
-} = enumExports;
+} = generatedExports;
 export const UserRole = generatedExports.UserRole;
 export const UserStatus = generatedExports.UserStatus;
 export const OrganizationStatus = generatedExports.OrganizationStatus;

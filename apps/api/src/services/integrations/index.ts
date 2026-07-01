@@ -3,6 +3,7 @@ import type { IntegrationProviderType } from "@lyrus/db";
 import type {
   IntegrationPreferences,
   IntegrationProviderInput,
+  PublicUrlRequest,
   UserIntegrationStatus,
 } from "@lyrus/shared";
 import { integrationPreferencesSchema } from "@lyrus/shared";
@@ -68,11 +69,12 @@ export async function listIntegrationStatuses(userId: string): Promise<UserInteg
 export async function startIntegrationConnect(
   userId: string,
   provider: IntegrationProviderInput,
+  req?: PublicUrlRequest,
 ): Promise<{ authUrl: string }> {
   if (provider === "google") {
     if (!isGoogleConfigured()) throw new Error("Google integration is not configured on this server");
     const state = await createOAuthState(userId, provider);
-    const redirectUri = integrationCallbackUrl("google");
+    const redirectUri = integrationCallbackUrl("google", req);
     return { authUrl: buildGoogleAuthUrl(state, redirectUri) };
   }
 
@@ -80,7 +82,7 @@ export async function startIntegrationConnect(
     throw new Error("Microsoft integration is not configured on this server");
   }
   const state = await createOAuthState(userId, provider);
-  const redirectUri = integrationCallbackUrl("microsoft");
+  const redirectUri = integrationCallbackUrl("microsoft", req);
   return { authUrl: buildMicrosoftAuthUrl(state, redirectUri) };
 }
 
@@ -88,13 +90,14 @@ export async function handleIntegrationCallback(
   provider: IntegrationProviderInput,
   code: string,
   state: string,
+  req?: PublicUrlRequest,
 ): Promise<{ userId: string }> {
   const verified = await verifyOAuthState(state);
   if (verified.provider !== provider) {
     throw new Error("OAuth provider mismatch");
   }
 
-  const redirectUri = integrationCallbackUrl(provider);
+  const redirectUri = integrationCallbackUrl(provider, req);
 
   if (provider === "google") {
     const tokens = await completeGoogleOAuth(code, redirectUri);

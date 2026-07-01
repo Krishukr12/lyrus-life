@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import nodemailer from "nodemailer";
+import { webAppJoinUrl } from "./app-urls.js";
 import { buildMeetingIcs, type CalendarEventInput } from "./ics.js";
 import { createSmtpTransport, getSmtpConfig } from "./smtp-config.js";
 
@@ -34,9 +35,7 @@ function resolveJoinUrl(input: SendMeetingInvitesInput, attendeeEmail?: string):
       ? `${input.joinUrl}${input.joinUrl.includes("?") ? "&" : "?"}email=${encodeURIComponent(attendeeEmail)}`
       : input.joinUrl;
   }
-  const base = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
-  const slug = input.joinSlug ?? "";
-  const url = `${base}/join/${slug}`;
+  const url = webAppJoinUrl(input.joinSlug ?? "");
   return attendeeEmail ? `${url}?email=${encodeURIComponent(attendeeEmail)}` : url;
 }
 

@@ -23,7 +23,7 @@ Output: `apps/marketing/dist/` — deploy to meetingdesk.in (Vercel, Netlify, S3
 
 | Variable | Description |
 |----------|-------------|
-| `VITE_APP_URL` | Product app URL for Login / Trial CTAs (e.g. `https://app.meetingdesk.in`) |
+| `VITE_APP_URL` | Product app URL for Login / Trial CTAs (e.g. `https://customer.meetingdesk.in`) |
 
 ## SEO
 

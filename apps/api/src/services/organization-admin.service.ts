@@ -6,6 +6,7 @@ import {
   prisma,
   type UserStatus as UserStatusType,
 } from "@lyrus/db";
+import { resolveWebAppUrl } from "@lyrus/shared";
 import { billingService } from "./billing.service.js";
 import { organizationRepository } from "../repositories/organization.repository.js";
 import { getIncludedSeats, getMeetingLimit } from "../lib/plan-limits.js";
@@ -244,11 +245,9 @@ export const organizationAdminService = {
       },
     });
 
-    const webAppUrl = (process.env.WEB_APP_URL ?? "http://localhost:8080").replace(/\/$/, "");
-
     return {
       token,
-      loginUrl: `${webAppUrl}/auth/impersonate?token=${encodeURIComponent(token)}`,
+      loginUrl: `${resolveWebAppUrl()}/auth/impersonate?token=${encodeURIComponent(token)}`,
       admin: {
         id: admin.id,
         name: admin.name,

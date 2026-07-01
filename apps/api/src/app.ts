@@ -30,6 +30,8 @@ import {
 export function createApp(corsOrigins: string[]): Express {
   const app = express();
 
+  app.set("trust proxy", 1);
+
   app.use(securityHeaders);
   // app.use(globalRateLimiter);
   app.use(
@@ -43,7 +45,7 @@ export function createApp(corsOrigins: string[]): Express {
   app.use(express.json({ limit: "2mb" }));
 
   app.get("/health", (_req, res) => {
-    res.json({ ok: true, service: "lyrus-api" });
+    res.json({ status: "ok" });
   });
 
   app.use(createAuthRouter());

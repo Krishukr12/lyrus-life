@@ -1,6 +1,7 @@
 import { UserRole, UserStatus, prisma } from "@lyrus/db";
 import { sendEmployeeInviteEmail, sendEmployeePasswordResetEmail } from "@lyrus/notifications";
 import type { createOrgUserSchema, updateOrgUserSchema } from "@lyrus/shared";
+import { webAppLoginUrl } from "@lyrus/shared";
 import type { z } from "zod";
 import {
   assertOrganizationCanAddUser,
@@ -30,11 +31,6 @@ export class UserManagementError extends Error {
   }
 }
 
-function inviteLoginUrl(): string {
-  const webAppUrl = process.env.WEB_APP_URL ?? "http://localhost:8080";
-  return `${webAppUrl}/login`;
-}
-
 async function sendInviteEmail(
   organizationName: string,
   user: { email: string; name: string },
@@ -46,7 +42,7 @@ async function sendInviteEmail(
       name: user.name,
       organizationName,
       temporaryPassword,
-      loginUrl: inviteLoginUrl(),
+      loginUrl: webAppLoginUrl(),
     });
   } catch (err) {
     console.warn("Failed to send employee invite email", err);
@@ -64,7 +60,7 @@ async function sendPasswordResetEmail(
       name: user.name,
       organizationName,
       temporaryPassword,
-      loginUrl: inviteLoginUrl(),
+      loginUrl: webAppLoginUrl(),
     });
   } catch (err) {
     console.warn("Failed to send password reset email", err);
