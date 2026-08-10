@@ -41,33 +41,28 @@ function getTemplateFields(input: MomPdfInput) {
       ? input.mom.actionItems.map((item, index) => ({
           slNo: index + 1,
           actionItem: item.task,
-          responsibility: item.assignee || "Owner Name",
+          responsibility: item.assignee || "Unassigned",
           status: STATUS_ROTATION[index % STATUS_ROTATION.length],
-          timeline: item.deadline || "Due Date",
+          timeline: item.deadline || "TBD",
         }))
-      : [
-          {
-            slNo: 1,
-            actionItem: "Add new action item",
-            responsibility: "Owner Name",
-            status: "Open" as const,
-            timeline: "Due Date",
-          },
-        ];
+      : [];
+
+  const nextSteps =
+    input.mom.actionItems.length > 0
+      ? input.mom.actionItems.slice(0, 5).map((a) => a.task)
+      : [];
 
   return {
     date: input.meetingDate,
     meetingTitle: input.meetingTitle,
     attendees,
     keyPoints:
-      input.mom.keyPoints.length > 0 ? input.mom.keyPoints : ["Brief summary of main topic"],
+      input.mom.keyPoints.length > 0
+        ? input.mom.keyPoints
+        : ["No key discussion points captured from the transcript."],
     actionItems,
-    nextSteps: [
-      "Immediate follow-up actions",
-      input.durationMinutes > 0
-        ? `Next review meeting in ${input.durationMinutes} minutes cadence`
-        : "Next meeting date if applicable",
-    ],
+    nextSteps:
+      nextSteps.length > 0 ? nextSteps : ["No follow-ups captured from the transcript."],
     generatedOn: nowDate.toLocaleString(),
   };
 }
@@ -84,8 +79,8 @@ function ensurePageSpace(pdf: jsPDF, y: number, needed: number, pageHeight: numb
 export function generateMomPdfBytes(input: MomPdfInput): Uint8Array {
   const fields = getTemplateFields(input);
   const branding = input.branding ?? {};
-  const brandName = branding.brandName ?? "LYRUS";
-  const tagline = branding.tagline ?? "Think • Design • Deliver";
+  const brandName = branding.brandName?.trim() || "Meeting Desk AI";
+  const tagline = branding.tagline?.trim() ?? "";
   const accent = branding.accentRgb ?? [28, 141, 149];
 
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
@@ -103,10 +98,14 @@ export function generateMomPdfBytes(input: MomPdfInput): Uint8Array {
   pdf.setFontSize(18);
   pdf.text(brandName.toUpperCase(), 297, y, { align: "center" });
   y += 14;
-  pdf.setFont("helvetica", "italic");
-  pdf.setFontSize(9);
-  pdf.text(tagline, 297, y, { align: "center" });
-  y += 22;
+  if (tagline) {
+    pdf.setFont("helvetica", "italic");
+    pdf.setFontSize(9);
+    pdf.text(tagline, 297, y, { align: "center" });
+    y += 22;
+  } else {
+    y += 10;
+  }
 
   pdf.setTextColor(0, 0, 0);
   pdf.setFont("helvetica", "bold");
@@ -137,20 +136,32 @@ export function generateMomPdfBytes(input: MomPdfInput): Uint8Array {
     y += 14;
   });
 
-  const templateSections =
-    input.sections && input.sections.length > 0
-      ? input.sections
-      : [
-          { title: "Key Discussion Points", content: fields.keyPoints },
-          {
-            title: "Action Items",
-            content: fields.actionItems.map(
-              (item) =>
-                `${item.slNo}. ${item.actionItem} — ${item.responsibility} (${item.timeline})`,
-            ),
-          },
-          { title: "Next Steps", content: fields.nextSteps },
-        ];
+  const templateSections = (() => {
+    const actionLines = fields.actionItems.map(
+      (item) =>
+        `${item.slNo}. ${item.actionItem}${item.responsibility ? ` — ${item.responsibility}` : ""}${item.timeline ? ` (${item.timeline})` : ""}`,
+    );
+
+    // Always show the user-edited core fields first. Template sections used to
+    // hide key points / actions entirely when present.
+    const core = [
+      { title: "Key Discussion Points", content: fields.keyPoints },
+      {
+        title: "Action Items",
+        content:
+          actionLines.length > 0
+            ? actionLines
+            : ["No action items captured."],
+      },
+    ];
+
+    const coreTitles = new Set(["key discussion points", "action items", "next steps"]);
+    const extras = (input.sections ?? []).filter(
+      (section) => !coreTitles.has(section.title.trim().toLowerCase()),
+    );
+
+    return [...core, ...extras];
+  })();
 
   for (const section of templateSections) {
     y += 10;

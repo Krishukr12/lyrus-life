@@ -4,6 +4,7 @@ import {
   Users,
   Plus,
   ListChecks,
+  FileText,
   ChartNoAxesCombined,
   LogOut,
   Building2,
@@ -30,13 +31,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import { cn } from "@/lib/utils";
+import { getWorkspaceLock, isWorkspaceLocked } from "@/lib/workspace-access";
 
 const workspaceNavItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Meetings", url: "/meetings", icon: Users },
-  { title: "Tasks", url: "/tasks", icon: ListChecks },
-  { title: "Calendar", url: "/calendar", icon: CalendarDays },
-  { title: "Integrations", url: "/settings/integrations", icon: Link2 },
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, requiresActiveWorkspace: true },
+  { title: "Meetings", url: "/meetings", icon: Users, requiresActiveWorkspace: true },
+  { title: "MOM inbox", url: "/mom", icon: FileText, requiresActiveWorkspace: true },
+  { title: "Tasks", url: "/tasks", icon: ListChecks, requiresActiveWorkspace: true },
+  { title: "Calendar", url: "/calendar", icon: CalendarDays, requiresActiveWorkspace: true },
+  { title: "Integrations", url: "/settings/integrations", icon: Link2, requiresActiveWorkspace: false },
 ];
 
 const organizationNavItems = [
@@ -82,6 +85,10 @@ export function AppSidebar() {
   const { user, organization, logout } = useAuth();
   const headerTitle = organization?.name ?? APP_NAME;
   const isOrgAdmin = user?.role === "ORG_ADMIN";
+  const workspaceLocked = isWorkspaceLocked(organization) || Boolean(getWorkspaceLock());
+  const visibleWorkspaceNav = workspaceNavItems.filter(
+    (item) => !item.requiresActiveWorkspace || !workspaceLocked,
+  );
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
@@ -131,7 +138,7 @@ export function AppSidebar() {
           </div>
         </div>
 
-        {!collapsed && (
+        {!collapsed && !workspaceLocked && (
           <div className="relative px-4 mb-6">
             <Button
               onClick={() => navigate("/schedule")}
@@ -145,6 +152,12 @@ export function AppSidebar() {
           </div>
         )}
 
+        {workspaceLocked && !collapsed ? (
+          <div className="relative mx-4 mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-[11px] leading-snug text-amber-700 dark:text-amber-300">
+            Trial ended. Ask your admin to upgrade. Integrations still work.
+          </div>
+        ) : null}
+
         <SidebarGroup className="relative">
           {!collapsed && (
             <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.14em] text-sidebar-foreground/45">
@@ -153,7 +166,7 @@ export function AppSidebar() {
           )}
           <SidebarGroupContent>
             <SidebarMenu>
-              {workspaceNavItems.map((item) => (
+              {visibleWorkspaceNav.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
@@ -172,7 +185,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isOrgAdmin ? (
+        {isOrgAdmin && !workspaceLocked ? (
           <SidebarGroup className="relative mt-2">
             {!collapsed && (
               <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.14em] text-sidebar-foreground/45">

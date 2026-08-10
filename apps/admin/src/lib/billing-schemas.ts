@@ -15,7 +15,7 @@ export const pricingConfigFormSchema = z.object({
 export type PricingConfigFormValues = z.infer<typeof pricingConfigFormSchema>;
 
 export const editBillingSchema = z.object({
-  subscriptionPlan: z.enum(["STARTER", "PROFESSIONAL", "ENTERPRISE"]),
+  subscriptionPlan: z.enum(["STARTER", "PROFESSIONAL", "ENTERPRISE", "FOREVER_FREE"]),
   billingCycle: z.enum(["monthly", "yearly"]),
   billingStatus: z.enum(["ACTIVE", "PENDING", "OVERDUE", "TRIAL", "CANCELLED"]),
   activeLocations: z.coerce.number().int().min(0).max(10_000),

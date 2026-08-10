@@ -16,7 +16,10 @@ export const userRepository = {
   async findByEmail(email: string) {
     return prisma.user.findUnique({
       where: { email: email.toLowerCase() },
-      include: { organization: true, employeeProfile: true },
+      include: {
+        organization: { include: { billingProfile: true } },
+        employeeProfile: true,
+      },
     });
   },
 

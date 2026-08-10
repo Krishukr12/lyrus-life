@@ -61,6 +61,14 @@ export const editMomSchema = z.object({
       deadline: z.string(),
     }),
   ),
+  sections: z
+    .array(
+      z.object({
+        title: z.string(),
+        content: z.array(z.string()),
+      }),
+    )
+    .optional(),
 });
 
 export const transcriptSegmentSchema = z.object({

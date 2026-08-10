@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -22,6 +23,11 @@ import { homePathForRole, isExternalRedirect } from "@/lib/role-routes";
 import { setApiAuthHandlers } from "@/lib/auth-handlers";
 import { setCurrentUser } from "@/lib/current-user";
 import { clearAccessToken } from "@/lib/token-store";
+import {
+  clearWorkspaceLock,
+  isWorkspaceLocked,
+  setWorkspaceLock,
+} from "@/lib/workspace-access";
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -37,7 +43,7 @@ interface AuthContextValue {
     confirmPassword: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
-  onApiForbidden: () => void;
+  onApiForbidden: (message?: string, code?: string) => void;
   refreshSession: () => Promise<void>;
 }
 
@@ -48,6 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [organization, setOrganization] = useState<AuthOrganization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const organizationRef = useRef<AuthOrganization | null>(null);
+  const lockingRef = useRef(false);
+
+  useEffect(() => {
+    organizationRef.current = organization;
+  }, [organization]);
 
   const loadSession = useCallback(async () => {
     try {
@@ -55,6 +67,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session) {
         setUser(session.user);
         setOrganization(session.organization);
+        if (
+          session.organization?.billingStatus === "ACTIVE" &&
+          !isWorkspaceLocked(session.organization)
+        ) {
+          clearWorkspaceLock();
+        }
       } else {
         setUser(null);
         setOrganization(null);
@@ -82,14 +100,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(user);
   }, [user]);
 
-  const onApiForbidden = useCallback(() => {
-    toast.error("You're not authorized to do so");
-  }, []);
+  const goToTrialExpired = useCallback(
+    (message: string, code = "trial_expired") => {
+      if (lockingRef.current) return;
+      lockingRef.current = true;
+      setWorkspaceLock(message, code);
+      setOrganization((prev) => {
+        if (!prev) return prev;
+        if (code === "billing_overdue") return { ...prev, billingStatus: "OVERDUE" };
+        if (code === "billing_cancelled") return { ...prev, billingStatus: "CANCELLED" };
+        return {
+          ...prev,
+          billingStatus: "TRIAL",
+          trialEndsAt: prev.trialEndsAt ?? new Date(0).toISOString(),
+        };
+      });
+      navigate("/trial-expired", { replace: true });
+      window.setTimeout(() => {
+        lockingRef.current = false;
+      }, 300);
+    },
+    [navigate],
+  );
+
+  const onApiForbidden = useCallback(
+    (message?: string, code?: string) => {
+      const msg = message?.trim() || "You're not authorized to do so";
+      // Never toast — always show the trial/lock screen for org 403s.
+      goToTrialExpired(
+        /not authorized/i.test(msg)
+          ? "Your organization's trial or subscription access has ended. Please ask your admin to upgrade."
+          : msg,
+        code ?? "trial_expired",
+      );
+    },
+    [goToTrialExpired],
+  );
 
   useEffect(() => {
     setApiAuthHandlers({
       onUnauthorized: () => {
         clearAccessToken();
+        clearWorkspaceLock();
         setUser(null);
         setOrganization(null);
         navigate("/login", { replace: true });
@@ -97,12 +149,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       onForbidden: onApiForbidden,
       onOrganizationBlocked: (message) => {
         clearAccessToken();
+        clearWorkspaceLock();
         setUser(null);
         setOrganization(null);
         navigate("/account-suspended", { replace: true, state: { message } });
       },
+      onWorkspaceLocked: (message, code) => {
+        goToTrialExpired(message, code ?? "trial_expired");
+      },
     });
-  }, [navigate, onApiForbidden]);
+  }, [goToTrialExpired, navigate, onApiForbidden]);
 
   const login = useCallback(
     async (email: string, password: string, redirectPath?: string) => {
@@ -115,6 +171,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setUser(session.user);
       setOrganization(session.organization ?? null);
+      if (isWorkspaceLocked(session.organization)) {
+        setWorkspaceLock(
+          "Your organization's free trial has ended. Please ask your admin to upgrade.",
+          "trial_expired",
+        );
+        navigate("/trial-expired", { replace: true });
+        return;
+      }
+      clearWorkspaceLock();
       const target = redirectPath ?? homePathForRole(session.user.role);
       if (isExternalRedirect(target)) {
         window.location.href = target;
@@ -150,13 +215,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
       setUser(session.user);
       setOrganization(session.organization ?? null);
-      navigate("/", { replace: true });
+      if (isWorkspaceLocked(session.organization)) {
+        setWorkspaceLock(
+          "Your organization's free trial has ended. Please ask your admin to upgrade.",
+          "trial_expired",
+        );
+        navigate("/trial-expired", { replace: true });
+        return;
+      }
+      clearWorkspaceLock();
+      navigate(homePathForRole(session.user.role), { replace: true });
     },
     [navigate],
   );
 
   const logout = useCallback(async () => {
     await logoutApi();
+    clearWorkspaceLock();
     setUser(null);
     setOrganization(null);
     navigate("/login", { replace: true });

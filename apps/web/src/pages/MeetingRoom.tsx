@@ -192,7 +192,9 @@ export default function MeetingRoom() {
       if (recording && recording.size > 5000) {
         toast.success("Recording processed from all participants");
       } else if (result.meeting.mom) {
-        toast.success("MOM generated from notes");
+        toast.success("MOM generated from recording");
+      } else if (!recording || recording.size <= 5000) {
+        toast.error("No usable recording — MOM was not generated from notes");
       }
       if (result.meeting.mom) {
         toast.info("Review and approve the MOM on the meeting page.");

@@ -16,11 +16,26 @@ import type { Prisma } from "@lyrus/db";
 import { logAudit } from "./audit.js";
 import { momTemplateService } from "./mom-template.service.js";
 
+function normalizeTranscriptComparable(text: string): string {
+  return text.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function isDuplicateTranscriptContent(existing: string, next: string): boolean {
+  const base = normalizeTranscriptComparable(existing);
+  const add = normalizeTranscriptComparable(next);
+  if (!base || !add) return false;
+  if (base === add) return true;
+  // Same content already appended (stuck retries) or subsumed by a previous merge.
+  if (base.includes(add)) return true;
+  return false;
+}
+
 function mergeTranscriptText(existing: string | null | undefined, next: string): string {
   const base = (existing ?? "").trim();
   const add = next.trim();
   if (!base) return add;
   if (!add) return base;
+  if (isDuplicateTranscriptContent(base, add)) return base;
   return `${base}\n\n---\n\n${add}`;
 }
 
@@ -30,6 +45,16 @@ function mergeTranscriptSegments(
 ) {
   if (existing.length === 0) return next;
   if (next.length === 0) return existing;
+
+  const existingFingerprint = existing.map((s) => `${s.speaker}|${s.text}`).join("||");
+  const nextFingerprint = next.map((s) => `${s.speaker}|${s.text}`).join("||");
+  if (
+    existingFingerprint === nextFingerprint ||
+    existingFingerprint.includes(nextFingerprint)
+  ) {
+    return existing;
+  }
+
   const lastEnd = Math.max(...existing.map((s) => s.endTime ?? 0));
   const shift = Number.isFinite(lastEnd) ? lastEnd + 1 : 0;
   return [
@@ -66,7 +91,10 @@ function parseDueDate(value: string, fallback: Date): Date | null {
 async function persistExtraction(meetingId: string, meetingDate: Date) {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
-    include: { participants: true, transcript: true },
+    include: {
+      participants: true,
+      transcript: { include: { segments: { orderBy: { startTime: "asc" } } } },
+    },
   });
 
   if (!meeting?.transcript) {
@@ -74,6 +102,9 @@ async function persistExtraction(meetingId: string, meetingDate: Date) {
   }
 
   const participantNames = meeting.participants.map((p) => p.name);
+  const participantLabels = meeting.participants.map((p) =>
+    p.email ? `${p.name} <${p.email}>` : p.name,
+  );
   const { date, time } = formatDateTime(meeting.scheduledAt);
 
   const template = await momTemplateService.resolveForMeeting(
@@ -88,13 +119,21 @@ async function persistExtraction(meetingId: string, meetingDate: Date) {
     });
   }
 
+  const labeledFromSegments = meeting.transcript.segments
+    .map((s) => `${s.speaker}: ${s.text}`.trim())
+    .filter((line) => line.length > 3)
+    .join("\n");
+
+  const transcriptForNlu =
+    labeledFromSegments.length > 40 ? labeledFromSegments : meeting.transcript.fullText;
+
   const extraction = await extractMeetingInsights({
-    transcript: meeting.transcript.fullText,
-    participants: participantNames,
+    transcript: transcriptForNlu,
+    participants: participantLabels.length > 0 ? participantLabels : participantNames,
     meetingDateIso: date,
     templateSections: template?.sections.map((s) => ({
       title: s.title,
-      aiInstructions: s.aiInstructions,
+      aiInstructions: `${s.aiInstructions.trim()} Only use transcript evidence; if the topic was not discussed, return an empty content array.`,
       isRequired: s.isRequired,
     })),
   });
@@ -230,9 +269,17 @@ export async function runMeetingPipeline(
     include: { segments: true },
   });
 
-  const combinedFullText = mergeTranscriptText(existing?.fullText, transcription.fullText);
+  // Never merge fabricated notes transcripts into a real recording transcript.
+  const reusableExisting =
+    existing && existing.source !== "notes" ? existing : null;
+  if (existing && !reusableExisting) {
+    await prisma.transcriptSegment.deleteMany({ where: { transcriptId: existing.id } });
+    await prisma.transcript.delete({ where: { id: existing.id } });
+  }
+
+  const combinedFullText = mergeTranscriptText(reusableExisting?.fullText, transcription.fullText);
   const combinedSegments = mergeTranscriptSegments(
-    (existing?.segments ?? []).map((s) => ({
+    (reusableExisting?.segments ?? []).map((s) => ({
       speaker: s.speaker,
       startTime: s.startTime,
       endTime: s.endTime,
@@ -297,6 +344,19 @@ export async function runMeetingPipeline(
 }
 
 export async function runNluFromExistingTranscript(meetingId: string) {
+  const transcript = await prisma.transcript.findUnique({ where: { meetingId } });
+  if (!transcript) {
+    throw new Error("No transcript available for this meeting");
+  }
+  if (transcript.source === "notes") {
+    throw new Error(
+      "Notes-based transcripts cannot generate MOM. Upload meeting audio or wait for the recording bot.",
+    );
+  }
+  if (transcript.fullText.trim().length < 40) {
+    throw new Error("Transcript is too short to generate a reliable MOM");
+  }
+
   await prisma.meeting.update({
     where: { id: meetingId },
     data: { status: MeetingStatus.PROCESSING },
@@ -314,148 +374,53 @@ export async function runNluFromExistingTranscript(meetingId: string) {
   });
 }
 
-/** Regenerate MOM using the same NLU + template path as the recording pipeline. */
+/** Regenerate MOM from a real recording transcript or uploaded audio — never from fabricated notes. */
 export async function regenerateMomForMeeting(meetingId: string) {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
-    include: { participants: true, transcript: true },
+    include: {
+      transcript: true,
+      audioFiles: { orderBy: { createdAt: "desc" }, take: 1 },
+    },
   });
   if (!meeting) throw new Error("Meeting not found");
 
-  if (!meeting.transcript) {
-    const fallbackText =
-      meeting.notes?.trim() || "No transcript available. Please upload meeting audio.";
-    const lines = buildTranscriptLinesFromNotes(meeting.notes, meeting.participants);
-    await prisma.transcript.create({
-      data: {
-        meetingId,
-        fullText: fallbackText,
-        language: "en",
-        source: "notes",
-        segments: {
-          create: lines.map((text, index) => ({
-            speaker: text.split(":")[0]?.trim() || "Speaker",
-            startTime: index * 5,
-            endTime: index * 5 + 4,
-            text: text.includes(":") ? text.split(":").slice(1).join(":").trim() : text,
-          })),
-        },
-      },
-    });
+  const transcript = meeting.transcript;
+  const isFakeNotes = transcript?.source === "notes";
+  const isRealTranscript =
+    Boolean(transcript) &&
+    !isFakeNotes &&
+    (transcript?.fullText.trim().length ?? 0) >= 40;
+
+  // Legacy notes transcripts must not produce MOM anymore.
+  if (isFakeNotes && transcript) {
+    await prisma.mom.deleteMany({ where: { meetingId } });
+    await prisma.transcriptSegment.deleteMany({ where: { transcriptId: transcript.id } });
+    await prisma.transcript.delete({ where: { id: transcript.id } });
+  }
+
+  if (!isRealTranscript) {
+    const audio = meeting.audioFiles[0];
+    if (!audio) {
+      throw new Error(
+        "No recording available. Wait for the meeting bot to finish uploading, or upload meeting audio — notes-only MOM is disabled.",
+      );
+    }
+    const { materializeAudioForProcessing } = await import("./storage/index.js");
+    const resolved = await materializeAudioForProcessing(audio);
+    try {
+      await runMeetingPipeline(meetingId, {
+        filePath: resolved.filePath,
+        mimeType: audio.mimeType,
+        s3Key: resolved.s3Key,
+        s3Bucket: resolved.s3Bucket,
+      });
+    } finally {
+      if (resolved.cleanup) await resolved.cleanup();
+    }
+    return;
   }
 
   await runNluFromExistingTranscript(meetingId);
-}
-
-function buildTranscriptLinesFromNotes(
-  notes: string,
-  participants: Array<{ name: string }>,
-): string[] {
-  const names = participants.map((p) => p.name);
-  const host = names[0] ?? "Host";
-  const lines: string[] = [`${host}: Meeting started. Welcome everyone.`];
-
-  const rawLines = notes
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
-
-  for (const line of rawLines) {
-    const speakerMatch = line.match(/^([^:[\]]+):\s*(.+)$/);
-    if (speakerMatch) {
-      lines.push(`${speakerMatch[1]!.trim()}: ${speakerMatch[2]!.trim()}`);
-      continue;
-    }
-    const timestampMatch = line.match(/^\[.+?\]\s*(.+)$/);
-    if (timestampMatch) {
-      lines.push(timestampMatch[1]!.trim());
-      continue;
-    }
-    lines.push(`${host}: ${line}`);
-  }
-
-  if (lines.length === 1) {
-    lines.push(`${host}: ${notes.trim() || "We reviewed priorities and next steps."}`);
-    const guest = names[1] ?? "Participant";
-    lines.push(`${guest}: I will follow up with updates by end of week.`);
-    lines.push(`${host}: Agreed. We will track action items in Lyrus Life after this meeting.`);
-  } else {
-    lines.push(`${host}: We will capture action items from this discussion in the minutes.`);
-  }
-
-  return lines;
-}
-
-export async function createTranscriptFromNotes(meetingId: string) {
-  const meeting = await prisma.meeting.findUnique({
-    where: { id: meetingId },
-    include: { participants: true },
-  });
-
-  if (!meeting) throw new Error("Meeting not found");
-
-  const notes = meeting.notes.trim() || meeting.description.trim() || "General sync and status review.";
-  const lines = buildTranscriptLinesFromNotes(notes, meeting.participants);
-  const fullText = lines.join("\n");
-
-  const existing = await prisma.transcript.findUnique({
-    where: { meetingId },
-    include: { segments: true },
-  });
-
-  const nextSegments = lines.map((line, index) => {
-    const [speaker, ...rest] = line.split(":");
-    return {
-      speaker: speaker?.trim() ?? "Speaker",
-      startTime: index * 15,
-      endTime: index * 15 + 14,
-      text: rest.join(":").trim() || line,
-      confidence: undefined as number | undefined,
-    };
-  });
-
-  const combinedFullText = mergeTranscriptText(existing?.fullText, fullText);
-  const combinedSegments = mergeTranscriptSegments(
-    (existing?.segments ?? []).map((s) => ({
-      speaker: s.speaker,
-      startTime: s.startTime,
-      endTime: s.endTime,
-      text: s.text,
-      confidence: s.confidence ?? undefined,
-    })),
-    nextSegments,
-  );
-
-  await prisma.transcript.upsert({
-    where: { meetingId },
-    create: {
-      meetingId,
-      fullText: combinedFullText,
-      source: "notes",
-      segments: {
-        create: combinedSegments.map((s) => ({
-          speaker: s.speaker,
-          startTime: s.startTime,
-          endTime: s.endTime,
-          text: s.text,
-        })),
-      },
-    },
-    update: {
-      fullText: combinedFullText,
-      source: "notes",
-      segments: {
-        deleteMany: {},
-        create: combinedSegments.map((s) => ({
-          speaker: s.speaker,
-          startTime: s.startTime,
-          endTime: s.endTime,
-          text: s.text,
-        })),
-      },
-    },
-  });
-
-  return fullText;
 }
 

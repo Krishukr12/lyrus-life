@@ -4,12 +4,12 @@ import {
   webIntegrationsRedirect as sharedWebIntegrationsRedirect,
   type PublicUrlRequest,
 } from "@lyrus/shared";
+import { getJwtSecret } from "../../lib/auth-config.js";
 
 const STATE_TTL_SECONDS = 600;
 
 function stateSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET ?? "dev-insecure-secret-change-me";
-  return new TextEncoder().encode(secret);
+  return new TextEncoder().encode(getJwtSecret());
 }
 
 export async function createOAuthState(userId: string, provider: string): Promise<string> {

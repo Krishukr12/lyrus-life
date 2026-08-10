@@ -1,7 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getMeetings } from "@/lib/api";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ApiError, getMeetings } from "@/lib/api";
+import {
+  APP_TIMEZONE_LABEL,
+  formatScheduleDateHeading,
+  meetingDateKey,
+  meetingTimeLabel,
+  toLocalDateKey,
+  toLocalTime,
+  todayLocalDateKey,
+} from "@/lib/datetime";
 import { Meeting } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,27 +62,7 @@ const MONTH_NAMES = [
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function formatDate(dateStr: string) {
-  const [y, m, d] = dateStr.split("-").map(Number);
-  const date = new Date(y, m - 1, d);
-  return date.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function isoToLocalDateKey(iso: string): string {
-  const d = new Date(iso);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function isoToLocalTime(iso: string): string {
-  const d = new Date(iso);
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  return formatScheduleDateHeading(dateStr);
 }
 
 type CalendarGoogleEvent = CalendarMeetEvent & {
@@ -88,12 +77,13 @@ export default function CalendarView() {
   const [importingEventId, setImportingEventId] = useState<string | null>(null);
   const importInFlightRef = useRef<Set<string>>(new Set());
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const { data: integrationsData } = useQuery({
+  const { data: integrationsData, refetch: refetchIntegrations } = useQuery({
     queryKey: ["user", "integrations"],
     queryFn: getMyIntegrations,
   });
@@ -102,20 +92,38 @@ export default function CalendarView() {
     integrationsData?.integrations.find((i) => i.provider === "google")
       ?.connected ?? false;
 
+  const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+
   const {
     data: googleData,
     isLoading: googleLoading,
     refetch: refetchGoogle,
     error: googleError,
   } = useQuery({
-    queryKey: ["user", "calendar", "google", "events", "calendar-view"],
-    queryFn: () => listGoogleCalendarMeetEvents(30, 30),
+    queryKey: ["user", "calendar", "google", "events", "calendar-view", monthKey],
+    queryFn: () => listGoogleCalendarMeetEvents({ month: monthKey }),
     enabled: googleConnected,
+    retry: false,
   });
 
+  useEffect(() => {
+    if (!(googleError instanceof ApiError)) return;
+    if (googleError.code === "google_not_connected" || googleError.status === 409) {
+      void refetchIntegrations();
+    }
+  }, [googleError, refetchIntegrations]);
+
   const refreshMeetings = useCallback(async () => {
-    const m = await getMeetings();
-    setMeetings(m);
+    try {
+      const m = await getMeetings();
+      setMeetings(m);
+      return m;
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to load meetings",
+      );
+      return null;
+    }
   }, []);
 
   useEffect(() => {
@@ -124,33 +132,54 @@ export default function CalendarView() {
 
   useEffect(() => {
     if (!googleData?.syncSummary) return;
-    const { imported } = googleData.syncSummary;
+    const { imported, alreadyPresent, failed } = googleData.syncSummary as {
+      imported: number;
+      alreadyPresent?: number;
+      failed?: number;
+      skipped?: number;
+    };
+    // Always reload platform meetings after a sync attempt (including "already present").
+    void refreshMeetings();
     if (imported > 0) {
-      void refreshMeetings();
       toast.success(
         imported === 1
           ? "1 Google Calendar meeting added to Meeting Desk AI"
           : `${imported} Google Calendar meetings added to Meeting Desk AI`,
       );
+    } else if ((failed ?? 0) > 0) {
+      toast.error("Some Google Calendar events could not be synced. Try Sync Google again.");
+    } else if ((alreadyPresent ?? googleData.syncSummary.skipped) > 0) {
+      toast.message("Google Calendar is up to date");
     }
   }, [googleData?.syncSummary, refreshMeetings]);
 
-  const importedJoinUrls = useMemo(
-    () =>
-      new Set(
-        meetings.map((m) => m.externalMeetingUrl).filter(Boolean) as string[],
-      ),
-    [meetings],
-  );
+  const importedKeys = useMemo(() => {
+    const calendarKeys = new Set<string>();
+    for (const m of meetings) {
+      if (!m.calendarEventId) continue;
+      calendarKeys.add(m.calendarEventId);
+      // Support both "calendarId:eventId" and bare eventId storage formats.
+      const colon = m.calendarEventId.indexOf(":");
+      if (colon >= 0) calendarKeys.add(m.calendarEventId.slice(colon + 1));
+    }
+    return calendarKeys;
+  }, [meetings]);
 
   const googleEvents: CalendarGoogleEvent[] = useMemo(() => {
-    return (googleData?.events ?? []).map((ev) => ({
-      ...ev,
-      date: isoToLocalDateKey(ev.startDateTimeIso),
-      time: isoToLocalTime(ev.startDateTimeIso),
-      imported: Boolean(ev.joinUrl && importedJoinUrls.has(ev.joinUrl)),
-    }));
-  }, [googleData?.events, importedJoinUrls]);
+    return (googleData?.events ?? []).map((ev) => {
+      const calendarKey = `${ev.calendarId}:${ev.eventId}`;
+      // Match by instance calendar event id only — Meet join URLs are reused across
+      // recurring series and must not hide later occurrences from the calendar.
+      const imported =
+        importedKeys.has(calendarKey) || importedKeys.has(ev.eventId);
+      return {
+        ...ev,
+        date: toLocalDateKey(ev.startDateTimeIso),
+        time: toLocalTime(ev.startDateTimeIso),
+        imported,
+      };
+    });
+  }, [googleData?.events, importedKeys]);
 
   const googleNotImported = googleEvents.filter((e) => !e.imported);
 
@@ -159,7 +188,8 @@ export default function CalendarView() {
 
   const meetingsByDate = meetings.reduce<Record<string, Meeting[]>>(
     (acc, m) => {
-      (acc[m.date] = acc[m.date] || []).push(m);
+      const key = meetingDateKey(m);
+      (acc[key] = acc[key] || []).push(m);
       return acc;
     },
     {},
@@ -189,36 +219,38 @@ export default function CalendarView() {
   const jumpToCurrentMonth = () => {
     setYear(today.getFullYear());
     setMonth(today.getMonth());
-    setSelectedDate(today.toISOString().split("T")[0]);
+    setSelectedDate(todayLocalDateKey());
   };
 
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = todayLocalDateKey();
   const selectedDateValue = selectedDate ?? todayStr;
   const selectedMeetings = meetingsByDate[selectedDateValue] || [];
   const selectedGoogleEvents = (googleByDate[selectedDateValue] || []).filter(
     (e) => !e.imported,
   );
   const monthPrefix = `${year}-${String(month + 1).padStart(2, "0")}`;
-  const monthMeetings = meetings.filter((m) => m.date.startsWith(monthPrefix));
+  const monthMeetings = meetings.filter((m) =>
+    meetingDateKey(m).startsWith(monthPrefix),
+  );
   const monthGoogleEvents = googleNotImported.filter((e) =>
     e.date.startsWith(monthPrefix),
   );
   const monthMeetingCount = monthMeetings.length + monthGoogleEvents.length;
   const monthDaysWithMeetings = new Set([
-    ...monthMeetings.map((m) => m.date),
+    ...monthMeetings.map((m) => meetingDateKey(m)),
     ...monthGoogleEvents.map((e) => e.date),
   ]).size;
 
   const upcomingMeetings = meetings
-    .filter((m) => m.date >= todayStr)
-    .sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`))
+    .filter((m) => meetingDateKey(m) >= todayStr)
+    .sort((a, b) =>
+      `${meetingDateKey(a)}T${meetingTimeLabel(a)}`.localeCompare(
+        `${meetingDateKey(b)}T${meetingTimeLabel(b)}`,
+      ),
+    )
     .slice(0, 5);
 
   const handleImportGoogleEvent = async (ev: CalendarGoogleEvent) => {
-    if (!ev.importable) {
-      toast.error("This event has no Google Meet link to import");
-      return;
-    }
     const importKey = `${ev.calendarId}:${ev.eventId}`;
     if (importInFlightRef.current.has(importKey)) return;
     importInFlightRef.current.add(importKey);
@@ -233,7 +265,11 @@ export default function CalendarView() {
         toast.error("Import succeeded but meeting id is missing");
         return;
       }
-      toast.success("Google Meet imported — recording bot scheduled");
+      toast.success(
+        ev.importable
+          ? "Google event imported — recording bot scheduled when available"
+          : "Google Calendar event imported into Meeting Desk AI",
+      );
       await refreshMeetings();
       void refetchGoogle();
       navigate(`/meetings/${meeting.id}`);
@@ -261,7 +297,7 @@ export default function CalendarView() {
             <span className="text-gradient">Calendar</span>
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Platform meetings plus Google Meet events from{" "}
+            Times shown in {APP_TIMEZONE_LABEL}. Platform meetings plus Google Meet events from{" "}
             {googleData?.connectedAccountEmail ?? "your connected account"}
           </p>
         </div>
@@ -299,43 +335,44 @@ export default function CalendarView() {
       </div>
 
       {googleConnected && googleError && (
-        <Card className="p-4 border-amber-500/30 bg-amber-500/5 text-sm text-amber-800 dark:text-amber-200">
-          Could not load Google Calendar:{" "}
-          {googleError instanceof Error ? googleError.message : "Unknown error"}
-          . Try disconnecting and reconnecting Google in Integrations.
+        <Card className="p-4 border-amber-500/30 bg-amber-500/5 text-sm text-amber-800 dark:text-amber-200 space-y-3">
+          <p>
+            Could not load Google Calendar:{" "}
+            {googleError instanceof Error ? googleError.message : "Unknown error"}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => navigate("/settings/integrations")}
+            >
+              Reconnect Google
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                void queryClient.invalidateQueries({ queryKey: ["user", "integrations"] });
+                void refetchGoogle();
+              }}
+            >
+              Retry sync
+            </Button>
+          </div>
         </Card>
       )}
 
-      {/* {googleConnected && googleData?.diagnostics && (
-        <Card className="p-4 text-xs text-muted-foreground space-y-2">
-          <p className="font-medium text-foreground">
-            Google sync for {googleData.connectedAccountEmail ?? "connected account"}
-          </p>
+      {!googleConnected && (
+        <Card className="p-4 border-amber-500/30 bg-amber-500/5 text-sm text-amber-800 dark:text-amber-200 space-y-3">
           <p>
-            GCP project owner and connected Google account can differ — that is normal. This sync uses{" "}
-            <strong>{googleData.connectedAccountEmail ?? "your Google account"}</strong>.
+            Google is not connected. Connect your Google account to pull today&apos;s calendar
+            meetings into Meeting Desk AI.
           </p>
-          {googleData.calendarsScanned?.length ? (
-            <p>Calendars scanned: {googleData.calendarsScanned.map((c) => c.name).join(", ")}</p>
-          ) : null}
-          {googleData.diagnostics.map((d) => (
-            <p key={d.calendarId}>
-              {d.calendarName}: {d.rawEventCount} event(s), {d.meetEventCount} with Meet link
-              {d.error ? ` — error: ${d.error}` : ""}
-            </p>
-          ))}
-          {googleData.syncSummary && googleData.syncSummary.imported > 0 ? (
-            <p className="text-success text-xs">
-              Auto-imported {googleData.syncSummary.imported} Meet event(s) into Meeting Desk AI.
-            </p>
-          ) : null}
-          {googleData.scopesGranted && !googleData.scopesGranted.includes("calendar") ? (
-            <p className="text-amber-700 dark:text-amber-300">
-              Calendar permission missing. Remove the app at myaccount.google.com/permissions and reconnect Google.
-            </p>
-          ) : null}
+          <Button size="sm" variant="secondary" onClick={() => navigate("/settings/integrations")}>
+            Open Integrations
+          </Button>
         </Card>
-      )} */}
+      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-[1.65fr_1fr] gap-5">
         <Card className="p-5 md:p-6 animate-fade-in-up">
@@ -480,7 +517,9 @@ export default function CalendarView() {
                 <div className="space-y-2">
                   {selectedMeetings
                     .slice()
-                    .sort((a, b) => a.time.localeCompare(b.time))
+                    .sort((a, b) =>
+                      meetingTimeLabel(a).localeCompare(meetingTimeLabel(b)),
+                    )
                     .map((m, idx) => (
                       <motion.div
                         key={m.id}
@@ -492,7 +531,10 @@ export default function CalendarView() {
                       >
                         <div className="flex flex-col items-center pt-0.5">
                           <span className="text-xs font-heading font-semibold tabular-nums text-secondary">
-                            {m.time}
+                            {meetingTimeLabel(m)}
+                            <span className="block text-[10px] font-medium text-muted-foreground">
+                              {APP_TIMEZONE_LABEL}
+                            </span>
                           </span>
                         </div>
                         <div className="min-w-0 flex-1">
@@ -543,26 +585,25 @@ export default function CalendarView() {
                           <p className="text-xs text-muted-foreground mt-1 truncate">
                             {ev.calendarName}
                           </p>
-                          {ev.importable ? (
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              className="mt-2 h-7 gap-1 text-xs"
-                              disabled={importingEventId === ev.eventId}
-                              onClick={() => void handleImportGoogleEvent(ev)}
-                            >
-                              {importingEventId === ev.eventId ? (
-                                <Loader2 className="h-3 w-3 animate-spin" />
-                              ) : (
-                                <Video className="h-3 w-3" />
-                              )}
-                              Import & track
-                            </Button>
-                          ) : (
-                            <p className="text-[11px] text-muted-foreground mt-2">
-                              No Google Meet link on this event
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="mt-2 h-7 gap-1 text-xs"
+                            disabled={importingEventId === ev.eventId}
+                            onClick={() => void handleImportGoogleEvent(ev)}
+                          >
+                            {importingEventId === ev.eventId ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Video className="h-3 w-3" />
+                            )}
+                            {ev.importable ? "Import & track" : "Import event"}
+                          </Button>
+                          {!ev.importable ? (
+                            <p className="text-[11px] text-muted-foreground mt-1">
+                              No Google Meet link — imported without recording bot
                             </p>
-                          )}
+                          ) : null}
                         </div>
                       </div>
                     ))}
@@ -598,7 +639,7 @@ export default function CalendarView() {
                       <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 -translate-x-1 transition-all group-hover/up:opacity-100 group-hover/up:translate-x-0" />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 tabular-nums">
-                      {formatDate(m.date)} · {m.time}
+                      {formatDate(meetingDateKey(m))} · {meetingTimeLabel(m)}
                     </p>
                   </button>
                 ))}

@@ -45,6 +45,8 @@ export interface Stakeholder {
     description: string;
     date: string; // ISO date
     time: string; // HH:mm
+    /** Absolute start (ISO). Prefer for local date/time display over date/time. */
+    scheduledAt?: string;
     duration: number; // minutes
     stakeholders: Stakeholder[];
     status: MeetingStatus;
@@ -57,6 +59,7 @@ export interface Stakeholder {
     joinSlug?: string;
     platform?: "lyrus" | "google_meet" | "microsoft_teams";
     externalMeetingUrl?: string;
+    calendarEventId?: string;
     recordingBotStatus?: string | null;
     recordingProgress?: {
       phase: string;

@@ -27,7 +27,14 @@ function microsoftClientSecret(): string {
 }
 
 export function isMicrosoftConfigured(): boolean {
-  return Boolean(process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET);
+  return Boolean(process.env.MICROSOFT_CLIENT_ID?.trim() && process.env.MICROSOFT_CLIENT_SECRET?.trim());
+}
+
+export function microsoftOAuthMissingEnv(): string[] {
+  const missing: string[] = [];
+  if (!process.env.MICROSOFT_CLIENT_ID?.trim()) missing.push("MICROSOFT_CLIENT_ID");
+  if (!process.env.MICROSOFT_CLIENT_SECRET?.trim()) missing.push("MICROSOFT_CLIENT_SECRET");
+  return missing;
 }
 
 export function buildMicrosoftAuthUrl(state: string, redirectUri: string): string {

@@ -13,7 +13,7 @@ export function createSectionDraft(
     id: createClientId(),
     title: partial?.title ?? "New Section",
     description: partial?.description ?? "",
-    aiInstructions: partial?.aiInstructions ?? "Summarize relevant content for this section.",
+    aiInstructions: partial?.aiInstructions ?? "Extract only what the transcript supports for this section. Leave empty if not discussed.",
     isRequired: partial?.isRequired ?? true,
     sortOrder,
   };

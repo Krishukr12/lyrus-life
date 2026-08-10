@@ -297,7 +297,8 @@ export type OrganizationStatus = (typeof OrganizationStatus)[keyof typeof Organi
 export const SubscriptionPlan: {
   STARTER: 'STARTER',
   PROFESSIONAL: 'PROFESSIONAL',
-  ENTERPRISE: 'ENTERPRISE'
+  ENTERPRISE: 'ENTERPRISE',
+  FOREVER_FREE: 'FOREVER_FREE'
 };
 
 export type SubscriptionPlan = (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan]

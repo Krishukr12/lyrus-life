@@ -24,18 +24,34 @@
     @apply bg-[hsl(var(--mist))] text-[hsl(var(--ink))] antialiased font-body;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-heading);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+  }
+
+  ::selection {
+    background: hsl(var(--teal) / 0.28);
+    color: hsl(var(--ink));
   }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand via-teal-300 to-cyan-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand via-teal-300 to-cyan-300;
   }
 
   .section-pad {
-    @apply py-20 md:py-28;
+    @apply py-24 md:py-32;
+  }
+
+  .hairline {
+    @apply border-slate-200/90;
+  }
+
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
   }
 }

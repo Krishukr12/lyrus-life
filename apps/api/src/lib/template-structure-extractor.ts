@@ -80,7 +80,7 @@ export function headingsToSections(headings: ExtractedHeading[]) {
   return headings.map((h, index) => ({
     title: h.text,
     description: `Content for ${h.text}`,
-    aiInstructions: `Extract and summarize content relevant to "${h.text}" from the meeting transcript.`,
+    aiInstructions: `Extract content relevant to "${h.text}" only if discussed in the transcript. Leave empty if not discussed.`,
     isRequired: h.level <= 2,
     sortOrder: index,
   }));

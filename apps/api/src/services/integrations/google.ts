@@ -26,7 +26,14 @@ function googleClientSecret(): string {
 }
 
 export function isGoogleConfigured(): boolean {
-  return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+  return Boolean(process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim());
+}
+
+export function googleOAuthMissingEnv(): string[] {
+  const missing: string[] = [];
+  if (!process.env.GOOGLE_CLIENT_ID?.trim()) missing.push("GOOGLE_CLIENT_ID");
+  if (!process.env.GOOGLE_CLIENT_SECRET?.trim()) missing.push("GOOGLE_CLIENT_SECRET");
+  return missing;
 }
 
 export function buildGoogleAuthUrl(state: string, redirectUri: string): string {
@@ -442,9 +449,8 @@ async function fetchMeetEventsForCalendar(
     if (!startIso || !endIso || !ev.id) continue;
 
     let joinUrl = extractMeetJoinUrl(ev);
-    if (!joinUrl && (ev.conferenceData || ev.hangoutLink === undefined)) {
-      joinUrl = await fetchEventMeetLink(accessToken, calendar.id, ev.id);
-    }
+    // List requests already use conferenceDataVersion=1. Avoid per-event detail
+    // fetches — they were the main source of sync latency (1 Google API call each).
 
     const attendees = (ev.attendees ?? [])
       .map((a) => ({
@@ -515,7 +521,10 @@ export async function listUpcomingGoogleMeetEvents(input: {
   for (const ev of merged.sort(
     (a, b) => new Date(a.startDateTimeIso).getTime() - new Date(b.startDateTimeIso).getTime(),
   )) {
-    const key = ev.iCalUID ?? `${ev.calendarId}:${ev.eventId}`;
+    // Deduplicate by calendar event *instance* id only.
+    // Recurring series share the same iCalUID across instances — using that key
+    // previously dropped every occurrence after the first (so "today" vanished).
+    const key = `${ev.calendarId}:${ev.eventId}`;
     if (seen.has(key)) continue;
     seen.add(key);
     deduped.push(ev);
@@ -556,7 +565,7 @@ export async function fetchGoogleCalendarEventById(input: {
     const joinUrl = extractMeetJoinUrl(ev);
     const startIso = parseEventDateTime(ev.start);
     const endIso = parseEventDateTime(ev.end);
-    if (!joinUrl || !startIso || !endIso || !ev.id) return null;
+    if (!startIso || !endIso || !ev.id) return null;
     const calendars = await listAccessibleGoogleCalendars(accessToken, integratedEmail);
     const calendarName = calendars.find((c) => c.id === calendarId)?.summary ?? calendarId;
     const attendees = (ev.attendees ?? [])
@@ -583,7 +592,7 @@ export async function fetchGoogleCalendarEventById(input: {
   if (input.calendarId) {
     const ev = await tryFetch(input.calendarId);
     if (!ev) {
-      throw new Error("Selected calendar event was not found or is missing a Google Meet link");
+      throw new Error("Selected calendar event was not found");
     }
     return ev;
   }
@@ -594,5 +603,5 @@ export async function fetchGoogleCalendarEventById(input: {
     if (ev) return ev;
   }
 
-  throw new Error("Selected calendar event was not found or is missing a Google Meet link");
+  throw new Error("Selected calendar event was not found");
 }

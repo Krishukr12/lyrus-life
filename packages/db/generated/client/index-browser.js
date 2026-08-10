@@ -592,7 +592,8 @@ exports.OrganizationStatus = exports.$Enums.OrganizationStatus = {
 exports.SubscriptionPlan = exports.$Enums.SubscriptionPlan = {
   STARTER: 'STARTER',
   PROFESSIONAL: 'PROFESSIONAL',
-  ENTERPRISE: 'ENTERPRISE'
+  ENTERPRISE: 'ENTERPRISE',
+  FOREVER_FREE: 'FOREVER_FREE'
 };
 
 exports.UserRole = exports.$Enums.UserRole = {

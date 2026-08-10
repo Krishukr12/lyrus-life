@@ -144,7 +144,7 @@ export const invitationService = {
       (await prisma.organization.findUnique({
         where: { id: organizationId },
         select: { subscriptionPlan: true },
-      }))!.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE",
+      }))!.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE" | "FOREVER_FREE",
     );
 
     await recordSeatChangeEvent(organizationId, actorId, {
@@ -220,7 +220,7 @@ export const invitationService = {
       select: { subscriptionPlan: true },
     });
     const includedSeats = getIncludedSeats(
-      org!.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE",
+      org!.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE" | "FOREVER_FREE",
     );
 
     await recordSeatChangeEvent(organizationId, actorId, {
@@ -310,7 +310,7 @@ export const invitationService = {
       select: { subscriptionPlan: true },
     });
     const includedSeats = getIncludedSeats(
-      org!.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE",
+      org!.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE" | "FOREVER_FREE",
     );
 
     await recordSeatChangeEvent(invitation.organizationId, user.id, {

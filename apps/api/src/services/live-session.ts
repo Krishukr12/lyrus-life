@@ -6,7 +6,8 @@ import {
   getLiveMeetingNotes,
   getLiveRoomParticipantCount,
 } from "../socket/live-meeting.js";
-import { createTranscriptFromNotes, runNluFromExistingTranscript } from "./pipeline.js";
+import { runMeetingPipeline } from "./pipeline.js";
+import { materializeAudioForProcessing } from "./storage/index.js";
 import { logTenantAudit } from "./tenant-audit.service.js";
 
 type MeetingLiveFields = {
@@ -105,8 +106,7 @@ export async function endLiveSessionForMeeting(
     metadata: { meetingId, title: meeting.title, auto: options?.auto ?? false },
   });
 
-  // Mirror the external-meeting flow: once the meeting ends, generate MOM automatically.
-  // For LiveKit meetings we may not have an uploaded recording, so we fall back to notes.
+  // Save any in-room notes for the host, but never fabricate a MOM from notes alone.
   try {
     const trimmed = socketNotes.trim();
     if (trimmed) {
@@ -124,9 +124,28 @@ export async function endLiveSessionForMeeting(
       }
     }
 
-    // If no audio was uploaded, generate a transcript from notes and run NLU to produce MOM.
-    await createTranscriptFromNotes(meetingId);
-    await runNluFromExistingTranscript(meetingId);
+    const audio = await prisma.audioFile.findFirst({
+      where: { meetingId },
+      orderBy: { createdAt: "desc" },
+    });
+    if (audio) {
+      const resolved = await materializeAudioForProcessing(audio);
+      try {
+        await runMeetingPipeline(meetingId, {
+          filePath: resolved.filePath,
+          mimeType: audio.mimeType,
+          s3Key: resolved.s3Key,
+          s3Bucket: resolved.s3Bucket,
+        });
+      } finally {
+        if (resolved.cleanup) await resolved.cleanup();
+      }
+    } else {
+      console.info(
+        "Skipping post-meeting MOM — no recording audio (notes-only MOM is disabled)",
+        meetingId,
+      );
+    }
   } catch (err) {
     // Do not block the "end meeting" operation on pipeline failures.
     console.warn("Post-meeting pipeline failed", err);

@@ -88,7 +88,7 @@ export function createOrganizationSettingsRouter(): Router {
         countOrganizationMeetings(tenant.organizationId),
         billingService.getCustomerBillingDetail(tenant.organizationId),
       ]);
-      const plan = org.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
+      const plan = org.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE" | "FOREVER_FREE";
       const meetingLimit = getMeetingLimit(plan);
       let canAddUser = true;
       try {

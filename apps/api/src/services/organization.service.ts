@@ -161,7 +161,18 @@ export const organizationService = {
     }
 
     const pricing = await billingRepository.getPricingConfig();
-    if (orgStatus === OrganizationStatus.ACTIVE && pricing.freeTrialDays > 0) {
+    const isForeverFree = input.subscriptionPlan === "FOREVER_FREE";
+    if (orgStatus === OrganizationStatus.ACTIVE && isForeverFree) {
+      // No trial expiry and no billing period — intentional for test tenants.
+      await billingRepository.upsertOrganizationBilling(result.organization.id, {
+        billingStatus: BillingStatus.ACTIVE,
+        trialStartedAt: null,
+        trialEndsAt: null,
+        nextBillingDate: null,
+        currentPeriodStart: null,
+        currentPeriodEnd: null,
+      });
+    } else if (orgStatus === OrganizationStatus.ACTIVE && pricing.freeTrialDays > 0) {
       await billingService.startTrial(
         result.organization.id,
         pricing.freeTrialDays,

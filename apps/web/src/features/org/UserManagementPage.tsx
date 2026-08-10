@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Mail, MoreHorizontal, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { isWorkspaceLockError } from "@/lib/workspace-access";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -120,6 +121,7 @@ export default function UserManagementPage() {
       setPendingAction(() => () => retry(true));
       return;
     }
+    if (isWorkspaceLockError(err)) return;
     toast.error(error.message);
   }
 

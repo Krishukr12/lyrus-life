@@ -24,15 +24,29 @@ export type RecordingProgress = {
 
 const TOTAL = 5;
 
+/** Bot is joining / in-call again (e.g. people left and rejoined the same Meet). */
+export function isActiveRecordingBotStatus(status: string | null | undefined): boolean {
+  return (
+    status === "scheduling" ||
+    status === "scheduled" ||
+    status === "joining" ||
+    status === "waiting_room" ||
+    status === "in_call" ||
+    status === "recording"
+  );
+}
+
 export function mapRecallCodeToBotStatus(code: string | null): string | null {
   if (!code) return null;
   const c = code.toLowerCase();
   if (c === "in_waiting_room") return "waiting_room";
-  if (c === "joining_call" || c === "ready") return "joining";
+  if (c === "joining_call") return "joining";
+  if (c === "ready") return "scheduled";
   if (c === "in_call_not_recording") return "in_call";
   if (c === "in_call_recording" || c === "recording") return "recording";
   if (c === "call_ended") return "call_ended";
-  if (c === "done" || c === "completed") return "done";
+  // Recall "done" means media may be ready — local "done" is reserved for successful ingest.
+  if (c === "done" || c === "completed") return "call_ended";
   if (c === "fatal" || c === "failed" || c === "error") return "failed";
   return c;
 }
@@ -47,7 +61,11 @@ export function buildRecordingProgress(input: {
   const bot = input.recordingBotStatus ?? null;
   if (!bot && !input.pipelineStatus) return null;
 
-  if (bot === "failed" || input.pipelineStatus === "failed") {
+  if (
+    (bot === "failed" || input.pipelineStatus === "failed") &&
+    !isActiveRecordingBotStatus(bot) &&
+    !input.hasMom
+  ) {
     return {
       phase: "failed",
       step: 0,
@@ -59,48 +77,7 @@ export function buildRecordingProgress(input: {
     };
   }
 
-  if (input.hasMom && bot === "done") {
-    return {
-      phase: "ready",
-      step: TOTAL,
-      totalSteps: TOTAL,
-      title: "MOM draft ready",
-      detail: "Review, edit, and approve before sharing with stakeholders.",
-      isLive: false,
-      isProcessing: false,
-    };
-  }
-
-  if (
-    input.pipelineStatus === "processing" ||
-    bot === "processing" ||
-    input.meetingStatus === "PROCESSING"
-  ) {
-    return {
-      phase: input.hasTranscript ? "generating_mom" : "transcribing",
-      step: 4,
-      totalSteps: TOTAL,
-      title: input.hasTranscript ? "Generating MOM" : "Transcribing recording",
-      detail: input.hasTranscript
-        ? "AI is extracting key points, action items, and template sections."
-        : "Speech-to-text is running on your meeting audio.",
-      isLive: false,
-      isProcessing: true,
-    };
-  }
-
-  if (bot === "call_ended" || bot === "done") {
-    return {
-      phase: "ending",
-      step: 3,
-      totalSteps: TOTAL,
-      title: "Everyone has left",
-      detail: "The recording bot is wrapping up and uploading audio for transcription.",
-      isLive: false,
-      isProcessing: true,
-    };
-  }
-
+  // Live / joining first — people may leave and rejoin the same Meet with a new bot.
   if (bot === "recording" || bot === "in_call") {
     return {
       phase: "live",
@@ -129,14 +106,73 @@ export function buildRecordingProgress(input: {
   }
 
   if (bot === "joining" || bot === "scheduled" || bot === "scheduling") {
+    const waitingToStart = bot === "scheduling" || bot === "scheduled";
     return {
-      phase: bot === "scheduling" || bot === "scheduled" ? "scheduling" : "joining",
+      phase: waitingToStart ? "scheduling" : "joining",
       step: 1,
       totalSteps: TOTAL,
-      title: bot === "scheduling" || bot === "scheduled" ? "Bot scheduled" : "Bot joining",
-      detail: "The recording bot is connecting to your meeting link.",
-      isLive: true,
+      title: waitingToStart ? "Bot scheduled" : "Bot joining",
+      detail: waitingToStart
+        ? "Bot is booked for this Meet. Click “Join on Google Meet” to send it now if you started early — then admit “Meeting Desk AI”."
+        : "The recording bot is connecting to your meeting link. Admit “Meeting Desk AI” if prompted.",
+      isLive: !waitingToStart,
       isProcessing: false,
+    };
+  }
+
+  // Draft already exists and bot is not live again — ignore sticky call_ended.
+  if (input.hasMom) {
+    return {
+      phase: "ready",
+      step: TOTAL,
+      totalSteps: TOTAL,
+      title: "MOM draft ready",
+      detail: "Review, edit, and approve before sharing with stakeholders.",
+      isLive: false,
+      isProcessing: false,
+    };
+  }
+
+  // Still waiting on Recall media — do not claim transcription has started.
+  if (bot === "call_ended") {
+    return {
+      phase: "ending",
+      step: 3,
+      totalSteps: TOTAL,
+      title: "Everyone has left",
+      detail: "The recording bot is wrapping up and uploading audio for transcription.",
+      isLive: false,
+      isProcessing: true,
+    };
+  }
+
+  if (
+    input.pipelineStatus === "processing" ||
+    bot === "processing" ||
+    (input.meetingStatus === "PROCESSING" && bot !== "done")
+  ) {
+    return {
+      phase: input.hasTranscript ? "generating_mom" : "transcribing",
+      step: 4,
+      totalSteps: TOTAL,
+      title: input.hasTranscript ? "Generating MOM" : "Transcribing recording",
+      detail: input.hasTranscript
+        ? "AI is extracting key points, action items, and template sections."
+        : "Speech-to-text is running on your meeting audio.",
+      isLive: false,
+      isProcessing: true,
+    };
+  }
+
+  if (bot === "done") {
+    return {
+      phase: "ending",
+      step: 3,
+      totalSteps: TOTAL,
+      title: "Everyone has left",
+      detail: "The recording bot is wrapping up and uploading audio for transcription.",
+      isLive: false,
+      isProcessing: true,
     };
   }
 

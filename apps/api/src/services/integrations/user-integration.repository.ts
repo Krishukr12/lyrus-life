@@ -1,6 +1,6 @@
-import { IntegrationProvider, prisma } from "@lyrus/db";
+import { prisma } from "@lyrus/db";
 import type { IntegrationProviderType } from "@lyrus/db";
-import { decryptSecret, encryptSecret } from "../../lib/token-crypto.js";
+import { encryptSecret, tryDecryptSecret } from "../../lib/token-crypto.js";
 
 export type StoredIntegration = {
   id: string;
@@ -15,6 +15,19 @@ export type StoredIntegration = {
   preferences: Record<string, unknown> | null;
 };
 
+export type IntegrationStatusRow = {
+  provider: IntegrationProviderType;
+  externalEmail: string | null;
+  preferences: Record<string, unknown> | null;
+  connectedAt: Date;
+};
+
+function parsePreferences(preferences: unknown): Record<string, unknown> | null {
+  return preferences && typeof preferences === "object"
+    ? (preferences as Record<string, unknown>)
+    : null;
+}
+
 function mapIntegration(row: {
   id: string;
   userId: string;
@@ -26,22 +39,46 @@ function mapIntegration(row: {
   externalAccountId: string | null;
   externalEmail: string | null;
   preferences?: unknown;
-}): StoredIntegration {
+}): StoredIntegration | null {
+  const accessToken = tryDecryptSecret(row.accessTokenEnc);
+  if (!accessToken) {
+    return null;
+  }
+
+  let refreshToken: string | null = null;
+  if (row.refreshTokenEnc) {
+    refreshToken = tryDecryptSecret(row.refreshTokenEnc);
+    // Refresh token alone failing shouldn't wipe the connection mid-request;
+    // callers that need refresh will fail and can reconnect.
+    if (refreshToken === null) {
+      console.warn(
+        `[integrations] Unable to decrypt refresh token for ${row.provider} (user ${row.userId}); treating as missing`,
+      );
+    }
+  }
+
   return {
     id: row.id,
     userId: row.userId,
     provider: row.provider,
-    accessToken: decryptSecret(row.accessTokenEnc),
-    refreshToken: row.refreshTokenEnc ? decryptSecret(row.refreshTokenEnc) : null,
+    accessToken,
+    refreshToken,
     expiresAt: row.expiresAt,
     scopes: row.scopes,
     externalAccountId: row.externalAccountId,
     externalEmail: row.externalEmail,
-    preferences:
-      row.preferences && typeof row.preferences === "object"
-        ? (row.preferences as Record<string, unknown>)
-        : null,
+    preferences: parsePreferences(row.preferences),
   };
+}
+
+async function purgeUndecryptableIntegration(
+  userId: string,
+  provider: IntegrationProviderType,
+): Promise<void> {
+  console.warn(
+    `[integrations] Removing undecryptable ${provider} tokens for user ${userId} — reconnect required`,
+  );
+  await prisma.userIntegration.deleteMany({ where: { userId, provider } });
 }
 
 export async function getUserIntegration(
@@ -51,12 +88,64 @@ export async function getUserIntegration(
   const row = await prisma.userIntegration.findUnique({
     where: { userId_provider: { userId, provider } },
   });
-  return row ? mapIntegration(row) : null;
+  if (!row) return null;
+
+  const mapped = mapIntegration(row);
+  if (!mapped) {
+    await purgeUndecryptableIntegration(userId, provider);
+    return null;
+  }
+  return mapped;
+}
+
+/** Status listing validates tokens can decrypt; undecryptable rows are purged. */
+export async function listUserIntegrationStatuses(
+  userId: string,
+): Promise<IntegrationStatusRow[]> {
+  const rows = await prisma.userIntegration.findMany({
+    where: { userId },
+    select: {
+      id: true,
+      userId: true,
+      provider: true,
+      accessTokenEnc: true,
+      externalEmail: true,
+      preferences: true,
+      createdAt: true,
+    },
+  });
+
+  const usable: IntegrationStatusRow[] = [];
+  for (const row of rows) {
+    const accessToken = tryDecryptSecret(row.accessTokenEnc);
+    if (!accessToken) {
+      await purgeUndecryptableIntegration(row.userId, row.provider);
+      continue;
+    }
+    usable.push({
+      provider: row.provider,
+      externalEmail: row.externalEmail,
+      preferences: parsePreferences(row.preferences),
+      connectedAt: row.createdAt,
+    });
+  }
+  return usable;
 }
 
 export async function listUserIntegrations(userId: string): Promise<StoredIntegration[]> {
   const rows = await prisma.userIntegration.findMany({ where: { userId } });
-  return rows.map(mapIntegration);
+  const usable: StoredIntegration[] = [];
+
+  for (const row of rows) {
+    const mapped = mapIntegration(row);
+    if (!mapped) {
+      await purgeUndecryptableIntegration(row.userId, row.provider);
+      continue;
+    }
+    usable.push(mapped);
+  }
+
+  return usable;
 }
 
 export async function upsertUserIntegration(input: {
@@ -92,7 +181,11 @@ export async function upsertUserIntegration(input: {
       externalEmail: input.externalEmail ?? null,
     },
   });
-  return mapIntegration(row);
+  const mapped = mapIntegration(row);
+  if (!mapped) {
+    throw new Error("Failed to read integration immediately after upsert");
+  }
+  return mapped;
 }
 
 export async function deleteUserIntegration(
@@ -109,7 +202,7 @@ export async function updateIntegrationPreferences(
 ): Promise<void> {
   await prisma.userIntegration.update({
     where: { userId_provider: { userId, provider } },
-    data: { preferences },
+    data: { preferences: preferences as object },
   });
 }
 

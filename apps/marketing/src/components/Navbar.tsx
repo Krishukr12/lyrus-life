@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { LogoIcon } from "@/components/BrandMark";
 import { appLink, cn } from "@/lib/utils";
 
 const NAV = [
@@ -15,7 +16,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -23,36 +24,54 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        scrolled ? "bg-[hsl(var(--navy-deep))]/90 backdrop-blur-xl border-b border-white/5 shadow-lg" : "bg-transparent",
+        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+        scrolled
+          ? "bg-navy-deep/85 backdrop-blur-xl border-b border-white/[0.06]"
+          : "bg-transparent",
       )}
     >
-      <nav className="container flex h-16 items-center justify-between" aria-label="Main navigation">
-        <a href="#" className="flex items-center gap-2.5 font-heading font-bold text-white text-lg tracking-tight">
-          <img src="/favicon.svg" alt="" width={32} height={32} className="rounded-lg" aria-hidden />
-          <span>Meeting Desk <span className="text-teal">AI</span></span>
+      <nav
+        className="container flex h-[4.25rem] items-center justify-between"
+        aria-label="Main navigation"
+      >
+        <a
+          href="#"
+          className="flex items-center gap-2.5"
+        >
+          <LogoIcon size={32} className="rounded-xl ring-1 ring-white/15" />
+          <span className="leading-tight">
+            <span className="block font-heading font-bold text-white text-[1.05rem] tracking-tight">
+              Meeting Desk <span className="text-brand">AI</span>
+            </span>
+            <span className="block text-[10px] text-white/45 tracking-wide">
+              by Virtual Edge
+            </span>
+          </span>
         </a>
 
-        <ul className="hidden md:flex items-center gap-8 text-sm text-white/75">
+        <ul className="hidden lg:flex items-center gap-9 text-[13px] text-white/60">
           {NAV.map((item) => (
             <li key={item.href}>
-              <a href={item.href} className="hover:text-white transition-colors">
+              <a
+                href={item.href}
+                className="hover:text-white transition-colors duration-200"
+              >
                 {item.label}
               </a>
             </li>
           ))}
         </ul>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2">
           <a
             href={appLink("/login")}
-            className="text-sm text-white/80 hover:text-white transition-colors px-3 py-2"
+            className="text-[13px] text-white/70 hover:text-white transition-colors px-3.5 py-2"
           >
             Log in
           </a>
           <a
             href={appLink("/login")}
-            className="text-sm font-medium bg-brand text-[hsl(var(--navy-deep))] hover:bg-teal-300 transition-colors px-4 py-2 rounded-full shadow-glow"
+            className="text-[13px] font-semibold bg-brand text-navy-deep hover:bg-teal-300 transition-colors px-5 py-2 rounded-full shadow-glow"
           >
             Start free trial
           </a>
@@ -60,8 +79,9 @@ export function Navbar() {
 
         <button
           type="button"
-          className="md:hidden text-white p-2"
+          className="md:hidden text-white/90 p-2 -mr-2"
           aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
           onClick={() => setOpen(!open)}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -69,18 +89,21 @@ export function Navbar() {
       </nav>
 
       {open && (
-        <div className="md:hidden border-t border-white/10 bg-[hsl(var(--navy-deep))] px-4 py-4 space-y-3">
+        <div className="md:hidden border-t border-white/10 bg-navy-deep/98 backdrop-blur-xl px-5 py-5 space-y-1">
           {NAV.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="block text-white/80 py-2"
+              className="block text-white/75 py-2.5 text-sm"
               onClick={() => setOpen(false)}
             >
               {item.label}
             </a>
           ))}
-          <a href={appLink("/login")} className="block w-full text-center bg-teal text-[hsl(var(--navy-deep))] font-medium py-2.5 rounded-full">
+          <a
+            href={appLink("/login")}
+            className="mt-3 block w-full text-center bg-brand text-navy-deep font-semibold py-3 rounded-full"
+          >
             Start free trial
           </a>
         </div>

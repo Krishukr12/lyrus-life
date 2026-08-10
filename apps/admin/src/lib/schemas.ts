@@ -34,7 +34,12 @@ export const onboardingStatusSchema = z.enum(["ACTIVE", "TRIAL", "SUSPENDED", "P
 
 export const billingCycleSchema = z.enum(["monthly", "annual"]);
 
-export const subscriptionPlanSchema = z.enum(["STARTER", "PROFESSIONAL", "ENTERPRISE"]);
+export const subscriptionPlanSchema = z.enum([
+  "STARTER",
+  "PROFESSIONAL",
+  "ENTERPRISE",
+  "FOREVER_FREE",
+]);
 
 export const onboardingFormSchema = z.object({
   name: z

@@ -47,7 +47,7 @@ export const organizationAdminService = {
     ]);
 
     const admin = org.users[0] ?? null;
-    const plan = org.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
+    const plan = org.subscriptionPlan as "STARTER" | "PROFESSIONAL" | "ENTERPRISE" | "FOREVER_FREE";
     const includedUsers = getIncludedSeats(plan);
     const meetingLimit = getMeetingLimit(plan);
 

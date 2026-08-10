@@ -1,6 +1,12 @@
 import { CreateMeetingResponse, Meeting, MOM, UserTask } from "./types";
 import { getApiAuthHandlers } from "./auth-handlers";
 import { getAccessToken } from "./token-store";
+import {
+  isWorkspaceLockCode,
+  isWorkspaceLockMessage,
+  setWorkspaceLock,
+} from "./workspace-access";
+import { withResolvedMeetingStatus } from "./meeting-status";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "/api";
 
@@ -20,6 +26,35 @@ function buildAuthHeaders(extra?: HeadersInit): HeadersInit {
     ...(extra ?? {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
+}
+
+function redirectToTrialExpired(message: string, code = "trial_expired") {
+  setWorkspaceLock(message, code);
+  try {
+    getApiAuthHandlers().onWorkspaceLocked?.(message, code);
+  } catch {
+    // ignore — AppLayout also watches sessionStorage lock
+  }
+}
+
+function handleForbiddenResponse(message: string, code?: string) {
+  if (code === "organization_suspended" || code === "organization_pending") {
+    getApiAuthHandlers().onOrganizationBlocked?.(message);
+    return;
+  }
+
+  const normalized = message.trim();
+  const looksLikeWorkspaceLock =
+    isWorkspaceLockCode(code) ||
+    isWorkspaceLockMessage(normalized) ||
+    /not authorized/i.test(normalized);
+
+  if (looksLikeWorkspaceLock) {
+    redirectToTrialExpired(normalized || "Your trial period has ended.", code ?? "trial_expired");
+    return;
+  }
+
+  getApiAuthHandlers().onForbidden?.(normalized, code);
 }
 
 export async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -54,11 +89,7 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
       getApiAuthHandlers().onUnauthorized?.();
     }
     if (response.status === 403) {
-      if (code === "organization_suspended" || code === "organization_pending") {
-        getApiAuthHandlers().onOrganizationBlocked?.(message);
-      } else {
-        getApiAuthHandlers().onForbidden?.();
-      }
+      handleForbiddenResponse(message, code);
     }
 
     throw new ApiError(message, response.status, code);
@@ -80,10 +111,13 @@ async function multipartRequest<T>(path: string, init: RequestInit): Promise<T> 
 
   if (!response.ok) {
     let message = response.statusText;
+    let code: string | undefined;
     try {
-      const body = (await response.json()) as { error?: string; message?: string };
+      const body = (await response.json()) as { error?: unknown; message?: string };
+      if (typeof body.error === "string") code = body.error;
       if (body.message) message = body.message;
-      else if (body.error) message = body.error;
+      else if (body.error && typeof body.error !== "string") message = JSON.stringify(body.error);
+      else if (typeof body.error === "string") message = body.error;
     } catch {
       // ignore
     }
@@ -92,17 +126,18 @@ async function multipartRequest<T>(path: string, init: RequestInit): Promise<T> 
       getApiAuthHandlers().onUnauthorized?.();
     }
     if (response.status === 403) {
-      getApiAuthHandlers().onForbidden?.();
+      handleForbiddenResponse(message, code);
     }
 
-    throw new ApiError(message, response.status);
+    throw new ApiError(message, response.status, code);
   }
 
   return response.json() as Promise<T>;
 }
 
 export async function getMeetings(): Promise<Meeting[]> {
-  return request<Meeting[]>("/meetings");
+  const meetings = await request<Meeting[]>("/meetings");
+  return meetings.map((m) => withResolvedMeetingStatus(m));
 }
 
 export interface PersonSuggestion {
@@ -119,7 +154,8 @@ export async function getPeopleSuggestions(query: string): Promise<PersonSuggest
 
 export async function getMeeting(id: string): Promise<Meeting | undefined> {
   try {
-    return await request<Meeting>(`/meetings/${id}`);
+    const meeting = await request<Meeting>(`/meetings/${id}`);
+    return withResolvedMeetingStatus(meeting);
   } catch (e) {
     if (e instanceof ApiError && e.status === 404) return undefined;
     throw e;
@@ -197,9 +233,18 @@ export async function uploadMeetingAudio(meetingId: string, file: File): Promise
   });
 
   if (!response.ok) {
+    let message = "Failed to upload audio";
+    let code: string | undefined;
+    try {
+      const body = (await response.json()) as { error?: string; message?: string };
+      if (typeof body.error === "string") code = body.error;
+      if (body.message) message = body.message;
+    } catch {
+      // ignore
+    }
     if (response.status === 401) getApiAuthHandlers().onUnauthorized?.();
-    if (response.status === 403) getApiAuthHandlers().onForbidden?.();
-    throw new ApiError("Failed to upload audio", response.status);
+    if (response.status === 403) handleForbiddenResponse(message, code);
+    throw new ApiError(message, response.status, code);
   }
 }
 
@@ -242,7 +287,7 @@ export async function shareMOM(meetingId: string): Promise<void> {
 
 export async function editMOM(
   meetingId: string,
-  updates: Pick<MOM, "keyPoints" | "actionItems">,
+  updates: Pick<MOM, "keyPoints" | "actionItems"> & Pick<Partial<MOM>, "sections">,
 ): Promise<MOM> {
   return request<MOM>(`/meetings/${meetingId}/mom`, {
     method: "PATCH",

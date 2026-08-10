@@ -21,6 +21,7 @@ const PLAN_OPTIONS = [
   { value: "STARTER", label: "Starter" },
   { value: "PROFESSIONAL", label: "Growth" },
   { value: "ENTERPRISE", label: "Enterprise" },
+  { value: "FOREVER_FREE", label: "Forever Free" },
 ];
 
 const CYCLE_OPTIONS = [

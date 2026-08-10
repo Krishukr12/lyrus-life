@@ -30,17 +30,23 @@ function getMeetingPageUrl(meetingId: string): string {
 
 function buildMomShareHtml(input: SendMomToStakeholdersInput): string {
   const meetingUrl = getMeetingPageUrl(input.meetingId);
+  const brandName = input.pdfInput.branding?.brandName?.trim() || "Meeting Desk AI";
+  const tagline = input.pdfInput.branding?.tagline?.trim() || "";
   const keyPointsHtml = input.pdfInput.mom.keyPoints
     .map((p) => `<li>${p.replace(/</g, "&lt;")}</li>`)
     .join("");
 
   return `
     <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto;">
-      <p style="color: #1C8D95; font-weight: bold; font-size: 14px; margin: 0;">LYRUS</p>
-      <p style="color: #1C8D95; font-style: italic; font-size: 12px; margin: 4px 0 16px;">Think • Design • Deliver</p>
-      <h2 style="color: #1a1a2e;">Minutes of Meeting — ${input.meetingTitle}</h2>
-      <p>The meeting minutes have been reviewed and approved by <strong>${input.approvedBy}</strong>.</p>
-      <p>Please find the official MOM attached as a PDF (Lyrus Life template).</p>
+      <p style="color: #1C8D95; font-weight: bold; font-size: 14px; margin: 0;">${brandName.replace(/</g, "&lt;")}</p>
+      ${
+        tagline
+          ? `<p style="color: #1C8D95; font-style: italic; font-size: 12px; margin: 4px 0 16px;">${tagline.replace(/</g, "&lt;")}</p>`
+          : `<div style="margin-bottom: 16px;"></div>`
+      }
+      <h2 style="color: #1a1a2e;">Minutes of Meeting — ${input.meetingTitle.replace(/</g, "&lt;")}</h2>
+      <p>The meeting minutes have been reviewed and approved by <strong>${input.approvedBy.replace(/</g, "&lt;")}</strong>.</p>
+      <p>Please find the official MOM attached as a PDF.</p>
       ${
         keyPointsHtml
           ? `<p><strong>Key discussion points:</strong></p><ul>${keyPointsHtml}</ul>`
@@ -48,11 +54,11 @@ function buildMomShareHtml(input: SendMomToStakeholdersInput): string {
       }
       <p style="margin-top: 24px;">
         <a href="${meetingUrl}" style="background: #0d9488; color: white; padding: 12px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">
-          View meeting in Lyrus Life
+          View meeting
         </a>
       </p>
       <p style="color: #666; font-size: 13px; margin-top: 24px;">
-        This message was sent automatically after Lyrus Life approval.
+        This message was sent automatically after approval.
       </p>
     </div>
   `.trim();

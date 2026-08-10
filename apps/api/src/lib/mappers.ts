@@ -11,7 +11,7 @@ import type {
   MeetingPlatformType,
 } from "@lyrus/db";
 import { MeetingPlatform } from "@lyrus/db";
-import { buildRecordingProgress } from "../services/recording-bot/recording-progress.js";
+import { buildRecordingProgress, isActiveRecordingBotStatus } from "../services/recording-bot/recording-progress.js";
 import type {
   MeetingStatusType,
   MeetingTagType,
@@ -72,6 +72,8 @@ export interface WebMeeting {
   description: string;
   date: string;
   time: string;
+  /** Absolute start time — clients should prefer this for local date/time display. */
+  scheduledAt: string;
   duration: number;
   stakeholders: WebStakeholder[];
   status: "upcoming" | "ongoing" | "completed";
@@ -101,6 +103,7 @@ export interface WebMeeting {
   joinSlug?: string;
   platform?: "lyrus" | "google_meet" | "microsoft_teams";
   externalMeetingUrl?: string;
+  calendarEventId?: string;
   recordingBotStatus?: string | null;
   recordingProgress?: {
     phase: string;
@@ -140,6 +143,36 @@ function mapDbStatus(status: MeetingStatusType): WebMeeting["status"] {
   }
 }
 
+/**
+ * Display status for the UI. Google imports (and other meetings) stay UPCOMING in DB
+ * until a pipeline/live session updates them — so past meetings looked "Upcoming".
+ * Derive from the schedule when the stored status is still open.
+ */
+export function resolveMeetingDisplayStatus(
+  status: MeetingStatusType,
+  scheduledAt: Date,
+  durationMinutes: number,
+  now = new Date(),
+): WebMeeting["status"] {
+  if (status === "COMPLETED" || status === "FAILED") {
+    return mapDbStatus(status);
+  }
+  if (status === "PROCESSING") {
+    return "ongoing";
+  }
+
+  const startMs = scheduledAt.getTime();
+  if (Number.isNaN(startMs)) {
+    return mapDbStatus(status);
+  }
+  const endMs = startMs + Math.max(durationMinutes || 60, 1) * 60_000;
+  const nowMs = now.getTime();
+
+  if (nowMs < startMs) return "upcoming";
+  if (nowMs < endMs) return "ongoing";
+  return "completed";
+}
+
 function mapDbTag(tag: MeetingTagType): WebMeeting["tag"] {
   return tag.toLowerCase() as WebMeeting["tag"];
 }
@@ -158,14 +191,38 @@ function mapTaskStatus(status: TaskStatusType): WebUserTask["status"] {
 }
 
 export function formatDateTime(scheduledAt: Date): { date: string; time: string } {
-  const date = scheduledAt.toISOString().split("T")[0]!;
-  const hours = scheduledAt.getHours().toString().padStart(2, "0");
-  const minutes = scheduledAt.getMinutes().toString().padStart(2, "0");
-  return { date, time: `${hours}:${minutes}` };
+  // Always present India wall-clock time (product timezone), not the API server's local TZ.
+  const dtf = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+  const map = Object.fromEntries(
+    dtf
+      .formatToParts(scheduledAt)
+      .filter((p) => p.type !== "literal")
+      .map((p) => [p.type, p.value]),
+  );
+  return {
+    date: `${map.year}-${map.month}-${map.day}`,
+    time: `${map.hour}:${map.minute}`,
+  };
 }
 
+/** Interpret date (YYYY-MM-DD) + time (HH:mm) as Asia/Kolkata wall clock. */
 export function parseScheduledAt(date: string, time: string): Date {
-  return new Date(`${date}T${time}:00`);
+  const [y, m, d] = date.split("-").map(Number);
+  const [hh, mm] = time.split(":").map(Number);
+  if ([y, m, d, hh, mm].some((n) => Number.isNaN(n))) {
+    return new Date(NaN);
+  }
+  // IST = UTC+05:30 (no daylight saving).
+  const utcMillis = Date.UTC(y, m - 1, d, hh, mm, 0) - (5 * 60 + 30) * 60_000;
+  return new Date(utcMillis);
 }
 
 export function mapMom(mom: Mom): WebMOM {
@@ -215,21 +272,30 @@ export function mapMeeting(meeting: MeetingWithRelations): WebMeeting {
     description: meeting.description,
     date,
     time,
+    scheduledAt: meeting.scheduledAt.toISOString(),
     duration: meeting.durationMinutes,
     stakeholders: meeting.participants.map((p) => ({
       name: p.name,
       email: p.email,
     })),
-    status: mapDbStatus(meeting.status),
+    // MOM draft means the meeting is done for approval UX — don't map PROCESSING → "ongoing".
+    status: meeting.mom && meeting.status !== "FAILED"
+      ? "completed"
+      : resolveMeetingDisplayStatus(
+          meeting.status,
+          meeting.scheduledAt,
+          meeting.durationMinutes,
+        ),
     tag: mapDbTag(meeting.tag),
     notes: meeting.notes,
     joinSlug: meeting.joinSlug ?? undefined,
     platform: mapDbPlatform(meeting.platform),
     externalMeetingUrl: meeting.externalMeetingUrl ?? undefined,
+    calendarEventId: meeting.calendarEventId ?? undefined,
     recordingBotStatus: meeting.recordingBotStatus ?? undefined,
   };
 
-  if (meeting.status === "PROCESSING") {
+  if (meeting.status === "PROCESSING" && !meeting.mom) {
     web.pipelineStatus = "processing";
   }
   if (meeting.status === "FAILED") {
@@ -240,15 +306,20 @@ export function mapMeeting(meeting: MeetingWithRelations): WebMeeting {
     meeting.platform === MeetingPlatform.GOOGLE_MEET ||
     meeting.platform === MeetingPlatform.MICROSOFT_TEAMS;
   if (isExternal) {
-    const progress = buildRecordingProgress({
-      recordingBotStatus: meeting.recordingBotStatus,
-      pipelineStatus: web.pipelineStatus ?? null,
-      meetingStatus: meeting.status,
-      hasMom: Boolean(meeting.mom),
-      hasTranscript: Boolean(meeting.transcript),
-    });
-    if (progress) {
-      web.recordingProgress = progress;
+    const hasMom = Boolean(meeting.mom);
+    const midSession = isActiveRecordingBotStatus(meeting.recordingBotStatus);
+    // Show bot chrome while live (including a rejoin after MOM exists); hide once ready.
+    if (!hasMom || midSession) {
+      const progress = buildRecordingProgress({
+        recordingBotStatus: meeting.recordingBotStatus,
+        pipelineStatus: web.pipelineStatus ?? null,
+        meetingStatus: meeting.status,
+        hasMom,
+        hasTranscript: Boolean(meeting.transcript),
+      });
+      if (progress && progress.phase !== "ready") {
+        web.recordingProgress = progress;
+      }
     }
   }
 
@@ -340,7 +411,11 @@ export function extractionToMomPayload(
     extraction.summary,
     ...extraction.decisions.map((d) => `Decision: ${d}`),
     ...(extraction.next_meeting_agenda ?? []).map((t) => `Follow-up: ${t}`),
-  ].filter(Boolean);
+  ]
+    .map((p) => p.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    // Never surface hard-coded platform fluff that slipped through older paths.
+    .filter((p) => !/\blyrus\s+(life|live)\b/i.test(p));
 
   const actionItems: WebActionItem[] = extraction.tasks.map((t) => ({
     task: t.description,

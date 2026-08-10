@@ -27,7 +27,14 @@ export function serializeUser(user: User & { employeeProfile?: EmployeeProfile |
 }
 
 export function serializeOrganization(
-  org: Organization & { _count?: { users: number; meetings: number } },
+  org: Organization & {
+    _count?: { users: number; meetings: number };
+    billingProfile?: {
+      billingStatus: string;
+      trialEndsAt: Date | null;
+      trialStartedAt?: Date | null;
+    } | null;
+  },
 ) {
   return {
     id: org.id,
@@ -50,6 +57,8 @@ export function serializeOrganization(
     meetingDefaultDurationMinutes: org.meetingDefaultDurationMinutes,
     status: org.status,
     subscriptionPlan: org.subscriptionPlan,
+    billingStatus: org.billingProfile?.billingStatus ?? null,
+    trialEndsAt: org.billingProfile?.trialEndsAt?.toISOString() ?? null,
     createdAt: org.createdAt.toISOString(),
     updatedAt: org.updatedAt.toISOString(),
     counts: org._count

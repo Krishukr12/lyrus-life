@@ -3,8 +3,8 @@ import { request } from "@/lib/api";
 
 export interface IntegrationsResponse {
   config: {
-    google: { configured: boolean };
-    microsoft: { configured: boolean };
+    google: { configured: boolean; missingEnv?: string[] };
+    microsoft: { configured: boolean; missingEnv?: string[] };
   };
   integrations: UserIntegrationStatus[];
 }
@@ -47,25 +47,41 @@ export type CalendarFetchDiagnostics = {
   error?: string;
 };
 
-export async function listGoogleCalendarMeetEvents(
-  days = 14,
-  pastDays = 30,
-): Promise<{
+export async function listGoogleCalendarMeetEvents(input?: {
+  /** Calendar month to sync, e.g. "2026-08". Defaults to current month. */
+  month?: string;
+}): Promise<{
   connectedAccountEmail: string | null;
   scopesGranted?: string;
   calendarsScanned?: Array<{ id: string; name: string; accessRole?: string }>;
   diagnostics?: CalendarFetchDiagnostics[];
   events: CalendarMeetEvent[];
-  syncSummary?: { imported: number; skipped: number };
+  syncSummary?: {
+    imported: number;
+    skipped: number;
+    alreadyPresent?: number;
+    failed?: number;
+    errors?: string[];
+  };
 }> {
+  const now = new Date();
+  const month =
+    input?.month ??
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   return request<{
     connectedAccountEmail: string | null;
     scopesGranted?: string;
     calendarsScanned?: Array<{ id: string; name: string; accessRole?: string }>;
     diagnostics?: CalendarFetchDiagnostics[];
     events: CalendarMeetEvent[];
-    syncSummary?: { imported: number; skipped: number };
-  }>(`/users/me/calendar/google/events?days=${days}&pastDays=${pastDays}&autoSync=1`);
+    syncSummary?: {
+      imported: number;
+      skipped: number;
+      alreadyPresent?: number;
+      failed?: number;
+      errors?: string[];
+    };
+  }>(`/users/me/calendar/google/events?month=${encodeURIComponent(month)}&autoSync=1`);
 }
 
 export async function syncGoogleCalendarMeetings(): Promise<{

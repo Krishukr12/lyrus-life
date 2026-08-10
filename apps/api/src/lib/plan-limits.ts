@@ -49,12 +49,17 @@ export async function countOrganizationMeetings(organizationId: string): Promise
   return prisma.meeting.count({ where: { organizationId } });
 }
 
+/** Included seats before extras bill. Unlimited plans return a large sentinel for math/UI. */
 export function getIncludedSeats(plan: PlanTier): number {
-  return PLAN_INCLUDED_ALLOWANCES[plan].users;
+  return PLAN_INCLUDED_ALLOWANCES[plan].users ?? Number.MAX_SAFE_INTEGER;
 }
 
 export function getMeetingLimit(plan: PlanTier): number | null {
   return PLAN_INCLUDED_ALLOWANCES[plan].meetings;
+}
+
+export function isForeverFreePlan(plan: PlanTier | string): boolean {
+  return plan === "FOREVER_FREE";
 }
 
 export async function assertOrganizationBillingActive(organizationId: string): Promise<void> {
@@ -127,4 +132,5 @@ export const PLAN_MAX_USERS: Record<PlanTier, number | null> = {
   STARTER: null,
   PROFESSIONAL: null,
   ENTERPRISE: null,
+  FOREVER_FREE: null,
 };

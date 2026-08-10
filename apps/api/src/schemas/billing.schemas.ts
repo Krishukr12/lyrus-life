@@ -13,7 +13,9 @@ export const pricingConfigSchema = z.object({
 });
 
 export const updateOrganizationBillingSchema = z.object({
-  subscriptionPlan: z.enum(["STARTER", "PROFESSIONAL", "ENTERPRISE"]).optional(),
+  subscriptionPlan: z
+    .enum(["STARTER", "PROFESSIONAL", "ENTERPRISE", "FOREVER_FREE"])
+    .optional(),
   billingCycle: z.enum(["monthly", "yearly"]).optional(),
   billingStatus: z.enum(["ACTIVE", "PENDING", "OVERDUE", "TRIAL", "CANCELLED"]).optional(),
   activeLocations: z.coerce.number().int().min(0).max(10_000).optional(),

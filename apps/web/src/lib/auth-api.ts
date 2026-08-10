@@ -17,6 +17,8 @@ export interface AuthOrganization {
   slug: string;
   status: string;
   subscriptionPlan: string;
+  billingStatus?: string | null;
+  trialEndsAt?: string | null;
   logoUrl?: string | null;
   email?: string;
   phone?: string | null;

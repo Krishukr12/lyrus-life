@@ -45,6 +45,7 @@ export function CustomerBillingFilters({
             <SelectItem value="STARTER">Starter</SelectItem>
             <SelectItem value="PROFESSIONAL">Growth</SelectItem>
             <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+            <SelectItem value="FOREVER_FREE">Forever Free</SelectItem>
           </SelectContent>
         </Select>
         <Select

@@ -1,6 +1,6 @@
 import { PLAN_INCLUDED_ALLOWANCES } from "./billing-defaults.js";
 
-export type PlanTier = "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
+export type PlanTier = "STARTER" | "PROFESSIONAL" | "ENTERPRISE" | "FOREVER_FREE";
 
 export type PricingConfigInput = {
   starterMonthlyInr: number;
@@ -37,6 +37,7 @@ function basePlanPrice(
   cycle: "monthly" | "yearly",
   pricing: PricingConfigInput,
 ): number {
+  if (plan === "FOREVER_FREE") return 0;
   if (plan === "STARTER") {
     return cycle === "yearly" ? pricing.starterYearlyInr : pricing.starterMonthlyInr;
   }
@@ -49,9 +50,24 @@ function basePlanPrice(
 export function calculateOrganizationBilling(
   input: BillingCalculationInput,
 ): BillingCalculationResult {
+  if (input.plan === "FOREVER_FREE") {
+    return {
+      basePlanInr: 0,
+      extraUsers: 0,
+      extraUsersCostInr: 0,
+      extraLocations: 0,
+      extraLocationsCostInr: 0,
+      monthlySubtotalInr: 0,
+      gstInr: 0,
+      totalInr: 0,
+    };
+  }
+
   const included = PLAN_INCLUDED_ALLOWANCES[input.plan];
-  const extraUsers = Math.max(0, input.activeUsers - included.users);
-  const extraLocations = Math.max(0, input.activeLocations - included.locations);
+  const extraUsers =
+    included.users == null ? 0 : Math.max(0, input.activeUsers - included.users);
+  const extraLocations =
+    included.locations == null ? 0 : Math.max(0, input.activeLocations - included.locations);
 
   const basePlanInr = basePlanPrice(input.plan, input.billingCycle, input.pricing);
   const extraUsersCostInr = extraUsers * input.pricing.extraUserMonthlyInr;
@@ -78,6 +94,7 @@ export function calculateOrganizationBilling(
 }
 
 export function planDisplayName(plan: PlanTier): string {
+  if (plan === "FOREVER_FREE") return "Forever Free";
   if (plan === "PROFESSIONAL") return "Growth";
   return plan.charAt(0) + plan.slice(1).toLowerCase();
 }

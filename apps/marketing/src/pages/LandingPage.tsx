@@ -1,12 +1,6 @@
 import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  ChevronDown,
-  Download,
-  Mail,
-  MessageSquare,
-  Video,
-} from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
+import { LogoIcon } from "@/components/BrandMark";
 import { Navbar } from "@/components/Navbar";
 import { Hero, featureCards } from "@/components/Hero";
 import { appLink, cn } from "@/lib/utils";
@@ -91,30 +85,46 @@ function SectionHeading({
   description,
   id,
   dark = false,
+  align = "center",
 }: {
   eyebrow: string;
   title: string;
   description: string;
   id?: string;
   dark?: boolean;
+  align?: "center" | "left";
 }) {
   return (
-    <div className="max-w-2xl mx-auto text-center mb-14 space-y-4">
+    <div
+      className={cn(
+        "max-w-2xl mb-16 space-y-4",
+        align === "center" ? "mx-auto text-center" : "text-left",
+      )}
+    >
       <p
         className={cn(
-          "text-sm font-medium uppercase tracking-[0.14em]",
-          dark ? "text-teal-300" : "text-teal-700",
+          "text-[12px] font-semibold uppercase tracking-[0.18em]",
+          dark ? "text-brand" : "text-teal-700",
         )}
       >
         {eyebrow}
       </p>
       <h2
         id={id}
-        className={cn("text-3xl md:text-4xl font-bold", dark ? "text-white" : "text-[hsl(var(--ink))]")}
+        className={cn(
+          "text-3xl md:text-[2.65rem] font-bold leading-[1.12] text-balance",
+          dark ? "text-white" : "text-ink",
+        )}
       >
         {title}
       </h2>
-      <p className={cn("text-lg leading-relaxed", dark ? "text-white/65" : "text-slate-600")}>
+      <p
+        className={cn(
+          "text-lg leading-relaxed",
+          dark ? "text-white/60" : "text-slate-600",
+          align === "center" && "mx-auto",
+        )}
+      >
         {description}
       </p>
     </div>
@@ -128,48 +138,47 @@ export default function LandingPage() {
       <main>
         <Hero />
 
-        {/* Social proof strip */}
-        <section className="border-y border-slate-200/80 bg-white py-8" aria-label="Platform highlights">
-          <div className="container flex flex-wrap justify-center gap-x-12 gap-y-4 text-sm text-slate-500">
-            <span className="flex items-center gap-2">
-              <Video className="h-4 w-4 text-teal" aria-hidden /> Google Meet & Teams ready
-            </span>
-            <span className="flex items-center gap-2">
-              <Download className="h-4 w-4 text-teal" aria-hidden /> PDF · DOCX · JSON export
-            </span>
-            <span className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-teal" aria-hidden /> Email on approval only
-            </span>
-            <span className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-teal" aria-hidden /> Action items → tasks
-            </span>
-          </div>
-        </section>
-
         {/* Features */}
-        <section id="features" className="section-pad bg-[hsl(var(--mist))]" aria-labelledby="features-heading">
+        <section
+          id="features"
+          className="section-pad bg-mist"
+          aria-labelledby="features-heading"
+        >
           <div className="container">
             <SectionHeading
               id="features-heading"
               eyebrow="Features"
               title="Meeting intelligence that respects your process"
-              description="Not another note-taker that spams your team. Meeting Desk AI fits how Indian businesses actually close meetings — with a signed-off MOM."
+              description="Not another note-taker that spams your team. Meeting Desk AI fits how Indian businesses close meetings — with a signed-off MOM."
             />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-slate-200/90">
               {featureCards.map((f, i) => (
                 <motion.article
                   key={f.title}
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ delay: i * 0.06 }}
-                  className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-card hover:shadow-lg hover:border-brand/30 transition-all"
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ delay: i * 0.05, duration: 0.45 }}
+                  className={cn(
+                    "group py-8 md:py-10 border-b border-slate-200/90",
+                    i % 2 === 0 && "md:pr-8 md:border-r",
+                    i % 2 === 1 && "md:pl-8",
+                  )}
                 >
-                  <div className="h-11 w-11 rounded-xl bg-teal-soft flex items-center justify-center text-teal-700 mb-4">
-                    <f.icon className="h-5 w-5" aria-hidden />
+                  <div className="flex items-start gap-4">
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-soft text-teal-800 transition-colors group-hover:bg-brand group-hover:text-navy-deep">
+                      <f.icon className="h-4 w-4" aria-hidden />
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-semibold text-lg text-ink mb-2">
+                        {f.title}
+                      </h3>
+                      <p className="text-slate-600 text-[15px] leading-relaxed">
+                        {f.description}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="font-heading font-semibold text-lg mb-2">{f.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{f.description}</p>
                 </motion.article>
               ))}
             </div>
@@ -177,29 +186,45 @@ export default function LandingPage() {
         </section>
 
         {/* How it works */}
-        <section id="how-it-works" className="section-pad bg-white" aria-labelledby="how-heading">
+        <section
+          id="how-it-works"
+          className="section-pad bg-white"
+          aria-labelledby="how-heading"
+        >
           <div className="container">
             <SectionHeading
               id="how-heading"
               eyebrow="How it works"
-              title="From calendar invite to approved MOM in four steps"
+              title="From calendar invite to approved MOM"
               description="Whether you host on Google Meet or join someone else's call — if it's on your connected calendar, Meeting Desk AI has you covered."
             />
-            <ol className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 list-none">
+
+            <ol className="relative max-w-3xl mx-auto list-none space-y-0">
+              <div
+                className="absolute left-[1.15rem] top-3 bottom-3 w-px bg-gradient-to-b from-brand via-slate-200 to-slate-200 md:left-[1.4rem]"
+                aria-hidden
+              />
               {steps.map((s, i) => (
-                <li
+                <motion.li
                   key={s.step}
-                  className="relative rounded-2xl border border-slate-200 bg-[hsl(var(--mist))] p-6"
+                  initial={{ opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ delay: i * 0.07, duration: 0.45 }}
+                  className="relative flex gap-5 md:gap-7 pb-10 last:pb-0"
                 >
-                  <span className="font-heading text-4xl font-bold text-brand/25">{s.step}</span>
-                  <h3 className="font-heading font-semibold text-lg mt-2 mb-2">{s.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{s.body}</p>
-                  {i < steps.length - 1 && (
-                    <span className="hidden lg:block absolute -right-3 top-1/2 text-slate-300" aria-hidden>
-                      →
-                    </span>
-                  )}
-                </li>
+                  <span className="relative z-10 flex h-9 w-9 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-full bg-navy-deep font-heading text-xs md:text-sm font-bold text-brand ring-4 ring-white">
+                    {s.step}
+                  </span>
+                  <div className="pt-1 md:pt-2">
+                    <h3 className="font-heading font-semibold text-lg md:text-xl text-ink mb-1.5">
+                      {s.title}
+                    </h3>
+                    <p className="text-[15px] text-slate-600 leading-relaxed max-w-lg">
+                      {s.body}
+                    </p>
+                  </div>
+                </motion.li>
               ))}
             </ol>
           </div>
@@ -208,25 +233,36 @@ export default function LandingPage() {
         {/* Integrations */}
         <section
           id="integrations"
-          className="section-pad bg-[hsl(var(--navy-deep))] text-white"
+          className="section-pad bg-navy-deep text-white relative overflow-hidden"
           aria-labelledby="integrations-heading"
         >
-          <div className="container">
+          <div
+            className="absolute inset-0 bg-hero-mesh opacity-70 pointer-events-none"
+            aria-hidden
+          />
+          <div className="container relative">
             <SectionHeading
               id="integrations-heading"
               dark
+              align="left"
               eyebrow="Integrations"
               title="Works where your meetings already happen"
               description="No rip-and-replace. Connect the calendar you use today and keep your Meet links."
             />
-            <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-              {integrations.map((item) => (
+
+            <div className="grid sm:grid-cols-2 border-t border-white/10">
+              {integrations.map((item, i) => (
                 <div
                   key={item.name}
-                  className="rounded-xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm"
+                  className={cn(
+                    "py-8 border-b border-white/10",
+                    i % 2 === 0 ? "sm:pr-10 sm:border-r" : "sm:pl-10",
+                  )}
                 >
-                  <h3 className="font-heading font-semibold text-teal-200">{item.name}</h3>
-                  <p className="text-sm text-white/60 mt-1">{item.desc}</p>
+                  <h3 className="font-heading font-semibold text-xl text-white mb-2">
+                    {item.name}
+                  </h3>
+                  <p className="text-[15px] text-white/55 leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -234,7 +270,11 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing */}
-        <section id="pricing" className="section-pad bg-[hsl(var(--mist))]" aria-labelledby="pricing-heading">
+        <section
+          id="pricing"
+          className="section-pad bg-mist"
+          aria-labelledby="pricing-heading"
+        >
           <div className="container">
             <SectionHeading
               id="pricing-heading"
@@ -242,32 +282,57 @@ export default function LandingPage() {
               title="Simple plans in INR"
               description="14-day free trial on all plans. GST as applicable. Upgrade as your team grows."
             />
-            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
               {plans.map((plan) => (
                 <article
                   key={plan.name}
                   className={cn(
-                    "rounded-2xl border bg-white p-6 flex flex-col",
+                    "rounded-2xl p-7 flex flex-col transition-shadow",
                     plan.highlighted
-                      ? "border-teal shadow-glow scale-[1.02] md:scale-105"
-                      : "border-slate-200 shadow-card",
+                      ? "bg-navy-deep text-white shadow-glow ring-1 ring-brand/40"
+                      : "bg-white border border-slate-200/90 shadow-card",
                   )}
                 >
                   {plan.highlighted && (
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-teal-700 mb-2">
+                    <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-brand mb-3">
                       Most popular
                     </span>
                   )}
                   <h3 className="font-heading font-bold text-xl">{plan.name}</h3>
-                  <p className="text-sm text-slate-500 mt-1 mb-4">{plan.desc}</p>
-                  <p className="font-heading text-3xl font-bold">
-                    {plan.price}
-                    <span className="text-base font-normal text-slate-500">{plan.period}</span>
+                  <p
+                    className={cn(
+                      "text-sm mt-1.5 mb-5",
+                      plan.highlighted ? "text-white/55" : "text-slate-500",
+                    )}
+                  >
+                    {plan.desc}
                   </p>
-                  <ul className="mt-6 space-y-2 text-sm text-slate-600 flex-1">
+                  <p className="font-heading text-3xl font-bold tracking-tight">
+                    {plan.price}
+                    <span
+                      className={cn(
+                        "text-base font-normal",
+                        plan.highlighted ? "text-white/45" : "text-slate-500",
+                      )}
+                    >
+                      {plan.period}
+                    </span>
+                  </p>
+                  <ul
+                    className={cn(
+                      "mt-7 space-y-2.5 text-sm flex-1",
+                      plan.highlighted ? "text-white/70" : "text-slate-600",
+                    )}
+                  >
                     {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2">
-                        <span className="text-teal mt-0.5" aria-hidden>
+                      <li key={f} className="flex items-start gap-2.5">
+                        <span
+                          className={cn(
+                            "mt-0.5",
+                            plan.highlighted ? "text-brand" : "text-teal-700",
+                          )}
+                          aria-hidden
+                        >
                           ✓
                         </span>
                         {f}
@@ -277,10 +342,10 @@ export default function LandingPage() {
                   <a
                     href={appLink("/login")}
                     className={cn(
-                      "mt-6 block text-center rounded-full py-2.5 text-sm font-semibold transition-colors",
+                      "mt-8 block text-center rounded-full py-3 text-sm font-semibold transition-colors",
                       plan.highlighted
-                        ? "bg-brand text-[hsl(var(--navy-deep))] hover:bg-teal-300"
-                        : "border border-slate-200 hover:border-brand hover:text-teal-800",
+                        ? "bg-brand text-navy-deep hover:bg-teal-300"
+                        : "border border-slate-200 text-ink hover:border-brand hover:text-teal-800",
                     )}
                   >
                     Get started
@@ -293,27 +358,28 @@ export default function LandingPage() {
 
         {/* FAQ */}
         <section id="faq" className="section-pad bg-white" aria-labelledby="faq-heading">
-          <div className="container max-w-3xl">
+          <div className="container max-w-2xl">
             <SectionHeading
               id="faq-heading"
               eyebrow="FAQ"
               title="Common questions"
               description="Everything you need to know before rolling out to your team."
             />
-            <div className="space-y-4">
+            <div className="divide-y divide-slate-200 border-y border-slate-200">
               {faqs.map((item) => (
-                <details
-                  key={item.q}
-                  className="group rounded-xl border border-slate-200 bg-[hsl(var(--mist))] open:bg-white open:shadow-card transition-all"
-                >
-                  <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-medium text-[hsl(var(--ink))] list-none [&::-webkit-details-marker]:hidden">
-                    {item.q}
+                <details key={item.q} className="group py-1">
+                  <summary className="flex cursor-pointer items-center justify-between gap-4 py-5 font-medium text-ink list-none [&::-webkit-details-marker]:hidden">
+                    <span className="text-[15px] md:text-base leading-snug pr-2">
+                      {item.q}
+                    </span>
                     <ChevronDown
-                      className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180"
+                      className="h-4 w-4 shrink-0 text-slate-400 transition-transform duration-300 group-open:rotate-180"
                       aria-hidden
                     />
                   </summary>
-                  <p className="px-5 pb-4 text-sm text-slate-600 leading-relaxed">{item.a}</p>
+                  <p className="pb-5 text-[15px] text-slate-600 leading-relaxed -mt-1">
+                    {item.a}
+                  </p>
                 </details>
               ))}
             </div>
@@ -321,18 +387,26 @@ export default function LandingPage() {
         </section>
 
         {/* CTA */}
-        <section className="section-pad bg-[hsl(var(--navy-deep))] text-white" aria-labelledby="cta-heading">
-          <div className="container text-center max-w-2xl space-y-6">
-            <h2 id="cta-heading" className="text-3xl md:text-4xl font-bold">
+        <section
+          className="relative overflow-hidden bg-navy-deep text-white py-24 md:py-32"
+          aria-labelledby="cta-heading"
+        >
+          <div className="absolute inset-0 bg-hero-mesh pointer-events-none" aria-hidden />
+          <div className="container relative text-center max-w-2xl space-y-7">
+            <h2
+              id="cta-heading"
+              className="text-3xl md:text-[2.75rem] font-bold leading-[1.12] text-balance"
+            >
               Ready to never write MOMs from scratch again?
             </h2>
-            <p className="text-white/65 text-lg">
-              Deploy at <strong className="text-white">meetingdesk.in</strong>. Your team gets clarity;
-              stakeholders get professional minutes — only when you approve.
+            <p className="text-white/60 text-lg leading-relaxed">
+              Deploy at{" "}
+              <span className="text-white font-medium">meetingdesk.in</span>. Your team
+              gets clarity; stakeholders get professional minutes — only when you approve.
             </p>
             <a
               href={appLink("/login")}
-              className="inline-flex items-center gap-2 rounded-full bg-brand px-8 py-3.5 text-sm font-semibold text-[hsl(var(--navy-deep))] shadow-glow hover:bg-teal-300 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full bg-brand px-8 py-3.5 text-sm font-semibold text-navy-deep shadow-glow hover:bg-teal-300 transition-colors"
             >
               Start your free trial
               <ArrowRight className="h-4 w-4" aria-hidden />
@@ -341,36 +415,48 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-12">
-        <div className="container flex flex-col md:flex-row justify-between gap-8">
+      <footer className="bg-white border-t border-slate-200/80 py-14">
+        <div className="container flex flex-col md:flex-row justify-between gap-10">
           <div className="space-y-3 max-w-sm">
-            <p className="font-heading font-bold text-lg">
-              Meeting Desk <span className="text-teal-700">AI</span>
-            </p>
+            <div className="flex items-center gap-2.5">
+              <LogoIcon size={32} className="rounded-xl ring-1 ring-slate-200/80" />
+              <div className="leading-tight">
+                <p className="font-heading font-bold text-lg tracking-tight">
+                  Meeting Desk <span className="text-teal-700">AI</span>
+                </p>
+                <p className="text-[11px] text-slate-400 tracking-wide">by Virtual Edge</p>
+              </div>
+            </div>
             <p className="text-sm text-slate-500 leading-relaxed">
-              AI meeting intelligence for teams in India. Record, transcribe, approve, and share Minutes
-              of Meeting — across Google Meet, Microsoft Teams, and live rooms.
+              AI meeting intelligence for teams in India. Record, transcribe, approve, and
+              share Minutes of Meeting — across Google Meet, Microsoft Teams, and live rooms.
             </p>
           </div>
-          <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm text-slate-600" aria-label="Footer">
-            <a href="#features" className="hover:text-teal-800">
+          <nav
+            className="flex flex-wrap gap-x-8 gap-y-3 text-sm text-slate-600"
+            aria-label="Footer"
+          >
+            <a href="#features" className="hover:text-teal-800 transition-colors">
               Features
             </a>
-            <a href="#pricing" className="hover:text-teal-800">
+            <a href="#pricing" className="hover:text-teal-800 transition-colors">
               Pricing
             </a>
-            <a href="#faq" className="hover:text-teal-800">
+            <a href="#faq" className="hover:text-teal-800 transition-colors">
               FAQ
             </a>
-            <a href={appLink("/login")} className="hover:text-teal-800">
+            <a href={appLink("/login")} className="hover:text-teal-800 transition-colors">
               Log in
             </a>
-            <a href="mailto:contact@virtualedge.in" className="hover:text-teal-800">
+            <a
+              href="mailto:contact@virtualedge.in"
+              className="hover:text-teal-800 transition-colors"
+            >
               Contact
             </a>
           </nav>
         </div>
-        <div className="container mt-8 pt-8 border-t border-slate-100 text-xs text-slate-400 flex flex-wrap justify-between gap-2">
+        <div className="container mt-10 pt-8 border-t border-slate-100 text-xs text-slate-400 flex flex-wrap justify-between gap-2">
           <p>© {new Date().getFullYear()} Meeting Desk AI. All rights reserved.</p>
           <p>meetingdesk.in</p>
         </div>

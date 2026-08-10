@@ -11,11 +11,17 @@ export const DEFAULT_PLATFORM_PRICING = {
   freeTrialDays: 14,
 } as const;
 
-/** Users/locations included in base plan before per-unit charges apply. */
+/** Users/locations included in base plan before per-unit charges apply. `null` = unlimited. */
 export const PLAN_INCLUDED_ALLOWANCES = {
-  STARTER: { users: 5, locations: 1, meetings: 100 },
-  PROFESSIONAL: { users: 20, locations: 5, meetings: 500 },
+  STARTER: { users: 5, locations: 1, meetings: 100 as number | null },
+  PROFESSIONAL: { users: 20, locations: 5, meetings: 500 as number | null },
   ENTERPRISE: { users: 50, locations: 20, meetings: null as number | null },
+  /** Temporary testing plan — no limits, no billing. Remove later. */
+  FOREVER_FREE: {
+    users: null as number | null,
+    locations: null as number | null,
+    meetings: null as number | null,
+  },
 } as const;
 
 export const PLATFORM_BILLING = {

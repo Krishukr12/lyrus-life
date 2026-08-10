@@ -75,13 +75,7 @@ async function issueSession(
     role: string;
     organizationId: string | null;
     mustChangePassword?: boolean;
-    organization?: {
-      id: string;
-      name: string;
-      slug: string;
-      status: string;
-      subscriptionPlan: string;
-    } | null;
+    organization?: ReturnType<typeof serializeOrganization> | null;
   },
 ) {
   const token = await signUserAccessToken(user);
@@ -210,13 +204,7 @@ export function createAuthRouter(): Router {
           organizationId: user.organizationId,
           mustChangePassword: user.mustChangePassword,
           organization: user.organization
-            ? {
-                id: user.organization.id,
-                name: user.organization.name,
-                slug: user.organization.slug,
-                status: user.organization.status,
-                subscriptionPlan: user.organization.subscriptionPlan,
-              }
+            ? serializeOrganization(user.organization)
             : null,
         }),
       );
@@ -396,7 +384,7 @@ export function createAuthRouter(): Router {
         const updated = await prisma.user.update({
           where: { id: user.id },
           data: { passwordHash: await hashPassword(parsed.data.newPassword) },
-          include: { organization: true },
+          include: { organization: { include: { billingProfile: true } } },
         });
 
         res.json(
@@ -407,13 +395,7 @@ export function createAuthRouter(): Router {
             role: updated.role,
             organizationId: updated.organizationId,
             organization: updated.organization
-              ? {
-                  id: updated.organization.id,
-                  name: updated.organization.name,
-                  slug: updated.organization.slug,
-                  status: updated.organization.status,
-                  subscriptionPlan: updated.organization.subscriptionPlan,
-                }
+              ? serializeOrganization(updated.organization)
               : null,
           }),
         );
@@ -477,13 +459,7 @@ export function createAuthRouter(): Router {
             organizationId: result.user.organizationId,
             mustChangePassword: false,
             organization: result.organization
-              ? {
-                  id: result.organization.id,
-                  name: result.organization.name,
-                  slug: result.organization.slug,
-                  status: result.organization.status,
-                  subscriptionPlan: result.organization.subscriptionPlan,
-                }
+              ? serializeOrganization(result.organization)
               : null,
           }),
         );

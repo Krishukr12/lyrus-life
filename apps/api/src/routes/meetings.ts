@@ -2,7 +2,11 @@ import { createReadStream } from "node:fs";
 import { Router } from "express";
 import { AudioStorageBackend, MeetingPlatform, MeetingStatus, MeetingTag, PipelineStep, TaskStatus, UserRole, UserStatus, prisma } from "@lyrus/db";
 import { assertMeetingAccess, meetingsListWhere } from "../lib/meeting-access.js";
-import { assertOrganizationCanCreateMeeting, PlanLimitError } from "../lib/plan-limits.js";
+import {
+  assertOrganizationBillingActive,
+  assertOrganizationCanCreateMeeting,
+  PlanLimitError,
+} from "../lib/plan-limits.js";
 import { generateJoinSlug } from "../lib/join-slug.js";
 import { requireAuthUser } from "../middleware/authenticate.js";
 import { authorize } from "../middleware/authorize.js";
@@ -19,10 +23,8 @@ import {
 } from "../lib/mappers.js";
 import { logAudit } from "../services/audit.js";
 import {
-  createTranscriptFromNotes,
   regenerateMomForMeeting,
   runMeetingPipeline,
-  runNluFromExistingTranscript,
 } from "../services/pipeline.js";
 import {
   getSecureRecordingDownloadUrl,
@@ -44,6 +46,7 @@ import {
   syncExternalRecordingState,
 } from "../services/recording-bot/index.js";
 import { isRecallConfigured } from "../services/recording-bot/recall.js";
+import { isActiveRecordingBotStatus } from "../services/recording-bot/recording-progress.js";
 import { sendMomToStakeholdersOnApproval } from "../services/mom-share.js";
 import { asyncHandler, sendAuthError } from "../lib/http.js";
 import { getMultipartFile, requireRouteParam } from "../lib/route-params.js";
@@ -71,10 +74,55 @@ function mapStatus(status: string): MeetingStatusType {
   }
 }
 
+function sendPlanLimitError(res: import("express").Response, err: unknown): boolean {
+  const code =
+    err instanceof PlanLimitError
+      ? err.code
+      : err &&
+          typeof err === "object" &&
+          "code" in err &&
+          typeof (err as { code: unknown }).code === "string"
+        ? (err as { code: string }).code
+        : null;
+  const message =
+    err instanceof Error
+      ? err.message
+      : "Trial period has ended. Upgrade to continue using the platform.";
+  const statusCode =
+    err instanceof PlanLimitError
+      ? err.statusCode
+      : err &&
+          typeof err === "object" &&
+          "statusCode" in err &&
+          typeof (err as { statusCode: unknown }).statusCode === "number"
+        ? (err as { statusCode: number }).statusCode
+        : 403;
+
+  if (
+    code === "trial_expired" ||
+    code === "billing_overdue" ||
+    code === "billing_cancelled" ||
+    code === "organization_inactive" ||
+    code === "plan_meeting_limit"
+  ) {
+    res.status(statusCode).json({ error: code, message });
+    return true;
+  }
+  return false;
+}
+
 export function createMeetingsRouter(): Router {
   const router = Router();
   router.get("/meetings", asyncHandler(async (req, res) => {
     const user = requireAuthUser(req);
+    if (user.organizationId) {
+      try {
+        await assertOrganizationBillingActive(user.organizationId);
+      } catch (err) {
+        if (sendPlanLimitError(res, err)) return;
+        throw err;
+      }
+    }
     const meetings = await prisma.meeting.findMany({
       where: meetingsListWhere(user),
       include: meetingInclude,
@@ -151,6 +199,23 @@ export function createMeetingsRouter(): Router {
     if (!meeting) {
       res.status(404).json({ error: "Meeting not found" });
         return;
+    }
+
+    // Seal sticky "Everyone has left" only when a draft exists and no one has rejoined.
+    if (
+      meeting.mom &&
+      !isActiveRecordingBotStatus(meeting.recordingBotStatus) &&
+      (meeting.recordingBotStatus !== "done" || meeting.status !== MeetingStatus.COMPLETED)
+    ) {
+      await prisma.meeting.update({
+        where: { id: meeting.id },
+        data: {
+          recordingBotStatus: "done",
+          status: MeetingStatus.COMPLETED,
+        },
+      });
+      meeting.recordingBotStatus = "done";
+      meeting.status = MeetingStatus.COMPLETED;
     }
 
     if (isRecallConfigured() && externalMeetingNeedsLiveRefresh(meeting)) {
@@ -652,30 +717,24 @@ export function createMeetingsRouter(): Router {
       data: { notes, status: MeetingStatus.COMPLETED },
     });
 
+    if (!savedAudio) {
+      res.status(400).json({
+        error:
+          "A recording is required to generate MOM. Notes-only MOM is disabled.",
+      });
+      return;
+    }
+
     try {
-      if (savedAudio) {
-        try {
-          await runMeetingPipeline(meeting.id, {
-            filePath: savedAudio.filePath,
-            mimeType,
-            s3Key: savedAudio.s3Key,
-            s3Bucket: savedAudio.s3Bucket,
-          });
-        } catch (pipelineErr) {
-          console.warn(
-            "Audio pipeline failed — falling back to notes transcript",
-            pipelineErr,
-          );
-          await createTranscriptFromNotes(meeting.id);
-          await runNluFromExistingTranscript(meeting.id);
-        } finally {
-          await savedAudio.cleanup?.();
-        }
-      } else {
-        if (!meeting.transcript) {
-          await createTranscriptFromNotes(meeting.id);
-        }
-        await runNluFromExistingTranscript(meeting.id);
+      try {
+        await runMeetingPipeline(meeting.id, {
+          filePath: savedAudio.filePath,
+          mimeType,
+          s3Key: savedAudio.s3Key,
+          s3Bucket: savedAudio.s3Bucket,
+        });
+      } finally {
+        await savedAudio.cleanup?.();
       }
 
       const refreshed = await prisma.meeting.findUnique({
@@ -691,7 +750,7 @@ export function createMeetingsRouter(): Router {
       res.json({
         ok: true,
         meeting: mapMeeting(refreshed!),
-        transcriptSource: refreshed?.transcript?.source ?? "notes",
+        transcriptSource: refreshed?.transcript?.source ?? null,
       });
     } catch (err) {
       console.error("Complete meeting pipeline failed", err);
@@ -729,31 +788,28 @@ export function createMeetingsRouter(): Router {
     });
 
     try {
-      if (latestAudio) {
-        const materialized = await materializeAudioForProcessing(latestAudio);
-        try {
-          await runMeetingPipeline(meeting.id, {
-            filePath: materialized.filePath,
-            mimeType: latestAudio.mimeType,
-            s3Key: materialized.s3Key,
-            s3Bucket:
-              materialized.storageBackend === AudioStorageBackend.S3
-                ? materialized.s3Bucket
-                : undefined,
-          });
-        } finally {
-          await materialized.cleanup?.();
-        }
-        res.json({ ok: true, message: "MOM generated from audio" });
+      if (!latestAudio) {
+        // Prefer regenerate so a real prior transcript (not notes) can still be used.
+        await regenerateMomForMeeting(meeting.id);
+        res.json({ ok: true, message: "MOM generated from recording transcript" });
         return;
       }
 
-      if (!meeting.transcript) {
-        await createTranscriptFromNotes(meeting.id);
+      const materialized = await materializeAudioForProcessing(latestAudio);
+      try {
+        await runMeetingPipeline(meeting.id, {
+          filePath: materialized.filePath,
+          mimeType: latestAudio.mimeType,
+          s3Key: materialized.s3Key,
+          s3Bucket:
+            materialized.storageBackend === AudioStorageBackend.S3
+              ? materialized.s3Bucket
+              : undefined,
+        });
+      } finally {
+        await materialized.cleanup?.();
       }
-
-      await runNluFromExistingTranscript(meeting.id);
-      res.json({ ok: true, message: "MOM generated from meeting notes" });
+      res.json({ ok: true, message: "MOM generated from audio" });
       return;
     } catch (err) {
       console.error("Pipeline failed", err);
@@ -834,6 +890,9 @@ export function createMeetingsRouter(): Router {
       data: {
         keyPoints: parsed.data.keyPoints as unknown as Prisma.InputJsonValue,
         actionItems: parsed.data.actionItems as unknown as Prisma.InputJsonValue,
+        ...(parsed.data.sections !== undefined
+          ? { sections: parsed.data.sections as unknown as Prisma.InputJsonValue }
+          : {}),
         approved: false,
         shared: false,
         approvedBy: null,
@@ -863,11 +922,12 @@ export function createMeetingsRouter(): Router {
         return;
     }
 
+    // MOM exists ⇒ treat as finishable. Sync polls previously left PROCESSING and blocked approve.
     if (meeting.status !== MeetingStatus.COMPLETED) {
-      res.status(400).json({
-        error: "Meeting must be finished before MOM can be approved and shared",
+      await prisma.meeting.update({
+        where: { id: meeting.id },
+        data: { status: MeetingStatus.COMPLETED },
       });
-        return;
     }
 
     const approvedBy = user.name;
@@ -929,6 +989,14 @@ export function createMeetingsRouter(): Router {
 
   router.get("/tasks", asyncHandler(async (req, res) => {
     const user = requireAuthUser(req);
+    if (user.organizationId) {
+      try {
+        await assertOrganizationBillingActive(user.organizationId);
+      } catch (err) {
+        if (sendPlanLimitError(res, err)) return;
+        throw err;
+      }
+    }
     const meetingFilter = meetingsListWhere(user);
     const items = await prisma.actionItem.findMany({
       where: {

@@ -247,6 +247,14 @@ export const invoiceService = {
       throw new InvoiceServiceError("not_found", "Organization not found", 404);
     }
 
+    if (ctx.org.subscriptionPlan === "FOREVER_FREE") {
+      throw new InvoiceServiceError(
+        "forever_free_no_invoice",
+        "Forever Free organizations are not billed",
+        400,
+      );
+    }
+
     const now = new Date();
     const periodStart = ctx.profile?.currentPeriodStart ?? startOfMonth(now);
     const periodEnd = ctx.profile?.currentPeriodEnd ?? endOfMonth(now);
@@ -263,7 +271,7 @@ export const invoiceService = {
       billingCycle: ctx.billingCycle,
       periodStart,
       periodEnd,
-      includedSeats: ctx.included.users,
+      includedSeats: ctx.included.users ?? 0,
       activeSeats: ctx.activeUsers,
       additionalSeats: ctx.amounts.extraUsers,
       subtotalInr: ctx.amounts.cycleSubtotalInr,
@@ -285,10 +293,10 @@ export const invoiceService = {
       billingCycle: ctx.billingCycle,
       periodStart,
       periodEnd,
-      includedSeats: ctx.included.users,
+      includedSeats: ctx.included.users ?? 0,
       activeSeats: ctx.activeUsers,
       additionalSeats: ctx.amounts.extraUsers,
-      includedLocations: ctx.included.locations,
+      includedLocations: ctx.included.locations ?? 0,
       activeLocations: ctx.activeLocations,
       subtotalInr: ctx.amounts.cycleSubtotalInr,
       discountInr: ctx.amounts.discountInr,

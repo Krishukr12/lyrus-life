@@ -111,7 +111,8 @@ export async function buildSeatBillingPreview(
     projectedTotalInr: projected.amounts.totalInr,
     additionalMonthlyCostInr,
     additionalAnnualCostInr,
-    requiresConfirmation: projectedActiveSeats > includedSeats,
+    requiresConfirmation:
+      plan !== "FOREVER_FREE" && projectedActiveSeats > includedSeats,
     gstPercent: pricing.gstPercent,
   };
 }

@@ -115,6 +115,8 @@ export default function IntegrationsPage() {
                     <h2 className="font-heading font-semibold">{provider.name}</h2>
                     {connected ? (
                       <Badge variant="secondary" className="text-[10px]">Connected</Badge>
+                    ) : !serverConfigured && provider.id === "microsoft" ? (
+                      <Badge variant="outline" className="text-[10px]">Coming soon</Badge>
                     ) : (
                       <Badge variant="outline" className="text-[10px]">Not connected</Badge>
                     )}
@@ -162,6 +164,10 @@ export default function IntegrationsPage() {
                       )}
                       Disconnect
                     </Button>
+                  ) : !serverConfigured && provider.id === "microsoft" ? (
+                    <Button size="sm" variant="outline" disabled>
+                      Coming soon
+                    </Button>
                   ) : (
                     <Button
                       size="sm"
@@ -179,9 +185,22 @@ export default function IntegrationsPage() {
                   )}
                 </div>
               </div>
-              {!serverConfigured ? (
+              {!serverConfigured && provider.id === "google" ? (
                 <p className="text-xs text-amber-600 dark:text-amber-400">
-                  Not configured on this server — ask your admin to set OAuth credentials.
+                  Not configured on this server — set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in the
+                  API .env, then restart the API.
+                  {data?.config.google?.missingEnv?.length ? (
+                    <>
+                      {" "}
+                      Missing:{" "}
+                      <code className="text-[11px]">{data.config.google.missingEnv.join(", ")}</code>
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
+              {!serverConfigured && provider.id === "microsoft" ? (
+                <p className="text-xs text-muted-foreground">
+                  We&apos;re working on Microsoft Teams integration — stay tuned.
                 </p>
               ) : null}
             </Card>

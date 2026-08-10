@@ -1,8 +1,10 @@
-import { generateMomPdfBytes } from "@lyrus/mom-pdf";
+import { generateMomPdfBytes, type MomPdfBranding } from "@lyrus/mom-pdf";
 import { Packer, Paragraph, TextRun, AlignmentType, Table, TableCell, TableRow, WidthType, BorderStyle } from "docx";
 import { Meeting, MOM } from "./types";
 
 type SupportedMomFormat = "docx" | "pdf" | "txt" | "json";
+
+export type MomExportBranding = MomPdfBranding;
 
 interface TemplateActionItem {
   slNo: number;
@@ -13,6 +15,16 @@ interface TemplateActionItem {
 }
 
 const STATUS_ROTATION = ["Open", "Closed", "In Progress"] as const;
+
+function resolveBranding(branding?: MomExportBranding): MomPdfBranding & { brandName: string } {
+  const brandName = branding?.brandName?.trim() || "Meeting Desk AI";
+  return {
+    ...branding,
+    brandName,
+    // If an org name is provided, don't fall back to the old Lyrus tagline.
+    tagline: branding?.tagline?.trim() || (branding?.brandName?.trim() ? "" : undefined),
+  };
+}
 
 function safeFilename(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -55,8 +67,9 @@ function createHeadingCell(text: string) {
   });
 }
 
-async function createDocxBlob(meeting: Meeting, mom: MOM): Promise<Blob> {
+async function createDocxBlob(meeting: Meeting, mom: MOM, branding?: MomExportBranding): Promise<Blob> {
   const fields = getTemplateFields(meeting, mom);
+  const brand = resolveBranding(branding);
   const actionHeader = ["Sl No", "Action Item", "Responsibility", "Status", "Timeline"];
 
   const tableRows = [
@@ -92,13 +105,17 @@ async function createDocxBlob(meeting: Meeting, mom: MOM): Promise<Blob> {
 
   const paragraphs = [
     new Paragraph({
-      children: [new TextRun({ text: "LYRUS", bold: true, color: "1C8D95", size: 28 })],
+      children: [new TextRun({ text: brand.brandName.toUpperCase(), bold: true, color: "1C8D95", size: 28 })],
       alignment: AlignmentType.CENTER,
     }),
-    new Paragraph({
-      children: [new TextRun({ text: "Think • Design • Deliver", italics: true, color: "1C8D95", size: 16 })],
-      alignment: AlignmentType.CENTER,
-    }),
+    ...(brand.tagline
+      ? [
+          new Paragraph({
+            children: [new TextRun({ text: brand.tagline, italics: true, color: "1C8D95", size: 16 })],
+            alignment: AlignmentType.CENTER,
+          }),
+        ]
+      : []),
     new Paragraph(""),
     new Paragraph({
       text: "Minutes of Meeting",
@@ -118,7 +135,19 @@ async function createDocxBlob(meeting: Meeting, mom: MOM): Promise<Blob> {
     new Paragraph(""),
   ];
 
+  const sectionParagraphs =
+    Array.isArray(mom.sections) && mom.sections.length > 0
+      ? mom.sections.flatMap((section) => [
+          new Paragraph(""),
+          new Paragraph({ children: [new TextRun({ text: section.title, bold: true })] }),
+          ...(section.content.length > 0
+            ? section.content.map((line) => new Paragraph(`  • ${line}`))
+            : [new Paragraph("  —")]),
+        ])
+      : [];
+
   const closingParagraphs = [
+    ...sectionParagraphs,
     new Paragraph(""),
     new Paragraph({ children: [new TextRun({ text: "Next Steps", bold: true })] }),
     ...fields.nextSteps.map((step) => new Paragraph(`  [${step}]`)),
@@ -141,12 +170,13 @@ async function createDocxBlob(meeting: Meeting, mom: MOM): Promise<Blob> {
   return Packer.toBlob(doc);
 }
 
-function createTextBlob(meeting: Meeting, mom: MOM): Blob {
+function createTextBlob(meeting: Meeting, mom: MOM, branding?: MomExportBranding): Blob {
   const fields = getTemplateFields(meeting, mom);
+  const brand = resolveBranding(branding);
   const lines = [
     "Minutes of Meeting",
     "==================",
-    "LYRUS | Think - Design - Deliver",
+    brand.tagline ? `${brand.brandName} | ${brand.tagline}` : brand.brandName,
     "",
     `Date: ${fields.date}`,
     `Meeting Title: ${fields.meetingTitle}`,
@@ -175,11 +205,12 @@ function createJsonBlob(meeting: Meeting, mom: MOM): Blob {
   return new Blob([JSON.stringify(fields, null, 2)], { type: "application/json;charset=utf-8" });
 }
 
-function toMomPdfInput(meeting: Meeting, mom: MOM) {
+function toMomPdfInput(meeting: Meeting, mom: MOM, branding?: MomExportBranding) {
   return {
     meetingTitle: meeting.title,
     meetingDate: `${meeting.date}`,
     durationMinutes: meeting.duration,
+    branding: resolveBranding(branding),
     sections: mom.sections?.length ? mom.sections : undefined,
     mom: {
       createdAt: mom.createdAt,
@@ -190,9 +221,16 @@ function toMomPdfInput(meeting: Meeting, mom: MOM) {
   };
 }
 
-export async function createMomPdfBlob(meeting: Meeting, mom: MOM): Promise<Blob> {
-  const bytes = generateMomPdfBytes(toMomPdfInput(meeting, mom));
-  return new Blob([bytes], { type: "application/pdf" });
+export async function createMomPdfBlob(
+  meeting: Meeting,
+  mom: MOM,
+  branding?: MomExportBranding,
+): Promise<Blob> {
+  const bytes = generateMomPdfBytes(toMomPdfInput(meeting, mom, branding));
+  // Copy into a fresh ArrayBuffer so Blob parts are always a plain BufferSource.
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return new Blob([copy.buffer], { type: "application/pdf" });
 }
 
 function triggerDownload(blob: Blob, fileName: string) {
@@ -206,23 +244,28 @@ function triggerDownload(blob: Blob, fileName: string) {
   URL.revokeObjectURL(url);
 }
 
-export async function downloadMomFile(meeting: Meeting, mom: MOM, format: SupportedMomFormat) {
+export async function downloadMomFile(
+  meeting: Meeting,
+  mom: MOM,
+  format: SupportedMomFormat,
+  branding?: MomExportBranding,
+) {
   const base = safeFilename(`${meeting.title}-mom`) || "meeting-mom";
 
   if (format === "docx") {
-    const docxBlob = await createDocxBlob(meeting, mom);
+    const docxBlob = await createDocxBlob(meeting, mom, branding);
     triggerDownload(docxBlob, `${base}.docx`);
     return;
   }
 
   if (format === "pdf") {
-    const pdfBlob = await createMomPdfBlob(meeting, mom);
+    const pdfBlob = await createMomPdfBlob(meeting, mom, branding);
     triggerDownload(pdfBlob, `${base}.pdf`);
     return;
   }
 
   if (format === "txt") {
-    triggerDownload(createTextBlob(meeting, mom), `${base}.txt`);
+    triggerDownload(createTextBlob(meeting, mom, branding), `${base}.txt`);
     return;
   }
 

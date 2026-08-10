@@ -12,7 +12,12 @@ export const tenantUserRoleSchema = z.enum([
 
 export const organizationStatusSchema = z.enum(["ACTIVE", "SUSPENDED", "PENDING"]);
 
-export const subscriptionPlanSchema = z.enum(["STARTER", "PROFESSIONAL", "ENTERPRISE"]);
+export const subscriptionPlanSchema = z.enum([
+  "STARTER",
+  "PROFESSIONAL",
+  "ENTERPRISE",
+  "FOREVER_FREE",
+]);
 
 export const userStatusSchema = z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]);
 

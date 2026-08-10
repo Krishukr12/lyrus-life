@@ -1,27 +1,26 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   getMeeting,
   updateMeeting,
   generateMOM,
-  editMOM,
   approveMOM,
   uploadMeetingAudio,
   resendMeetingInvites,
   rescheduleMeetingRecordingBot,
   syncMeetingRecording,
 } from "@/lib/api";
-import { ActionItem, Meeting } from "@/lib/types";
+import { Meeting, MOM } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { StatusBadge, TagBadge } from "@/components/StatusBadge";
 import { MomStakeholderBadge } from "@/components/MomStakeholderBadge";
 import { ExternalRecordingProgress } from "@/components/ExternalRecordingProgress";
+import { MomInlineEditor, type MomInlineEditorHandle } from "@/components/MomInlineEditor";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft,
   Clock,
@@ -35,14 +34,17 @@ import {
   Download,
   Eye,
   ShieldCheck,
-  PencilLine,
   Mail,
   Send,
+  NotebookPen,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { createMomPdfBlob, downloadMomFile } from "@/lib/mom-export";
 import { getCurrentUserDisplayName } from "@/lib/current-user";
+import { useAuth } from "@/contexts/AuthContext";
+import { APP_NAME } from "@/lib/brand";
 
 /** Avoid white-screen crashes when API returns partial mom/transcript shapes */
 function normalizeMeeting(m: Meeting): Meeting {
@@ -72,33 +74,84 @@ function normalizeMeeting(m: Meeting): Meeting {
   };
 }
 
+/** Ignore poll payloads that only churn object identity (prevents scroll/draft jumps). */
+function meetingPollFingerprint(m: Meeting): string {
+  return [
+    m.status,
+    m.pipelineStatus ?? "",
+    m.recordingBotStatus ?? "",
+    m.recordingProgress?.phase ?? "",
+    String(m.recordingProgress?.step ?? ""),
+    m.mom?.id ?? "",
+    m.mom?.approved ? "1" : "0",
+    m.mom?.shared ? "1" : "0",
+    m.mom?.lastEditedAt ?? m.mom?.createdAt ?? "",
+    String(Array.isArray(m.mom?.actionItems) ? m.mom.actionItems.length : 0),
+    String(Array.isArray(m.mom?.keyPoints) ? m.mom.keyPoints.length : 0),
+    String(Array.isArray(m.transcript?.segments) ? m.transcript.segments.length : 0),
+    m.notes ?? "",
+  ].join("|");
+}
+
 export default function MeetingDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { organization } = useAuth();
+  const momBranding = {
+    brandName: organization?.name?.trim() || APP_NAME,
+  };
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState("");
   const [generatingMom, setGeneratingMom] = useState(false);
-  const [downloadingFormat, setDownloadingFormat] = useState<"docx" | "pdf" | "txt" | "json" | null>(null);
+  const [downloadingFormat, setDownloadingFormat] = useState<"docx" | "txt" | "json" | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [editingMom, setEditingMom] = useState(false);
   const [approvingMom, setApprovingMom] = useState(false);
-  const [momKeyPointsDraft, setMomKeyPointsDraft] = useState("");
-  const [momActionItemsDraft, setMomActionItemsDraft] = useState("");
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [resendingInvites, setResendingInvites] = useState(false);
   const audioInputRef = useRef<HTMLInputElement>(null);
+  const momEditorRef = useRef<MomInlineEditorHandle>(null);
+  const didScrollToMom = useRef(false);
+  const [detailTab, setDetailTab] = useState<"overview" | "capture" | "mom">("overview");
+  const [showAllStakeholders, setShowAllStakeholders] = useState(false);
+
+  const applyMeetingUpdate = useCallback((updated: Meeting) => {
+    const normalized = normalizeMeeting(updated);
+    setMeeting((prev) => {
+      let next = normalized;
+      // Once a MOM draft exists, never let sync polls downgrade status to "ongoing"
+      // (PROCESSING maps to ongoing) — that was flapping Approve & send.
+      if (
+        prev?.mom &&
+        next.mom &&
+        prev.status === "completed" &&
+        next.status !== "completed" &&
+        next.status !== "failed"
+      ) {
+        next = { ...next, status: "completed", pipelineStatus: undefined };
+      }
+      if (prev && meetingPollFingerprint(prev) === meetingPollFingerprint(next)) {
+        return prev;
+      }
+      return next;
+    });
+    return normalized;
+  }, []);
 
   const refreshMeeting = useCallback(async () => {
     if (!id) return;
     const m = await getMeeting(id);
     if (!m) return undefined;
-    const normalized = normalizeMeeting(m);
-    setMeeting(normalized);
-    setNotes(normalized.notes);
+    const normalized = applyMeetingUpdate(m);
+    setNotes((prev) => (prev === normalized.notes ? prev : normalized.notes));
     return normalized;
+  }, [id, applyMeetingUpdate]);
+
+  useEffect(() => {
+    didScrollToMom.current = false;
   }, [id]);
 
   useEffect(() => {
@@ -106,13 +159,49 @@ export default function MeetingDetail() {
     refreshMeeting().finally(() => setLoading(false));
   }, [id, refreshMeeting]);
 
+  // Early Google Meet / Teams start: if a bot is only booked for later (e.g. tomorrow),
+  // opening the meeting page (or clicking Join) replaces it with an immediate join bot.
   useEffect(() => {
+    if (!id || !meeting) return;
+    const external =
+      meeting.platform === "google_meet" || meeting.platform === "microsoft_teams";
+    if (!external || !meeting.externalMeetingUrl) return;
+    if (meeting.status === "completed" || meeting.status === "failed") return;
+    if (
+      meeting.recordingBotStatus === "processing" ||
+      meeting.recordingBotStatus === "done" ||
+      meeting.recordingBotStatus === "call_ended" ||
+      meeting.recordingBotStatus === "failed"
+    ) {
+      return;
+    }
+    if (meeting.mom) return;
+
+    const scheduledMs = new Date(meeting.scheduledAt).getTime();
+    if (Number.isNaN(scheduledMs)) return;
+    const now = Date.now();
+    // Allow joining up to 48h early; ignore far-future calendar browsing.
+    const earlyWindowStart = scheduledMs - 48 * 60 * 60 * 1000;
+    const meetingEnd = scheduledMs + meeting.duration * 60_000 + 60 * 60_000;
+    if (now < earlyWindowStart || now > meetingEnd) return;
+
+    void rescheduleMeetingRecordingBot(id)
+      .then((updated) => applyMeetingUpdate(updated))
+      .catch(() => {
+        /* Join button still retries; ignore first-pass failures while browsing */
+      });
+    // Intentionally once per meeting id load — not on every status poll.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- kick early-join only when meeting identity loads
+  }, [id, meeting?.platform, meeting?.externalMeetingUrl]);
+
+  useEffect(() => {
+    if (meeting?.mom) return;
     if (!meeting?.pipelineStatus || meeting.pipelineStatus !== "processing") return;
     const interval = setInterval(() => {
       void refreshMeeting();
     }, 3000);
     return () => clearInterval(interval);
-  }, [meeting?.pipelineStatus, refreshMeeting]);
+  }, [meeting?.pipelineStatus, meeting?.mom?.id, refreshMeeting]);
 
   // Poll Recall for live status + MOM pipeline (local dev often has no webhook URL).
   useEffect(() => {
@@ -122,6 +211,18 @@ export default function MeetingDetail() {
     if (!external) return;
 
     const botStatus = meeting.recordingBotStatus;
+    // Stop Recall churn once MOM is ready — unless the bot was sent back for a rejoin.
+    const rejoined =
+      botStatus === "joining" ||
+      botStatus === "waiting_room" ||
+      botStatus === "in_call" ||
+      botStatus === "recording" ||
+      botStatus === "scheduling" ||
+      botStatus === "scheduled";
+    if (meeting.mom && !rejoined) {
+      return;
+    }
+
     const shouldPoll =
       Boolean(meeting.recordingProgress?.isLive) ||
       Boolean(meeting.recordingProgress?.isProcessing) ||
@@ -139,7 +240,7 @@ export default function MeetingDetail() {
 
     const poll = () => {
       void syncMeetingRecording(id)
-        .then(({ meeting: updated }) => setMeeting(normalizeMeeting(updated)))
+        .then(({ meeting: updated }) => applyMeetingUpdate(updated))
         .catch(() => {
           // ignore transient poll errors
         });
@@ -150,9 +251,11 @@ export default function MeetingDetail() {
     return () => clearInterval(interval);
   }, [
     id,
+    applyMeetingUpdate,
     meeting?.platform,
     meeting?.recordingBotStatus,
     meeting?.pipelineStatus,
+    meeting?.mom?.id,
     meeting?.recordingProgress?.isLive,
     meeting?.recordingProgress?.isProcessing,
     meeting?.recordingProgress?.phase,
@@ -160,26 +263,18 @@ export default function MeetingDetail() {
 
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (previewUrl) URL.revokeObjectURL(previewUrl.split("#")[0] ?? previewUrl);
     };
   }, [previewUrl]);
 
+  // Deep-link /Mom pending → open MOM tab once (no long-page scroll needed).
   useEffect(() => {
-    if (!meeting?.mom) {
-      setMomKeyPointsDraft("");
-      setMomActionItemsDraft("");
-      return;
+    if (loading || !meeting || didScrollToMom.current) return;
+    if (location.hash === "#mom" || (meeting.mom && !meeting.mom.approved)) {
+      setDetailTab("mom");
+      didScrollToMom.current = true;
     }
-
-    const keyPoints = Array.isArray(meeting.mom.keyPoints) ? meeting.mom.keyPoints : [];
-    const actionItems = Array.isArray(meeting.mom.actionItems) ? meeting.mom.actionItems : [];
-    setMomKeyPointsDraft(keyPoints.join("\n"));
-    setMomActionItemsDraft(
-      actionItems
-        .map((item) => `${item.task ?? ""} | ${item.assignee ?? ""} | ${item.deadline ?? ""}`)
-        .join("\n"),
-    );
-  }, [meeting?.mom]);
+  }, [loading, meeting?.id, location.hash, meeting?.mom?.id, meeting?.mom?.approved]);
 
   const saveNotes = async () => {
     if (!meeting) return;
@@ -203,7 +298,7 @@ export default function MeetingDetail() {
       window.open(meeting.externalMeetingUrl, "_blank", "noopener,noreferrer");
       // Server is idempotent: reuses bot on first join, schedules a new one only after prior session ended.
       void rescheduleMeetingRecordingBot(meeting.id)
-        .then((updated) => setMeeting(normalizeMeeting(updated)))
+        .then((updated) => applyMeetingUpdate(updated))
         .catch((err) => {
           toast.error(err instanceof Error ? err.message : "Could not schedule recording bot");
         });
@@ -248,7 +343,7 @@ export default function MeetingDetail() {
       ? "Google Meet"
       : meeting?.platform === "microsoft_teams"
         ? "Microsoft Teams"
-        : "Lyrus Live";
+        : APP_NAME;
 
   const handleResendInvites = async () => {
     if (!meeting) return;
@@ -296,59 +391,42 @@ export default function MeetingDetail() {
     toast.success("MOM generated successfully!");
   };
 
-  const parseActionItemsDraft = (): ActionItem[] => {
-    return momActionItemsDraft
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => {
-        const [task = "", assignee = "", deadline = ""] = line.split("|").map((part) => part.trim());
-        return { task, assignee, deadline };
-      })
-      .filter((item) => item.task);
-  };
+  const handleMomSaved = useCallback((savedMom: MOM) => {
+    setMeeting((prev) => {
+      if (!prev) return prev;
+      return normalizeMeeting({
+        ...prev,
+        // Keep status completed so Approve stays stable across sync polls.
+        status: prev.status === "failed" ? prev.status : "completed",
+        mom: {
+          ...prev.mom!,
+          ...savedMom,
+          keyPoints: Array.isArray(savedMom.keyPoints) ? savedMom.keyPoints : [],
+          actionItems: Array.isArray(savedMom.actionItems) ? savedMom.actionItems : [],
+          participants: Array.isArray(savedMom.participants)
+            ? savedMom.participants
+            : prev.mom?.participants ?? [],
+          sections: Array.isArray(savedMom.sections)
+            ? savedMom.sections
+            : prev.mom?.sections,
+        },
+      });
+    });
+  }, []);
 
-  const handleSaveMomEdits = async () => {
-    if (!meeting?.mom) return;
-    const keyPoints = momKeyPointsDraft.split("\n").map((p) => p.trim()).filter(Boolean);
-    const actionItems = parseActionItemsDraft();
-
-    if (keyPoints.length === 0) {
-      toast.error("Add at least one key discussion point.");
-      return;
-    }
-
-    if (actionItems.length === 0) {
-      toast.error("Add at least one action item.");
-      return;
-    }
-
-    setEditingMom(true);
-    try {
-      await editMOM(meeting.id, { keyPoints, actionItems });
-      const updated = await getMeeting(meeting.id);
-      if (updated) setMeeting(updated);
-      toast.success("MOM updated. Re-approval is required before sharing.");
-    } catch {
-      toast.error("Failed to save MOM edits");
-    } finally {
-      setEditingMom(false);
-    }
-  };
-
-  const canApproveMom =
-    Boolean(meeting?.mom) &&
-    !meeting?.mom?.approved &&
-    meeting?.status === "completed";
+  // MOM draft ready => approval eligible. Do not depend on transient sync status.
+  const canApproveMom = Boolean(meeting?.mom) && !meeting?.mom?.approved;
 
   const handleApproveMom = async () => {
     if (!meeting?.mom) return;
-    if (meeting.status !== "completed") {
-      toast.error("Meeting must finish before MOM can be approved and shared.");
-      return;
-    }
     setApprovingMom(true);
     try {
+      // Flush pending inline edits so Approve never races with autosave/sync.
+      const saved = await momEditorRef.current?.flushSave();
+      if (!saved && momEditorRef.current?.isBusy()) {
+        toast.error("Could not save your latest MOM edits. Try again.");
+        return;
+      }
       await approveMOM(meeting.id);
       const updated = await getMeeting(meeting.id);
       if (updated) setMeeting(updated);
@@ -367,12 +445,21 @@ export default function MeetingDetail() {
     }
   };
 
-  const handleDownloadFormat = async (format: "docx" | "pdf" | "txt" | "json") => {
+  const resolveMomForExport = async (): Promise<MOM | null> => {
+    if (!meeting?.mom) return null;
+    // Flush so server/state catch up, but always prefer live editor snapshot for export.
+    await momEditorRef.current?.flushSave().catch(() => null);
+    return momEditorRef.current?.getSnapshot() ?? meeting.mom;
+  };
+
+  const handleDownloadFormat = async (format: "docx" | "txt" | "json") => {
     if (!meeting?.mom) return;
     setDownloadingFormat(format);
     try {
-      await downloadMomFile(meeting, meeting.mom, format);
-      toast.success(`MOM downloaded as ${format.toUpperCase()}`);
+      const momForExport = await resolveMomForExport();
+      if (!momForExport) return;
+      await downloadMomFile(meeting, momForExport, format, momBranding);
+      toast.success(`Downloaded ${format.toUpperCase()} (local only — not sent to stakeholders)`);
     } catch {
       toast.error(`Failed to download ${format.toUpperCase()} file`);
     } finally {
@@ -384,13 +471,16 @@ export default function MeetingDetail() {
     if (!meeting?.mom) return;
     setPreviewLoading(true);
     try {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      const pdfBlob = await createMomPdfBlob(meeting, meeting.mom);
-      const url = URL.createObjectURL(pdfBlob);
-      setPreviewUrl(url);
+      const momForExport = await resolveMomForExport();
+      if (!momForExport) return;
+      if (previewUrl) URL.revokeObjectURL(previewUrl.split("#")[0] ?? previewUrl);
+      const pdfBlob = await createMomPdfBlob(meeting, momForExport, momBranding);
+      // Prefer inline preview; fragment helps some browsers show the viewer chrome.
+      const objectUrl = URL.createObjectURL(pdfBlob);
+      setPreviewUrl(`${objectUrl}#toolbar=1&navpanes=0`);
       setPreviewOpen(true);
     } catch {
-      toast.error("Failed to generate PDF preview");
+      toast.error("Failed to open PDF preview");
     } finally {
       setPreviewLoading(false);
     }
@@ -409,467 +499,525 @@ export default function MeetingDetail() {
     );
   }
 
+  const showRecordingProgress =
+    isExternalPlatform &&
+    meeting.recordingProgress &&
+    meeting.recordingProgress.phase !== "ready" &&
+    (!meeting.mom ||
+      meeting.recordingProgress.isLive ||
+      meeting.recordingProgress.isProcessing);
+
+  const visibleStakeholders = showAllStakeholders
+    ? meeting.stakeholders
+    : meeting.stakeholders.slice(0, 4);
+  const hiddenStakeholderCount = Math.max(0, meeting.stakeholders.length - 4);
+
   return (
     <>
-      <div className="max-w-3xl mx-auto space-y-6">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1 text-muted-foreground -ml-2">
-          <ArrowLeft className="h-4 w-4" /> Back
-        </Button>
+      <div className="mx-auto max-w-5xl space-y-4 pb-8">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1 text-muted-foreground -ml-2">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {(isExternalPlatform || meeting.status !== "completed") && (
+              <Button onClick={handleJoin} variant="secondary" className="gap-2" size="sm">
+                <Video className="h-3.5 w-3.5" />
+                {isExternalPlatform ? `Join on ${platformLabel}` : "Join Meeting"}
+              </Button>
+            )}
+            {meeting.mom && !meeting.mom.approved && (
+              <Button
+                size="sm"
+                onClick={handleApproveMom}
+                disabled={approvingMom || !canApproveMom}
+                className="gap-2"
+              >
+                {approvingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+                Approve & send
+              </Button>
+            )}
+          </div>
+        </div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="aurora-panel p-6 space-y-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-xl font-heading font-bold text-gradient">{meeting.title}</h1>
-                <p className="text-muted-foreground text-sm mt-1">{meeting.description}</p>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <div className="flex items-center gap-2">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="overflow-hidden">
+            <div className="border-b bg-gradient-to-br from-secondary/10 via-background to-background px-5 py-4 sm:px-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 space-y-1">
+                  <h1 className="font-heading text-xl font-bold tracking-tight sm:text-2xl">{meeting.title}</h1>
+                  {meeting.description ? (
+                    <p className="text-muted-foreground line-clamp-2 text-sm">{meeting.description}</p>
+                  ) : null}
+                  <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-xs sm:text-sm">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5" />
+                      {meeting.date} · {meeting.time} · {meeting.duration} min
+                    </span>
+                    <Badge variant="outline" className="text-[10px]">{platformLabel}</Badge>
+                  </div>
+                </div>
+                <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
                   <TagBadge tag={meeting.tag} />
                   <StatusBadge status={meeting.status} />
+                  <MomStakeholderBadge meeting={meeting} />
                 </div>
-                <MomStakeholderBadge meeting={meeting} />
               </div>
             </div>
 
-            <div className="flex gap-6 text-sm text-muted-foreground flex-wrap">
-              <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {meeting.date} at {meeting.time}</span>
-              <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {meeting.duration} min</span>
-              <Badge variant="outline" className="text-[10px]">{platformLabel}</Badge>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium mb-2 flex items-center gap-1.5"><Users className="h-4 w-4" /> Stakeholders</h3>
-              <div className="flex flex-wrap gap-2">
-                {(meeting.stakeholders ?? []).map((s, i) => (
-                  <span key={i} className="inline-flex items-center px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm">
-                    {s.name} <span className="text-muted-foreground ml-1 text-xs">({s.email})</span>
-                  </span>
-                ))}
-                {meeting.stakeholders.length === 0 && <span className="text-muted-foreground text-sm">No stakeholders added</span>}
+            {showRecordingProgress ? (
+              <div className="border-b px-4 py-3 sm:px-5">
+                <ExternalRecordingProgress meeting={meeting} />
               </div>
-              {meeting.stakeholders.length > 0 && (
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="gap-1.5"
-                    disabled={resendingInvites}
-                    onClick={handleResendInvites}
-                  >
-                    {resendingInvites ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                    Resend invites
-                  </Button>
-      </div>
-              )}
-              {meeting.invites && meeting.invites.length > 0 && (
-                <div className="mt-3 space-y-1.5">
-                  <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                    <Mail className="h-3.5 w-3.5" /> Invite delivery
-                  </p>
-                  {meeting.invites.map((inv) => (
-                    <div key={inv.email} className="text-xs flex items-center gap-2">
-                      <span>{inv.name}</span>
-                      <Badge variant="outline" className="text-[10px]">
-                        {inv.status === "logged" ? "saved (dev)" : inv.status}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            ) : null}
 
-            <div className="flex gap-2 flex-wrap">
-              {(isExternalPlatform || meeting.status !== "completed") && (
-                <Button onClick={handleJoin} variant="secondary" className="gap-2 shine" size="sm">
-                  <Video className="h-3.5 w-3.5" />
-                  {isExternalPlatform ? `Join on ${platformLabel}` : "Join Meeting"}
-                </Button>
-              )}
-              {meeting.status === "upcoming" && !isExternalPlatform && (
-                <Button onClick={handleStart} variant="outline" size="sm" className="gap-2">
-                  <Play className="h-3.5 w-3.5" /> Start Meeting
-                </Button>
-              )}
-              {meeting.status !== "completed" && !isExternalPlatform && (
-                <Button onClick={handleComplete} variant="outline" size="sm" className="gap-2">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Mark Completed
-                </Button>
-              )}
-              <Button onClick={handleGenerateMOM} variant="outline" size="sm" className="gap-2" disabled={generatingMom}>
-                {generatingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
-                Generate MOM
-              </Button>
-            </div>
-          </Card>
-        </motion.div>
+            <div className="px-4 py-3 sm:px-5">
+              <Tabs
+                value={detailTab}
+                onValueChange={(value) => setDetailTab(value as "overview" | "capture" | "mom")}
+                className="space-y-4"
+              >
+                <TabsList className="grid h-auto w-full grid-cols-3 gap-1 rounded-xl p-1 sm:inline-flex sm:w-auto">
+                  <TabsTrigger value="overview" className="rounded-lg px-3 py-2 text-xs sm:text-sm">
+                    Overview
+                  </TabsTrigger>
+                  <TabsTrigger value="capture" className="gap-1.5 rounded-lg px-3 py-2 text-xs sm:text-sm">
+                    <NotebookPen className="hidden h-3.5 w-3.5 sm:block" />
+                    Notes & recording
+                  </TabsTrigger>
+                  <TabsTrigger value="mom" className="gap-1.5 rounded-lg px-3 py-2 text-xs sm:text-sm">
+                    <FileText className="hidden h-3.5 w-3.5 sm:block" />
+                    MOM
+                    {meeting.mom && !meeting.mom.approved ? (
+                      <span className="ml-1 inline-flex h-1.5 w-1.5 rounded-full bg-warning" aria-label="Needs approval" />
+                    ) : null}
+                  </TabsTrigger>
+                </TabsList>
 
-        {isExternalPlatform && meeting.recordingProgress && !meeting.mom && (
-          <ExternalRecordingProgress meeting={meeting} />
-        )}
-
-        <Card className="p-6 space-y-4">
-          <h2 className="text-lg font-heading font-semibold">Meeting Notes</h2>
-          <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add meeting notes here..." rows={5} />
-          <Button variant="outline" size="sm" onClick={saveNotes}>Save Notes</Button>
-        </Card>
-
-        <Card className="p-6 space-y-4">
-          <h2 className="text-lg font-heading font-semibold">Recording</h2>
-          {isExternalPlatform ? (
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>
-                A recording bot joins your {platformLabel} call automatically. When everyone leaves,
-                the bot exits on its own — even if time remains on the calendar — then MOM is generated.
-              </p>
-            </div>
-          ) : (
-            <>
-              <p className="text-muted-foreground text-sm">
-                Upload meeting audio for speech-to-text with speaker segments, then AI extracts tasks and decisions.
-              </p>
-              <input
-                ref={audioInputRef}
-                type="file"
-                accept="audio/*,video/webm"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) void handleAudioUpload(file);
-                  e.target.value = "";
-                }}
-              />
-              <motion.div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  disabled={uploadingAudio}
-                  onClick={() => audioInputRef.current?.click()}
-                >
-                  {uploadingAudio ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mic className="h-3.5 w-3.5" />}
-                  Upload audio
-                </Button>
-                {meeting.pipelineStatus === "processing" && (
-                  <Badge variant="outline" className="gap-1">
-                    <Loader2 className="h-3 w-3 animate-spin" /> Processing…
-                  </Badge>
-                )}
-              </motion.div>
-            </>
-          )}
-          {meeting.transcript && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg border bg-muted/20 p-4">
-              <motion.div className="max-h-64 space-y-2 overflow-y-auto text-sm">
-                {(meeting.transcript.segments ?? []).map((seg, i) => (
-                  <p key={i}>
-                    <span className="font-medium text-secondary">{seg.speaker}:</span> {seg.text}
-                  </p>
-                ))}
-              </motion.div>
-            </motion.div>
-          )}
-        </Card>
-
-        {meeting.mom && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="overflow-hidden border-ring/30 shadow-sm">
-              <div className="relative border-b bg-gradient-to-br from-secondary/12 via-secondary/5 to-background px-6 py-5">
-                <div className="absolute left-0 top-0 h-full w-1 bg-secondary" aria-hidden />
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="space-y-1.5 pl-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary/15 text-secondary">
-                        <FileText className="h-5 w-5" />
+                <TabsContent value="overview" className="mt-0 space-y-4 focus-visible:outline-none">
+                  <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                    <div className="space-y-3 rounded-xl border p-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <h2 className="flex items-center gap-1.5 text-sm font-medium">
+                          <Users className="h-4 w-4" /> Stakeholders
+                        </h2>
+                        {meeting.stakeholders.length > 0 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1.5"
+                            disabled={resendingInvites}
+                            onClick={handleResendInvites}
+                          >
+                            {resendingInvites ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                            Resend invites
+                          </Button>
+                        )}
                       </div>
-                      <div>
-                        <h2 className="text-lg font-heading font-semibold tracking-tight">Minutes of Meeting</h2>
-                        <p className="text-muted-foreground text-sm">
-                          Refine the draft, then approve — stakeholders are notified automatically.
+                      <div className="flex flex-wrap gap-2">
+                        {visibleStakeholders.map((s, i) => (
+                          <span
+                            key={`${s.email}-${i}`}
+                            className="bg-accent text-accent-foreground inline-flex max-w-full items-center truncate rounded-full px-3 py-1 text-xs sm:text-sm"
+                            title={`${s.name} (${s.email})`}
+                          >
+                            {s.name}
+                            <span className="text-muted-foreground ml-1 hidden truncate text-[11px] sm:inline">
+                              {s.email}
+                            </span>
+                          </span>
+                        ))}
+                        {meeting.stakeholders.length === 0 && (
+                          <span className="text-muted-foreground text-sm">No stakeholders added</span>
+                        )}
+                      </div>
+                      {hiddenStakeholderCount > 0 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 gap-1 px-2"
+                          onClick={() => setShowAllStakeholders((v) => !v)}
+                        >
+                          <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showAllStakeholders ? "rotate-180" : ""}`} />
+                          {showAllStakeholders ? "Show less" : `Show ${hiddenStakeholderCount} more`}
+                        </Button>
+                      )}
+                      {meeting.invites && meeting.invites.length > 0 && (
+                        <div className="border-t pt-3">
+                          <p className="text-muted-foreground mb-2 flex items-center gap-1 text-xs font-medium">
+                            <Mail className="h-3.5 w-3.5" /> Invite delivery
+                          </p>
+                          <div className="grid max-h-28 gap-1 overflow-y-auto pr-1">
+                            {meeting.invites.map((inv) => (
+                              <div key={inv.email} className="flex items-center justify-between gap-2 text-xs">
+                                <span className="truncate">{inv.name}</span>
+                                <Badge variant="outline" className="shrink-0 text-[10px]">
+                                  {inv.status === "logged" ? "saved (dev)" : inv.status}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-3 rounded-xl border p-4">
+                      <h2 className="text-sm font-medium">Quick actions</h2>
+                      <div className="flex flex-col gap-2">
+                        {meeting.status === "upcoming" && !isExternalPlatform && (
+                          <Button onClick={handleStart} variant="outline" size="sm" className="justify-start gap-2">
+                            <Play className="h-3.5 w-3.5" /> Start Meeting
+                          </Button>
+                        )}
+                        {meeting.status !== "completed" && !isExternalPlatform && (
+                          <Button onClick={handleComplete} variant="outline" size="sm" className="justify-start gap-2">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Mark Completed
+                          </Button>
+                        )}
+                        <Button
+                          onClick={() => {
+                            setDetailTab("mom");
+                            void handleGenerateMOM();
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="justify-start gap-2"
+                          disabled={generatingMom}
+                        >
+                          {generatingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+                          {meeting.mom ? "Regenerate MOM" : "Generate MOM"}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="justify-start gap-2"
+                          onClick={() => setDetailTab("mom")}
+                        >
+                          <FileText className="h-3.5 w-3.5" />
+                          {meeting.mom ? "Open MOM editor" : "Go to MOM"}
+                        </Button>
+                        <Button variant="ghost" size="sm" className="justify-start gap-2" onClick={() => navigate("/mom")}>
+                          MOM inbox
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="capture" className="mt-0 space-y-4 focus-visible:outline-none">
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    <div className="space-y-3 rounded-xl border p-4">
+                      <h2 className="text-sm font-medium">Meeting notes</h2>
+                      <Textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Capture notes during or after the call…"
+                        rows={8}
+                        className="min-h-[180px] resize-y"
+                      />
+                      <Button variant="outline" size="sm" onClick={saveNotes}>
+                        Save notes
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3 rounded-xl border p-4">
+                      <h2 className="text-sm font-medium">Recording</h2>
+                      {isExternalPlatform ? (
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          A recording bot joins your {platformLabel} call automatically. When everyone leaves,
+                          the bot exits and MOM generation starts.
                         </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                    {meeting.mom.shared ? (
-                      <Badge variant="secondary" className="gap-1 border border-success/20 bg-success/10 text-success">
-                        <CheckCircle2 className="h-3 w-3" /> Sent to stakeholders
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="gap-1 border-warning/30 bg-warning/10 text-warning">
-                        Awaiting approval
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
+                      ) : (
+                        <>
+                          <p className="text-muted-foreground text-sm leading-relaxed">
+                            Upload meeting audio for transcription and AI extraction.
+                          </p>
+                          <input
+                            ref={audioInputRef}
+                            type="file"
+                            accept="audio/*,video/webm"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) void handleAudioUpload(file);
+                              e.target.value = "";
+                            }}
+                          />
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2"
+                              disabled={uploadingAudio}
+                              onClick={() => audioInputRef.current?.click()}
+                            >
+                              {uploadingAudio ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mic className="h-3.5 w-3.5" />}
+                              Upload audio
+                            </Button>
+                            {meeting.pipelineStatus === "processing" && (
+                              <Badge variant="outline" className="gap-1">
+                                <Loader2 className="h-3 w-3 animate-spin" /> Processing…
+                              </Badge>
+                            )}
+                          </div>
+                        </>
+                      )}
 
-              <div className="space-y-4 p-6">
-                <div className="rounded-xl border bg-muted/30 p-4 md:p-5">
-                  <div className="mb-4 flex items-center gap-2 text-sm font-medium">
-                    <PencilLine className="h-4 w-4 text-secondary" />
-                    Prepare draft
-                  </div>
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="mom-key-points">Key discussion points</Label>
-                      <p className="text-muted-foreground text-xs">One bullet per line. This text appears in PDF and exports.</p>
-                      <Textarea
-                        id="mom-key-points"
-                        value={momKeyPointsDraft}
-                        onChange={(e) => setMomKeyPointsDraft(e.target.value)}
-                        rows={5}
-                        className="min-h-[120px] resize-y font-mono text-sm"
-                        placeholder="e.g. Agreed on Q2 roadmap&#10;Budget review deferred to next week"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="mom-actions">Action items</Label>
-                      <p className="text-muted-foreground text-xs">One row per item: Task | Owner | Deadline</p>
-                      <Textarea
-                        id="mom-actions"
-                        value={momActionItemsDraft}
-                        onChange={(e) => setMomActionItemsDraft(e.target.value)}
-                        rows={5}
-                        className="min-h-[120px] resize-y font-mono text-sm"
-                        placeholder="e.g. Send revised scope | Alex | Next Friday"
-                      />
+                      {meeting.transcript ? (
+                        <div className="rounded-lg border bg-muted/20 p-3">
+                          <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
+                            Transcript
+                          </p>
+                          <div className="max-h-56 space-y-2 overflow-y-auto text-sm">
+                            {(meeting.transcript.segments ?? []).map((seg, i) => (
+                              <p key={i}>
+                                <span className="font-medium text-secondary">{seg.speaker}:</span> {seg.text}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground text-xs">
+                          Transcript appears here after recording or audio upload is processed.
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <div className="mt-4 flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-muted-foreground text-xs">
-                      Saving updates the live MOM and resets approval if it was already approved.
-                    </p>
-                    <Button variant="secondary" size="sm" onClick={handleSaveMomEdits} disabled={editingMom} className="shrink-0 gap-2">
-                      {editingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
-                      Save draft
-                    </Button>
-                  </div>
-                </div>
+                </TabsContent>
 
-                {!meeting.mom.approved && (
-                  <div className="rounded-xl border border-secondary/25 bg-gradient-to-br from-secondary/8 to-transparent p-4 md:p-5">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-secondary">
-                        <ShieldCheck className="h-5 w-5" />
-                      </div>
-                      <div className="min-w-0 flex-1 space-y-4">
-                        <div>
-                          <h3 className="font-heading text-sm font-semibold">Review & approve</h3>
-                          <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-                            Stakeholders only receive this MOM after a reviewer approves it. Approval emails the
-                            MOM PDF to everyone listed on this meeting.
+                <TabsContent value="mom" id="mom" className="mt-0 scroll-mt-6 space-y-4 focus-visible:outline-none">
+                  {meeting.mom ? (
+                    <>
+                      <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-background/95 px-3 py-2.5 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium">Minutes of Meeting</p>
+                          <p className="text-muted-foreground truncate text-xs">
+                            {meeting.mom.dateTime}
+                            {(meeting.mom.participants ?? []).length > 0
+                              ? ` · ${(meeting.mom.participants ?? []).slice(0, 3).join(", ")}`
+                              : ""}
                           </p>
                         </div>
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="text-muted-foreground text-sm">
-                            {meeting.status !== "completed" ? (
-                              <>
-                                Approval unlocks when the meeting ends and MOM generation finishes.
-                              </>
-                            ) : (
-                              <>
-                                Approving as{" "}
-                                <span className="font-medium text-foreground">{getCurrentUserDisplayName()}</span>
-                              </>
-                            )}
-                          </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {meeting.mom.shared ? (
+                            <Badge variant="secondary" className="gap-1 border border-success/20 bg-success/10 text-success">
+                              <CheckCircle2 className="h-3 w-3" /> Sent
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="gap-1 border-warning/30 bg-warning/10 text-warning">
+                              Awaiting approval
+                            </Badge>
+                          )}
                           <Button
                             size="sm"
-                            onClick={handleApproveMom}
-                            disabled={approvingMom || !canApproveMom}
-                            className="gap-2 shrink-0 sm:h-10"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={handlePreviewPdf}
+                            disabled={previewLoading}
                           >
-                            {approvingMom ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                            Approve & send
+                            {previewLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />}
+                            View PDF
+                          </Button>
+                          {!meeting.mom.approved && (
+                            <Button
+                              size="sm"
+                              onClick={handleApproveMom}
+                              disabled={approvingMom || !canApproveMom}
+                              className="gap-1.5"
+                            >
+                              {approvingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+                              Approve & send
+                            </Button>
+                          )}
+                          {meeting.mom.approved && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="gap-1.5"
+                              onClick={() => handleDownloadFormat("docx")}
+                              disabled={downloadingFormat !== null}
+                            >
+                              {downloadingFormat === "docx" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                              DOCX
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {!meeting.mom.approved && (
+                        <p className="text-muted-foreground rounded-lg border border-dashed px-3 py-2 text-xs">
+                          Viewing the PDF does not email anyone. Stakeholders receive the MOM only after you click{" "}
+                          <span className="font-medium text-foreground">Approve & send</span>.
+                        </p>
+                      )}
+
+                      {meeting.mom.approved && (
+                        <div className="flex items-start gap-3 rounded-lg border border-success/20 bg-success/5 px-4 py-3 text-sm">
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                          <div className="space-y-1">
+                            <p className="font-medium text-foreground">
+                              Approved by {meeting.mom.approvedBy || organization?.name || APP_NAME}
+                            </p>
+                            {meeting.mom.approvedAt && (
+                              <p className="text-muted-foreground text-xs">
+                                {new Date(meeting.mom.approvedAt).toLocaleString()}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="rounded-xl border p-3 sm:p-4">
+                        <MomInlineEditor
+                          ref={momEditorRef}
+                          meetingId={meeting.id}
+                          mom={meeting.mom}
+                          participantNames={[
+                            ...meeting.stakeholders.map((s) => s.name),
+                            ...(meeting.mom.participants ?? []),
+                          ]}
+                          onMomSaved={handleMomSaved}
+                        />
+                      </div>
+
+                      {meeting.mom.approved && (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-muted-foreground mr-1 text-xs">Local export:</p>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={handlePreviewPdf}
+                            disabled={previewLoading}
+                          >
+                            {previewLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />}
+                            View PDF
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={() => handleDownloadFormat("docx")}
+                            disabled={downloadingFormat !== null}
+                          >
+                            {downloadingFormat === "docx" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                            DOCX
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={() => handleDownloadFormat("txt")}
+                            disabled={downloadingFormat !== null}
+                          >
+                            {downloadingFormat === "txt" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                            TXT
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={() => handleDownloadFormat("json")}
+                            disabled={downloadingFormat !== null}
+                          >
+                            {downloadingFormat === "json" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                            JSON
+                          </Button>
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="gap-1.5"
+                          onClick={handleGenerateMOM}
+                          disabled={generatingMom}
+                        >
+                          {generatingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+                          Regenerate
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="rounded-xl border border-dashed p-6">
+                      <div className="mx-auto max-w-lg space-y-3 text-center">
+                        <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/15 text-secondary">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <h2 className="font-heading text-lg font-semibold">No MOM draft yet</h2>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {meeting.status === "failed" || meeting.recordingBotStatus === "failed"
+                            ? "Recording/MOM generation failed or no audio was available from the bot. Upload the meeting recording — MOM is only created from real audio, not notes."
+                            : isExternalPlatform
+                              ? `After your ${platformLabel} call ends, transcription creates a draft automatically. Keep this page open briefly after the call, or come back and open MOM — generation continues on the server.`
+                              : "MOM is generated from the meeting recording only. Upload audio if the bot did not capture it, then generate."}
+                        </p>
+                        {(meeting.status === "failed" || meeting.recordingBotStatus === "failed") && (
+                          <Badge variant="outline" className="gap-1 border-destructive/30 text-destructive">
+                            Recording failed
+                          </Badge>
+                        )}
+                        {(meeting.pipelineStatus === "processing" ||
+                          meeting.recordingBotStatus === "processing" ||
+                          meeting.recordingBotStatus === "call_ended" ||
+                          meeting.recordingBotStatus === "scheduling") &&
+                          meeting.status !== "failed" &&
+                          meeting.recordingBotStatus !== "failed" && (
+                          <Badge variant="outline" className="gap-1">
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            {meeting.recordingBotStatus === "call_ended"
+                              ? "Finishing recording upload…"
+                              : "Generating MOM from recording…"}
+                          </Badge>
+                        )}
+                        <div className="flex flex-wrap justify-center gap-2 pt-1">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="gap-2"
+                            onClick={handleGenerateMOM}
+                            disabled={generatingMom}
+                          >
+                            {generatingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+                            Generate MOM
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => setDetailTab("capture")}>
+                            Upload audio
                           </Button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-
-                {meeting.mom.approved && (
-                  <div className="flex items-start gap-3 rounded-lg border border-success/20 bg-success/5 px-4 py-3 text-sm">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                    <div className="space-y-1">
-                      <p className="font-medium text-foreground">Approved by {meeting.mom.approvedBy || "Lyrus Life"}</p>
-                      {meeting.mom.approvedAt && (
-                        <p className="text-muted-foreground text-xs">{new Date(meeting.mom.approvedAt).toLocaleString()}</p>
-                      )}
-                      {meeting.mom.shared && (
-                        <p className="text-muted-foreground text-xs">Stakeholders were notified automatically when this was approved.</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <Separator />
-
-                <div>
-                  <p className="text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wide">Export</p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-2"
-                      onClick={handlePreviewPdf}
-                      disabled={previewLoading}
-                    >
-                      {previewLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />}
-                      View PDF
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-2"
-                      onClick={() => handleDownloadFormat("docx")}
-                      disabled={downloadingFormat !== null}
-                    >
-                      {downloadingFormat === "docx" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-                      DOCX
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-2"
-                      onClick={() => handleDownloadFormat("pdf")}
-                      disabled={downloadingFormat !== null}
-                    >
-                      {downloadingFormat === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-                      PDF
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-2"
-                      onClick={() => handleDownloadFormat("txt")}
-                      disabled={downloadingFormat !== null}
-                    >
-                      {downloadingFormat === "txt" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-                      TXT
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-2"
-                      onClick={() => handleDownloadFormat("json")}
-                      disabled={downloadingFormat !== null}
-                    >
-                      {downloadingFormat === "json" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-                      JSON
-                    </Button>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <p className="text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wide">Current version</p>
-                  <div className="space-y-4 rounded-lg border bg-card/50 p-4 text-sm">
-                    <div>
-                      <p className="font-medium text-muted-foreground">Date & Time</p>
-                      <p>{meeting.mom.dateTime}</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-muted-foreground">Participants</p>
-                      <p>{(meeting.mom.participants ?? []).join(", ")}</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-muted-foreground">Key Discussion Points</p>
-                      <ul className="mt-1 list-inside list-disc space-y-1">
-                        {(meeting.mom.keyPoints ?? []).map((p, i) => (
-                          <li key={i}>{p}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    {(meeting.mom.sections ?? []).length > 0 && (
-                      <div className="space-y-3">
-                        {(meeting.mom.sections ?? []).map((section, i) => (
-                          <div key={i}>
-                            <p className="font-medium text-muted-foreground">{section.title}</p>
-                            <ul className="mt-1 list-inside list-disc space-y-1">
-                              {(section.content ?? []).map((line, j) => (
-                                <li key={j}>{line}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-medium text-muted-foreground">Action Items</p>
-                      <div className="mt-2 overflow-hidden rounded-lg border">
-                        <table className="w-full text-sm">
-                          <thead className="bg-muted/50">
-                            <tr>
-                              <th className="p-2 text-left font-medium">Task</th>
-                              <th className="p-2 text-left font-medium">Assignee</th>
-                              <th className="p-2 text-left font-medium">Deadline</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {(meeting.mom.actionItems ?? []).map((a, i) => (
-                              <tr key={i} className="border-t">
-                                <td className="p-2">{a.task}</td>
-                                <td className="p-2">{a.assignee}</td>
-                                <td className="p-2">{a.deadline}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        )}
-
-        {isExternalPlatform && !meeting.mom && !meeting.recordingProgress && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="overflow-hidden border-dashed">
-              <div className="space-y-3 p-6">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-secondary" />
-                  <h2 className="text-lg font-heading font-semibold">Minutes of Meeting</h2>
-                </div>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  After your {platformLabel} call ends, the recording is transcribed and a draft MOM is created
-                  automatically — same workflow as Lyrus Live: edit the draft, approve it, then export or email
-                  stakeholders. Nothing is sent until you approve.
-                </p>
-                {(meeting.pipelineStatus === "processing" ||
-                  meeting.recordingBotStatus === "processing" ||
-                  meeting.recordingBotStatus === "scheduling") && (
-                  <Badge variant="outline" className="gap-1">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    Generating MOM from recording…
-                  </Badge>
-                )}
-                {meeting.recordingBotStatus === "done" && meeting.pipelineStatus !== "processing" && (
-                  <Button variant="outline" size="sm" className="gap-2" onClick={handleGenerateMOM} disabled={generatingMom}>
-                    {generatingMom ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
-                    Generate MOM now
-                  </Button>
-                )}
-              </div>
-            </Card>
-          </motion.div>
-        )}
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+          </Card>
+        </motion.div>
       </div>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-5xl h-[85vh]">
+        <DialogContent className="flex h-[85vh] max-w-5xl flex-col gap-3">
           <DialogHeader>
-            <DialogTitle>MOM PDF Preview</DialogTitle>
+            <DialogTitle>MOM PDF preview</DialogTitle>
+            <p className="text-muted-foreground text-sm font-normal">
+              {meeting?.mom?.approved
+                ? "This is an in-app preview of the approved minutes."
+                : "Preview only — stakeholders are not emailed until you Approve & send."}
+            </p>
           </DialogHeader>
           {previewUrl ? (
-            <iframe title="MOM PDF Preview" src={previewUrl} className="w-full h-full rounded-md border" />
+            <iframe
+              title="MOM PDF Preview"
+              src={previewUrl}
+              className="min-h-0 w-full flex-1 rounded-md border bg-muted/20"
+            />
           ) : (
-            <div className="h-full flex items-center justify-center text-sm text-muted-foreground">No preview available</div>
+            <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+              No preview available
+            </div>
           )}
         </DialogContent>
       </Dialog>

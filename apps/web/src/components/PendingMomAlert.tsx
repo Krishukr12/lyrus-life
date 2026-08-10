@@ -4,17 +4,26 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MomStakeholderBadge } from "@/components/MomStakeholderBadge";
 import type { Meeting } from "@/lib/types";
-import { filterMeetingsPendingMom } from "@/lib/mom-status";
+import {
+  filterMeetingsPendingMom,
+  type MomEligibilityContext,
+} from "@/lib/mom-status";
 
 type PendingMomAlertProps = {
   meetings: Meeting[];
+  eligibility?: MomEligibilityContext;
   maxItems?: number;
   className?: string;
 };
 
-export function PendingMomAlert({ meetings, maxItems = 5, className }: PendingMomAlertProps) {
+export function PendingMomAlert({
+  meetings,
+  eligibility,
+  maxItems = 5,
+  className,
+}: PendingMomAlertProps) {
   const navigate = useNavigate();
-  const pending = filterMeetingsPendingMom(meetings);
+  const pending = filterMeetingsPendingMom(meetings, eligibility);
   const shown = pending.slice(0, maxItems);
 
   if (pending.length === 0) return null;
@@ -37,9 +46,9 @@ export function PendingMomAlert({ meetings, maxItems = 5, className }: PendingMo
           variant="outline"
           size="sm"
           className="gap-1.5 shrink-0"
-          onClick={() => navigate("/meetings?mom=pending")}
+          onClick={() => navigate("/mom")}
         >
-          View all
+          Open inbox
           <ArrowRight className="h-3.5 w-3.5" />
         </Button>
       </div>
@@ -48,7 +57,7 @@ export function PendingMomAlert({ meetings, maxItems = 5, className }: PendingMo
           <li key={m.id}>
             <button
               type="button"
-              onClick={() => navigate(`/meetings/${m.id}`)}
+              onClick={() => navigate(`/meetings/${m.id}#mom`)}
               className="w-full flex flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-5 text-left hover:bg-muted/40 transition-colors"
             >
               <div className="min-w-0 flex items-center gap-2">
@@ -68,7 +77,7 @@ export function PendingMomAlert({ meetings, maxItems = 5, className }: PendingMo
       </ul>
       {pending.length > maxItems && (
         <p className="text-xs text-muted-foreground text-center py-2 border-t">
-          +{pending.length - maxItems} more — use &quot;Pending MOM&quot; filter on Meetings
+          +{pending.length - maxItems} more in the MOM inbox
         </p>
       )}
     </Card>

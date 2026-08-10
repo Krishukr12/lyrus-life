@@ -152,11 +152,17 @@ export const billingService = {
       await billingRepository.updateOrganizationPlan(organizationId, input.subscriptionPlan);
     }
 
+    const switchingToForeverFree = input.subscriptionPlan === "FOREVER_FREE";
+
     await billingRepository.upsertOrganizationBilling(organizationId, {
       activeLocations: input.activeLocations,
-      billingStatus: input.billingStatus,
+      billingStatus: switchingToForeverFree ? "ACTIVE" : input.billingStatus,
       billingCycle: input.billingCycle,
-      nextBillingDate: input.nextBillingDate,
+      nextBillingDate: switchingToForeverFree ? null : input.nextBillingDate,
+      trialStartedAt: switchingToForeverFree ? null : undefined,
+      trialEndsAt: switchingToForeverFree ? null : undefined,
+      currentPeriodStart: switchingToForeverFree ? null : undefined,
+      currentPeriodEnd: switchingToForeverFree ? null : undefined,
       discountPercent: input.discountPercent,
       billingEmail: input.billingEmail,
       cancelledAt: input.billingStatus === "CANCELLED" ? new Date() : undefined,
@@ -164,13 +170,15 @@ export const billingService = {
 
     if (input.subscriptionPlan && input.subscriptionPlan !== previousPlan) {
       const direction =
-        previousPlan === "STARTER" && input.subscriptionPlan !== "STARTER"
-          ? "upgrade"
-          : previousPlan === "ENTERPRISE"
-            ? "downgrade"
-            : input.subscriptionPlan === "ENTERPRISE"
-              ? "upgrade"
-              : "downgrade";
+        input.subscriptionPlan === "FOREVER_FREE"
+          ? "downgrade"
+          : previousPlan === "STARTER" && input.subscriptionPlan !== "STARTER"
+            ? "upgrade"
+            : previousPlan === "ENTERPRISE"
+              ? "downgrade"
+              : input.subscriptionPlan === "ENTERPRISE"
+                ? "upgrade"
+                : "downgrade";
       await invoiceRepository.logBillingEvent({
         organizationId,
         type: `subscription.${direction}`,

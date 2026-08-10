@@ -60,8 +60,8 @@ export async function sendMomToStakeholdersOnApproval(
       meetingDate: date,
       durationMinutes: meeting.durationMinutes,
       branding: meeting.organization?.name
-        ? { brandName: meeting.organization.name, tagline: "Minutes of Meeting" }
-        : undefined,
+        ? { brandName: meeting.organization.name }
+        : { brandName: "Meeting Desk AI" },
       sections,
       mom: {
         createdAt: meeting.mom.createdAt.toISOString(),

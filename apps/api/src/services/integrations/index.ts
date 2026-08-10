@@ -10,12 +10,14 @@ import { integrationPreferencesSchema } from "@lyrus/shared";
 import {
   buildGoogleAuthUrl,
   completeGoogleOAuth,
+  googleOAuthMissingEnv,
   isGoogleConfigured,
 } from "./google.js";
 import {
   buildMicrosoftAuthUrl,
   completeMicrosoftOAuth,
   isMicrosoftConfigured,
+  microsoftOAuthMissingEnv,
 } from "./microsoft.js";
 import {
   createOAuthState,
@@ -25,6 +27,7 @@ import {
 import {
   deleteUserIntegration,
   getUserIntegration,
+  listUserIntegrationStatuses,
   listUserIntegrations,
   updateIntegrationPreferences,
   upsertUserIntegration,
@@ -40,13 +43,19 @@ function toProviderEnum(provider: IntegrationProviderInput): IntegrationProvider
 
 export function getIntegrationsConfig() {
   return {
-    google: { configured: isGoogleConfigured() },
-    microsoft: { configured: isMicrosoftConfigured() },
+    google: {
+      configured: isGoogleConfigured(),
+      missingEnv: googleOAuthMissingEnv(),
+    },
+    microsoft: {
+      configured: isMicrosoftConfigured(),
+      missingEnv: microsoftOAuthMissingEnv(),
+    },
   };
 }
 
 export async function listIntegrationStatuses(userId: string): Promise<UserIntegrationStatus[]> {
-  const rows = await listUserIntegrations(userId);
+  const rows = await listUserIntegrationStatuses(userId);
   const byProvider = new Map(rows.map((r) => [r.provider, r]));
 
   const providers: IntegrationProviderInput[] = ["google", "microsoft"];
@@ -60,7 +69,7 @@ export async function listIntegrationStatuses(userId: string): Promise<UserInteg
       provider,
       connected: Boolean(row),
       externalEmail: row?.externalEmail ?? null,
-      connectedAt: row ? new Date().toISOString() : null,
+      connectedAt: row ? row.connectedAt.toISOString() : null,
       preferences,
     };
   });

@@ -15,16 +15,20 @@ function recallApiKey(): string {
 }
 
 export function isRecallConfigured(): boolean {
-  return Boolean(process.env.RECALL_API_KEY);
+  return Boolean(process.env.RECALL_API_KEY?.trim());
 }
 
 type RecallBotApiResponse = {
   video_url?: string;
+  join_at?: string | null;
   status?: { code?: string };
   status_changes?: Array<{ code?: string }>;
   recordings?: Array<{
     status?: { code?: string };
-    media_shortcuts?: { video_mixed?: { data?: { download_url?: string } } };
+    media_shortcuts?: {
+      video_mixed?: { data?: { download_url?: string } };
+      audio_mixed?: { data?: { download_url?: string } };
+    };
   }>;
 };
 
@@ -33,6 +37,8 @@ function extractDownloadUrlFromBotPayload(data: RecallBotApiResponse): string | 
   for (const recording of data.recordings ?? []) {
     const mixed = recording.media_shortcuts?.video_mixed?.data?.download_url;
     if (mixed) return mixed;
+    const audio = recording.media_shortcuts?.audio_mixed?.data?.download_url;
+    if (audio) return audio;
   }
   return null;
 }
@@ -50,16 +56,33 @@ function extractBotStatusCode(data: RecallBotApiResponse): string | null {
 export type RecallBotSnapshot = {
   statusCode: string | null;
   downloadUrl: string | null;
+  joinAt: Date | null;
   isDone: boolean;
   isFatal: boolean;
   isInCall: boolean;
   isCallEnded: boolean;
+  /** Bot is actively connecting / in waiting room / recording — do not replace. */
+  isJoiningOrInCall: boolean;
+  /** Bot exists but join_at is still in the future (won't cover an early Meet). */
+  isAwaitingFutureJoin: boolean;
 };
+
+const JOINING_OR_IN_CALL_CODES = new Set([
+  "joining_call",
+  "in_waiting_room",
+  "in_call_not_recording",
+  "in_call_recording",
+  "recording",
+  "joining",
+  "waiting_room",
+  "in_call",
+]);
 
 /** Recall auto-leave: exit soon after everyone else leaves (even if calendar time remains). */
 function recallAutomaticLeaveConfig() {
   return {
-    everyone_left_timeout: { timeout: 20, activate_after: 45 },
+    // activate_after must be >= 1 (Recall validation); keep low so short calls still auto-leave quickly
+    everyone_left_timeout: { timeout: 10, activate_after: 1 },
     noone_joined_timeout: 900,
     waiting_room_timeout: 900,
     bot_detection: {
@@ -91,9 +114,19 @@ export async function fetchRecallBotSnapshot(botId: string): Promise<RecallBotSn
   const statusCode = extractBotStatusCode(data);
   const downloadUrl = extractDownloadUrlFromBotPayload(data);
   const code = statusCode ?? "";
+  const joinAt =
+    typeof data.join_at === "string" && data.join_at.trim()
+      ? new Date(data.join_at)
+      : null;
+  const isJoiningOrInCall = JOINING_OR_IN_CALL_CODES.has(code);
+  const isAwaitingFutureJoin = Boolean(
+    joinAt && !Number.isNaN(joinAt.getTime()) && joinAt.getTime() > Date.now() + 60_000,
+  );
+
   return {
     statusCode,
     downloadUrl,
+    joinAt,
     isDone: code === "done" || Boolean(downloadUrl),
     isFatal: code === "fatal" || code === "failed",
     isInCall:
@@ -101,7 +134,20 @@ export async function fetchRecallBotSnapshot(botId: string): Promise<RecallBotSn
       code === "in_call_not_recording" ||
       code === "recording",
     isCallEnded: code === "call_ended",
+    isJoiningOrInCall,
+    isAwaitingFutureJoin,
   };
+}
+
+export async function deleteRecallBot(botId: string): Promise<void> {
+  try {
+    await fetch(`${RECALL_API_BASE}/bot/${botId}/`, {
+      method: "DELETE",
+      headers: { Authorization: `Token ${recallApiKey()}` },
+    });
+  } catch {
+    /* best-effort cleanup of superseded scheduled bots */
+  }
 }
 
 function resolveJoinAt(scheduledAt: Date, joinImmediately: boolean): Date {
@@ -109,8 +155,8 @@ function resolveJoinAt(scheduledAt: Date, joinImmediately: boolean): Date {
   if (joinImmediately) {
     return new Date(now + 5000);
   }
-  // Meeting is now or within 15 minutes — send the bot soon, not at a future calendar time.
-  if (scheduledAt.getTime() <= now + 15 * 60_000) {
+  // Join soon if start is within 2 hours — covers “starting early” Meets.
+  if (scheduledAt.getTime() <= now + 2 * 60 * 60_000) {
     return new Date(now + 5000);
   }
   return scheduledAt;
@@ -122,12 +168,26 @@ function sleep(ms: number): Promise<void> {
 
 async function isBotStillActive(botId: string): Promise<boolean> {
   const snapshot = await fetchRecallBotSnapshot(botId);
-  if (!snapshot) return true;
+  // Missing bot (404 / network) is NOT active — allow reschedule.
+  if (!snapshot) return false;
   const code = snapshot.statusCode ?? "";
   if (snapshot.isDone || snapshot.isFatal || code === "call_ended") return false;
   return true;
 }
 
+/** True when a bot is already useful for a live Meet (joining/in-call), not merely scheduled for later. */
+export async function isRecordingBotLiveOrJoining(botId: string): Promise<boolean> {
+  const snapshot = await fetchRecallBotSnapshot(botId);
+  if (!snapshot) return false;
+  if (snapshot.isDone || snapshot.isFatal || snapshot.isCallEnded) return false;
+  if (snapshot.isJoiningOrInCall) return true;
+  // Ad-hoc bots without a future join_at may appear as "ready" while launching.
+  if (snapshot.isAwaitingFutureJoin) return false;
+  // Local "scheduled" rows for near-term ad-hoc joins still count as active.
+  return !snapshot.joinAt || snapshot.joinAt.getTime() <= Date.now() + 60_000;
+}
+
+/** Broad "not finished" check — includes bots waiting for a future calendar join_at. */
 export async function isRecordingBotActive(botId: string): Promise<boolean> {
   return isBotStillActive(botId);
 }

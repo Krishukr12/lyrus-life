@@ -5,7 +5,7 @@ import { PLAN_INCLUDED_ALLOWANCES } from "@/lib/plan-allowances";
 import type { PlatformPricing } from "@/lib/billing-types";
 import { cn } from "@/lib/utils";
 
-type PlanKey = "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
+type PlanKey = "STARTER" | "PROFESSIONAL" | "ENTERPRISE" | "FOREVER_FREE";
 
 const PLANS: {
   key: PlanKey;
@@ -43,6 +43,15 @@ const PLANS: {
     ring: "ring-blue-200",
     selectedRing: "ring-blue-500",
   },
+  {
+    key: "FOREVER_FREE",
+    label: "Forever Free",
+    description: "Internal testing orgs — no limits and no billing. Remove later.",
+    features: ["Unlimited users", "Unlimited meetings", "No invoices or trial expiry"],
+    accent: "from-emerald-500 to-teal-600",
+    ring: "ring-emerald-200",
+    selectedRing: "ring-emerald-500",
+  },
 ];
 
 type OnboardingPlanCardsProps = {
@@ -52,15 +61,20 @@ type OnboardingPlanCardsProps = {
 };
 
 function planPrice(plan: PlanKey, pricing?: PlatformPricing) {
+  if (plan === "FOREVER_FREE") return formatInr(0);
   if (!pricing) return "—";
   if (plan === "STARTER") return formatInr(pricing.starterMonthlyInr);
   if (plan === "PROFESSIONAL") return formatInr(pricing.growthMonthlyInr);
   return formatInr(pricing.enterpriseBaseMonthlyInr);
 }
 
+function formatAllowance(value: number | null) {
+  return value == null ? "Unlimited" : String(value);
+}
+
 export function OnboardingPlanCards({ value, onChange, pricing }: OnboardingPlanCardsProps) {
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {PLANS.map((plan) => {
         const selected = value === plan.key;
         const allowances = PLAN_INCLUDED_ALLOWANCES[plan.key];
@@ -102,11 +116,15 @@ export function OnboardingPlanCards({ value, onChange, pricing }: OnboardingPlan
               <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2.5 space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500">Included users</span>
-                  <span className="font-semibold text-slate-800">{allowances.users}</span>
+                  <span className="font-semibold text-slate-800">
+                    {formatAllowance(allowances.users)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500">Locations</span>
-                  <span className="font-semibold text-slate-800">{allowances.locations}</span>
+                  <span className="font-semibold text-slate-800">
+                    {formatAllowance(allowances.locations)}
+                  </span>
                 </div>
               </div>
 

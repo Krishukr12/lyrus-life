@@ -103,6 +103,8 @@ enum SubscriptionPlan {
   STARTER
   PROFESSIONAL
   ENTERPRISE
+  /// Temporary internal plan for test tenants — no limits, no billing. Remove later.
+  FOREVER_FREE
 }
 
 enum BillingStatus {

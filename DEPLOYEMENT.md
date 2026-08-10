@@ -50,9 +50,11 @@ ssh -i /path/to/your-key.pem ubuntu@3.7.108.255
 
 ## 6. Login to Amazon ECR (EC2)
 
+Use `sudo docker login` so credentials are stored for root. `sudo docker pull` / `sudo docker run` ignore the ubuntu user's `~/.docker/config.json`.
+
 ```bash
 aws ecr get-login-password --region ap-south-1 | \
-docker login \
+sudo docker login \
 --username AWS \
 --password-stdin 950884909240.dkr.ecr.ap-south-1.amazonaws.com
 ```

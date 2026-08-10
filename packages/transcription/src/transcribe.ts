@@ -2,7 +2,11 @@ import { createReadStream, statSync } from "node:fs";
 import OpenAI from "openai";
 import type { TranscribeAudioInput } from "./transcribe-input.js";
 import type { TranscriptionOutput, TranscriptionSource } from "./types.js";
-import { awsTranscribeAvailable, transcribeWithAws } from "./aws-transcribe.js";
+import {
+  awsTranscribeAvailable,
+  labeledTranscriptFromSegments,
+  transcribeWithAws,
+} from "./aws-transcribe.js";
 
 export type { TranscribeAudioInput } from "./transcribe-input.js";
 export type { TranscriptionOutput, TranscriptionSource } from "./types.js";
@@ -44,7 +48,7 @@ function mockTranscription(input: TranscribeAudioInput): TranscriptionOutput {
   });
 
   return {
-    fullText: segments.map((s) => `${s.speaker}: ${s.text}`).join("\n"),
+    fullText: labeledTranscriptFromSegments(segments),
     language: "en",
     segments,
     source: "mock",
@@ -62,11 +66,11 @@ async function transcribeWithOpenAI(input: TranscribeAudioInput): Promise<Transc
     timestamp_granularities: ["segment"],
   });
 
+  // Whisper has no true diarization — keep neutral speakers (do not round-robin stakeholders).
   const segments =
     "segments" in result && Array.isArray(result.segments)
       ? result.segments.map((seg, index) => ({
-          speaker:
-            input.participants[index % Math.max(input.participants.length, 1)] ?? "Speaker",
+          speaker: "Speaker",
           startTime: seg.start ?? index * 10,
           endTime: seg.end ?? (seg.start ?? index * 10) + 10,
           text: seg.text?.trim() ?? "",
@@ -74,7 +78,7 @@ async function transcribeWithOpenAI(input: TranscribeAudioInput): Promise<Transc
         }))
       : [
           {
-            speaker: input.participants[0] ?? "Speaker",
+            speaker: "Speaker",
             startTime: 0,
             endTime: 60,
             text: result.text,
@@ -82,19 +86,29 @@ async function transcribeWithOpenAI(input: TranscribeAudioInput): Promise<Transc
           },
         ];
 
+  const clean = segments.filter((s) => s.text.length > 0);
   return {
-    fullText: result.text,
+    fullText: labeledTranscriptFromSegments(clean),
     language: "en",
-    segments: segments.filter((s) => s.text.length > 0),
+    segments: clean,
     source: "openai_whisper",
   };
 }
 
+/**
+ * Prefer AWS when configured — it provides speaker diarization, which is required
+ * for reliable task assignee extraction. Whisper is fallback (ASR only).
+ */
 function resolveProvider(): "openai" | "aws" | "mock" {
   const pref = (process.env.TRANSCRIPTION_PROVIDER ?? "auto").toLowerCase();
   if (pref === "openai" && process.env.OPENAI_API_KEY) return "openai";
   if (pref === "aws" && awsTranscribeAvailable()) return "aws";
   if (pref === "mock") return "mock";
+  if (pref === "auto" || pref === "") {
+    if (awsTranscribeAvailable()) return "aws";
+    if (process.env.OPENAI_API_KEY) return "openai";
+    return "mock";
+  }
   if (process.env.OPENAI_API_KEY) return "openai";
   if (awsTranscribeAvailable()) return "aws";
   return "mock";
@@ -104,10 +118,6 @@ export async function transcribeAudio(input: TranscribeAudioInput): Promise<Tran
   const fileSize = getFileSize(input.filePath);
   const hasRealRecording = fileSize > 8_000;
   const provider = resolveProvider();
-
-  if (provider === "openai") {
-    return transcribeWithOpenAI(input);
-  }
 
   if (provider === "aws") {
     try {
@@ -130,6 +140,10 @@ export async function transcribeAudio(input: TranscribeAudioInput): Promise<Tran
       }
       throw awsErr;
     }
+  }
+
+  if (provider === "openai") {
+    return transcribeWithOpenAI(input);
   }
 
   if (hasRealRecording) {

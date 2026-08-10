@@ -7,6 +7,8 @@ const styles: Record<string, string> = {
   Growth: "bg-violet-50 text-violet-700 ring-violet-200",
   ENTERPRISE: "bg-blue-50 text-blue-700 ring-blue-200",
   Enterprise: "bg-blue-50 text-blue-700 ring-blue-200",
+  FOREVER_FREE: "bg-emerald-50 text-emerald-800 ring-emerald-200",
+  "Forever Free": "bg-emerald-50 text-emerald-800 ring-emerald-200",
   Platform: "bg-amber-50 text-amber-800 ring-amber-200",
 };
 
@@ -39,7 +41,9 @@ export function PlanBadge({ plan }: { plan: string }) {
         ? "Starter"
         : plan === "ENTERPRISE" || plan === "Enterprise"
           ? "Enterprise"
-          : plan;
+          : plan === "FOREVER_FREE" || plan === "Forever Free"
+            ? "Forever Free"
+            : plan;
 
   return (
     <span

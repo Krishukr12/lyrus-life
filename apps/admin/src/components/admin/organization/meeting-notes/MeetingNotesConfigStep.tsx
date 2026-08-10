@@ -80,14 +80,14 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
         createSectionDraft(
           {
             title: "Executive Summary",
-            aiInstructions: "Generate a concise executive summary.",
+            aiInstructions: "Extract a concise executive summary only from what was said. Leave empty if unsupported.",
           },
           0,
         ),
         createSectionDraft(
           {
             title: "Action Items",
-            aiInstructions: "Extract tasks, owners, and deadlines.",
+            aiInstructions: "Extract only stated tasks, owners, and deadlines. Leave empty if none.",
           },
           1,
         ),
@@ -111,7 +111,7 @@ export function MeetingNotesConfigStep({ templates, onChange }: MeetingNotesConf
         createSectionDraft(
           {
             title: "Meeting Overview",
-            aiInstructions: "Summarize the meeting purpose and context.",
+            aiInstructions: "Extract meeting purpose and context only if stated. Leave empty if none.",
           },
           0,
         ),
